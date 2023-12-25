@@ -108,7 +108,7 @@ export function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) =
 /** 删除 ESLint 配置文件 */
 export function removeESLint() {
     try {
-        const files = getFiles(cwd(), (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile())
+        const files = getFiles(cwd(), (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile(), 1)
         files.forEach(file => {
             try {
                 unlinkSync(file)
