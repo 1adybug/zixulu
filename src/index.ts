@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
 import { Argument, Command } from "commander"
-import { consola } from "consola"
-import { addPrettierConfig, readPackageJson, removeComment, tailwind, vite } from "./utils"
+import { addPrettierConfig, readPackageJson, removeComment, removeESLint, tailwind, vite } from "./utils"
 
 const program = new Command()
 
 const pkg = readPackageJson("./")
 
 program.name("格数科技").version(pkg.version)
+
+program.command("eslint").description("删除 ESLint 配置文件").action(removeESLint)
 
 program
     .command("prettier")
