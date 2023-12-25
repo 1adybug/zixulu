@@ -1,6 +1,6 @@
 import consola from "consola"
-import { readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "fs"
-import { join } from "path"
+import { Stats, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "fs"
+import { ParsedPath, join, parse } from "path"
 import { Config } from "prettier"
 import { cwd, exit } from "process"
 
@@ -88,27 +88,37 @@ export function writePackageJson(packageJson: Record<string, any>, path?: string
     }
 }
 
-export function getFilesOrFolders(path: string, isFile: boolean, regExp?: string | RegExp) {
-    function satisfy(name: string): boolean {
-        if (typeof regExp === "string" && name !== regExp) return false
-        if (regExp instanceof RegExp && !regExp.test(name)) return false
-        const stat = statSync(join(path, name))
-        return (isFile && stat.isFile()) || (!isFile && stat.isDirectory())
+export function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) => boolean, depth?: number) {
+    const result: string[] = []
+    const files = readdirSync(path)
+    for (const file of files) {
+        const filePath = resolve(path, file)
+        const parsedPath = parse(filePath)
+        const stat = statSync(filePath)
+        if (judge(parsedPath, stat)) {
+            result.push(filePath)
+        }
+        if (stat.isDirectory() && (depth === undefined || depth > 0)) {
+            result.push(...getFiles(filePath, judge, depth === undefined ? undefined : depth - 1))
+        }
     }
-    const dir = readdirSync(path)
-    return dir.filter(item => satisfy)
+    return result
 }
 
-/** 去除项目中的 eslint */
+/** 删除 ESLint 配置文件 */
 export function removeESLint() {
     try {
-        const dir = readdirSync(cwd())
-    } catch (error) {}
-    try {
-        unlinkSync(resolve(".eslintrc.cjs"))
-        consola.success("删除 .eslintrc.cjs 文件成功")
+        const files = getFiles(cwd(), (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile())
+        files.forEach(file => {
+            try {
+                unlinkSync(file)
+            } catch (error) {
+                consola.fail(`删除 ${file} 失败`)
+            }
+        })
+        consola.success("删除 ESLint 配置文件成功")
     } catch (error) {
-        consola.fail("删除 .eslintrc.cjs 文件失败")
+        consola.fail("获取 ESLint 配置文件列表失败")
     }
     try {
         const pkg = readPackageJson()
