@@ -4,5 +4,6 @@ export default defineConfig({
     cjs: { output: "dist" },
     prebundle: {
         deps: {}
-    }
+    },
+    sourcemap: true
 })
