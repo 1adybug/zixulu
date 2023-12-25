@@ -2,10 +2,11 @@
 
 import { Argument, Command } from "commander"
 import { addPrettierConfig, readPackageJson, removeComment, removeESLint, tailwind, vite } from "./utils"
+import { resolve } from "path"
 
 const program = new Command()
 
-const pkg = readPackageJson("./")
+const pkg = readPackageJson(resolve(__dirname, "../"))
 
 program.name("格数科技").version(pkg.version)
 

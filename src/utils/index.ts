@@ -1,15 +1,15 @@
 import consola from "consola"
 import { Stats, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "fs"
-import { ParsedPath, join, parse } from "path"
+import { ParsedPath, isAbsolute, join, parse } from "path"
 import { Config } from "prettier"
 import { cwd, exit } from "process"
 
-export function resolve(...paths: string[]) {
-    return join(cwd(), ...paths)
+function getAbsolutePath(path: string) {
+    return isAbsolute(path) ? path : join(cwd(), path)
 }
 
 export function getPackageJsonPath(path?: string) {
-    return resolve(path ?? cwd(), "package.json")
+    return join(getAbsolutePath(path ?? cwd()), "package.json")
 }
 
 /** 获取包的最新版本 */
@@ -34,6 +34,7 @@ export function readPackageJson(path?: string): Record<string, any> {
         consola.success("读取 package.json 成功")
         return result
     } catch (error) {
+        consola.error(error)
         consola.fail("读取 package.json 失败")
         exit()
     }
@@ -88,27 +89,41 @@ export function writePackageJson(packageJson: Record<string, any>, path?: string
     }
 }
 
-export function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) => boolean, depth?: number) {
+export interface GetFilesOptions {
+    depth?: number
+    exclude?: (path: ParsedPath, stats: Stats) => boolean
+}
+
+export function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) => boolean, depthOrOptions?: number | GetFilesOptions) {
     const result: string[] = []
-    const files = readdirSync(path)
-    for (const file of files) {
-        const filePath = resolve(path, file)
-        const parsedPath = parse(filePath)
-        const stat = statSync(filePath)
-        if (judge(parsedPath, stat)) {
-            result.push(filePath)
-        }
-        if (stat.isDirectory() && (depth === undefined || depth > 0)) {
-            result.push(...getFiles(filePath, judge, depth === undefined ? undefined : depth - 1))
+    function _getFiles(path: string, judge: (path: ParsedPath, stats: Stats) => boolean, depthOrOptions?: number | GetFilesOptions) {
+        const options: GetFilesOptions = typeof depthOrOptions === "number" ? { depth: depthOrOptions } : depthOrOptions ?? {}
+        const { depth, exclude } = options
+        path = getAbsolutePath(path)
+        const files = readdirSync(path)
+        for (const file of files) {
+            const filePath = join(path, file)
+            const parsedPath = parse(filePath)
+            const stat = statSync(filePath)
+            if (judge(parsedPath, stat)) {
+                result.push(filePath)
+            }
+            if (stat.isDirectory() && (!exclude || exclude(parsedPath, stat)) && (depth === undefined || depth > 0)) {
+                getFiles(filePath, judge, depth === undefined ? undefined : depth - 1)
+            }
         }
     }
+    _getFiles(path, judge, depthOrOptions)
     return result
 }
 
 /** 删除 ESLint 配置文件 */
 export function removeESLint() {
     try {
-        const files = getFiles(cwd(), (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile(), 1)
+        const files = getFiles(cwd(), (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile(), {
+            depth: 1,
+            exclude: path => path.base !== "node_modules"
+        })
         files.forEach(file => {
             try {
                 unlinkSync(file)
@@ -118,6 +133,7 @@ export function removeESLint() {
         })
         consola.success("删除 ESLint 配置文件成功")
     } catch (error) {
+        consola.error(error)
         consola.fail("获取 ESLint 配置文件列表失败")
     }
     try {
@@ -129,17 +145,17 @@ export function removeESLint() {
             if (key.includes("eslint")) delete pkg.devDependencies[key]
         })
         writePackageJson(pkg)
-        consola.success("删除 eslintrc 依赖成功")
+        consola.success("删除 ESLint 依赖成功")
     } catch (error) {
-        consola.fail("删除 eslintrc 依赖失败")
+        consola.fail("删除 ESLint 依赖失败")
     }
 }
 
 export function vite() {
     try {
-        const text = readFileSync(resolve("tsconfig.json"), "utf-8")
+        const text = readFileSync(getAbsolutePath("tsconfig.json"), "utf-8")
         const newText = text.replace(/^ +?"noUnusedLocals": true,$\n/m, "").replace(/^ +?"noUnusedParameters": true,$\n/m, "")
-        writeFileSync(resolve("tsconfig.json"), newText, "utf-8")
+        writeFileSync(getAbsolutePath("tsconfig.json"), newText, "utf-8")
         consola.success("修改 tsconfig.json 配置成功")
     } catch (error) {
         consola.fail("修改 tsconfig.json 配置失败")
@@ -150,7 +166,7 @@ export function vite() {
 export function addTailwindConfig() {
     try {
         writeFileSync(
-            resolve("tailwind.config.js"),
+            getAbsolutePath("tailwind.config.js"),
             `/** @type {import('tailwindcss').Config} */
 export default {
     content: [
@@ -174,7 +190,7 @@ export default {
 export function addPostCSSConfig() {
     try {
         writeFileSync(
-            resolve("postcss.config.js"),
+            getAbsolutePath("postcss.config.js"),
             `export default {
         plugins: {
             tailwindcss: {},
@@ -192,9 +208,9 @@ export function addPostCSSConfig() {
 /** 添加 tailwind 至 index.css 成功 */
 export function addTailwindToCSS() {
     try {
-        const css = readFileSync(resolve("./src/index.css"), "utf-8")
+        const css = readFileSync(getAbsolutePath("./src/index.css"), "utf-8")
         writeFileSync(
-            resolve("./src/index.css"),
+            getAbsolutePath("./src/index.css"),
             `@tailwind base;    
 @tailwind components;
 @tailwind utilities;
@@ -223,7 +239,7 @@ export const prettierConfigTextWithTailwind = `module.exports = ${JSON.stringify
 /** 添加 prettier 配置成功 */
 export function addPrettierConfig(tailwind?: boolean) {
     try {
-        writeFileSync(resolve("./prettier.config.cjs"), tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
+        writeFileSync(getAbsolutePath("./prettier.config.cjs"), tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
         consola.success("添加 prettier 配置成功")
     } catch (error) {
         consola.fail("添加 prettier 配置失败")
@@ -247,9 +263,9 @@ export async function tailwind() {
 
 export function removeComment(path: string) {
     try {
-        const text = readFileSync(resolve(path), "utf-8")
+        const text = readFileSync(getAbsolutePath(path), "utf-8")
         const newText = text.replace(/^ *?\/\/.*?$/gm, "")
-        writeFileSync(resolve(path), newText, "utf-8")
+        writeFileSync(getAbsolutePath(path), newText, "utf-8")
         consola.success("删除注释成功")
     } catch (error) {
         consola.fail("删除注释失败")
