@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import { Argument, Command } from "commander"
-import { addPrettierConfig, readPackageJson, removeComment, removeESLint, tailwind, vite } from "./utils"
+import { Module, ModuleResolution, Target, addPrettierConfig, readPackageJson, removeComment, removeESLint, setTsConfig, tailwind, vite } from "./utils"
 import { resolve } from "path"
+import consola from "consola"
 
 const program = new Command()
 
@@ -26,5 +27,42 @@ program.command("vite").description("删除 vite 模板中的某些配置").acti
 program.command("tailwind").description("添加 tailwind 配置文件").action(tailwind)
 
 program.command("remove-comment").description("删除所有注释").addArgument(new Argument("path")).action(removeComment)
+
+program
+    .command("ts-target")
+    .description("设置 tsconfig 中 target 字段")
+    .action(async () => {
+        const target = await consola.prompt("Please choose a target", {
+            type: "select",
+            options: Object.values(Target),
+            initial: Target.ESNext
+        })
+        setTsConfig("target", target)
+    })
+
+program
+    .command("ts-module")
+    .description("设置 tsconfig 中 module 字段")
+    .action(async () => {
+        const module = await consola.prompt("Please choose a module", {
+            type: "select",
+            options: Object.values(Module),
+            initial: Module.ESNext
+        })
+        setTsConfig("module", module)
+    })
+
+program
+    .command("ts-module-resolution")
+    .alias("ts-mr")
+    .description("设置 tsconfig 中 module 字段")
+    .action(async () => {
+        const moduleResolution = await consola.prompt("Please choose a module resolution", {
+            type: "select",
+            options: Object.values(ModuleResolution),
+            initial: ModuleResolution.NodeNext
+        })
+        setTsConfig("moduleResolution", moduleResolution)
+    })
 
 program.parse()

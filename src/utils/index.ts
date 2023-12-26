@@ -3,6 +3,7 @@ import { Stats, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync }
 import { ParsedPath, isAbsolute, join, parse } from "path"
 import { Config } from "prettier"
 import { cwd, exit } from "process"
+import * as JSON5 from "json5"
 
 function getAbsolutePath(path: string) {
     return isAbsolute(path) ? path : join(cwd(), path)
@@ -10,6 +11,10 @@ function getAbsolutePath(path: string) {
 
 export function getPackageJsonPath(path?: string) {
     return join(getAbsolutePath(path ?? cwd()), "package.json")
+}
+
+export function getTsConfigJsonPath(path?: string) {
+    return join(getAbsolutePath(path ?? cwd()), "tsconfig.json")
 }
 
 /** 获取包的最新版本 */
@@ -36,6 +41,19 @@ export function readPackageJson(path?: string): Record<string, any> {
     } catch (error) {
         consola.error(error)
         consola.fail("读取 package.json 失败")
+        exit()
+    }
+}
+
+/** 读取 tsconfig.json */
+export function readTsconfigJSON(path?: string): Record<string, any> {
+    try {
+        const result = JSON5.parse(readFileSync(getTsConfigJsonPath(path), "utf-8"))
+        consola.success("读取 tsconfig.json 成功")
+        return result
+    } catch (error) {
+        consola.error(error)
+        consola.fail("读取 tsconfig.json 失败")
         exit()
     }
 }
@@ -152,14 +170,11 @@ export function removeESLint() {
 }
 
 export function vite() {
-    try {
-        const text = readFileSync(getAbsolutePath("tsconfig.json"), "utf-8")
-        const newText = text.replace(/^ +?"noUnusedLocals": true,$\n/m, "").replace(/^ +?"noUnusedParameters": true,$\n/m, "")
-        writeFileSync(getAbsolutePath("tsconfig.json"), newText, "utf-8")
-        consola.success("修改 tsconfig.json 配置成功")
-    } catch (error) {
-        consola.fail("修改 tsconfig.json 配置失败")
-    }
+    setTsConfig("noUnusedLocals")
+    setTsConfig("noUnusedParameters")
+    const pkg = readPackageJson()
+    pkg.scripts.dev = "vite --host"
+    writePackageJson(pkg)
 }
 
 /** 添加 tailwind.config.js 配置成功 */
@@ -270,4 +285,79 @@ export function removeComment(path: string) {
     } catch (error) {
         consola.fail("删除注释失败")
     }
+}
+
+export enum Target {
+    ES2015 = "ES2015",
+    ES2016 = "ES2016",
+    ES2017 = "ES2017",
+    ES2018 = "ES2018",
+    ES2019 = "ES2019",
+    ES2020 = "ES2020",
+    ES2021 = "ES2021",
+    ES2022 = "ES2022",
+    ES2023 = "ES2023",
+    ES3 = "ES3",
+    ES5 = "ES5",
+    ES6 = "ES6",
+    ESNext = "ESNext"
+}
+
+export enum Module {
+    AMD = "AMD",
+    CommonJS = "CommonJS",
+    ES2015 = "ES2015",
+    ES2020 = "ES2020",
+    ES2022 = "ES2022",
+    ES6 = "ES6",
+    ESNext = "ESNext",
+    Node16 = "Node16",
+    NodeNext = "NodeNext",
+    None = "None",
+    System = "System",
+    UMD = "UMD"
+}
+
+export enum ModuleResolution {
+    Bundler = "Bundler",
+    Classic = "Classic",
+    Node = "Node",
+    Node10 = "Node10",
+    Node16 = "Node16",
+    NodeNext = "NodeNext"
+}
+
+export function setTsConfig(key: string, value?: string | undefined) {
+    const tsconfig = readTsconfigJSON()
+    if (value === undefined) {
+        delete tsconfig.compilerOptions[key]
+    } else {
+        if (key === "target") {
+            const t = Object.values(Target).find(t => t.toLowerCase() === value.trim().toLowerCase())
+            if (!t) {
+                consola.fail("无效的 target 选项")
+                exit()
+            }
+            tsconfig.compilerOptions.target = t
+        } else if (key === "module") {
+            const m = Object.values(Module).find(m => m.toLowerCase() === value.trim().toLowerCase())
+            if (!m) {
+                consola.fail("无效的 module 选项")
+                exit()
+            }
+            tsconfig.compilerOptions.module = m
+        } else if (key === "moduleResolution") {
+            const mr = Object.values(ModuleResolution).find(mr => mr.toLowerCase() === value.trim().toLowerCase())
+            if (!mr) {
+                consola.fail("无效的 moduleResolution 选项")
+                exit()
+            }
+            tsconfig.compilerOptions.moduleResolution = mr
+        } else {
+            consola.fail(`暂不支持 ${key} 项`)
+            exit()
+        }
+    }
+    writeFileSync(getTsConfigJsonPath(), JSON.stringify(tsconfig, undefined, 4), "utf-8")
+    consola.success(`修改 ${key} 成功`)
 }
