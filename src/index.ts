@@ -4,6 +4,7 @@ import { Argument, Command } from "commander"
 import consola from "consola"
 import { resolve } from "path"
 import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, readPackageJson, removeComment, removeESLint, setTsConfig, tailwind, vite, writePackageJson } from "./utils"
+import { exec } from "child_process"
 
 const program = new Command()
 
@@ -118,6 +119,21 @@ program
             await (latest ? addLatestDependencies : addDependencies)(packageJson, pkg)
         }
         writePackageJson(packageJson)
+        const install = await consola.prompt("是否立即安装", {
+            type: "select",
+            options: ["yarn", "pnpm", "npm", "no"],
+            initial: "yarn"
+        })
+        if (install !== "no") {
+            consola.start("正在安装")
+            exec(`${install} install`, err => {
+                if (err) {
+                    consola.error(err)
+                } else {
+                    consola.success("安装成功")
+                }
+            })
+        }
     })
 
 program.parse()
