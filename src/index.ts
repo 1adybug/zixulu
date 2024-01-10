@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import { Argument, Command } from "commander"
-import { Module, ModuleResolution, Target, addDependencies, addPrettierConfig, getPackageLatestVersion, readPackageJson, removeComment, removeESLint, setTsConfig, tailwind, vite, writePackageJson } from "./utils"
-import { resolve } from "path"
 import consola from "consola"
+import { resolve } from "path"
+import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, readPackageJson, removeComment, removeESLint, setTsConfig, tailwind, vite, writePackageJson } from "./utils"
 
 const program = new Command()
 
@@ -109,9 +109,13 @@ program
             type: "multiselect",
             options: packages.map(pkg => ({ label: pkg.name, value: pkg.name, hint: pkg.description }))
         })) as unknown as string[]
+        const latest = await consola.prompt("是否安装最新版本", {
+            type: "confirm",
+            initial: true
+        })
         const packageJson = readPackageJson()
         for (const pkg of packageNames) {
-            await addDependencies(packageJson, pkg)
+            await (latest ? addLatestDependencies : addDependencies)(packageJson, pkg)
         }
         writePackageJson(packageJson)
     })
