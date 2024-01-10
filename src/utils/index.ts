@@ -77,11 +77,49 @@ export async function addDependencies(packageJson: Record<string, any>, packageN
     }
 }
 
+/** 写入最新依赖 */
+export async function addLatestDependencies(packageJson: Record<string, any>, packageName: string) {
+    try {
+        packageJson.dependencies ??= {}
+        packageJson.dependencies[packageName] = `^${await getPackageLatestVersion(packageName)}`
+        const keys = Object.keys(packageJson.dependencies)
+        keys.sort()
+        const sortedDependencies: Record<string, string> = {}
+        for (const key of keys) {
+            sortedDependencies[key] = packageJson.dependencies[key]
+        }
+        packageJson.dependencies = sortedDependencies
+        consola.success(`添加 ${packageName} 至依赖成功`)
+    } catch (error) {
+        consola.fail(`添加 ${packageName} 至依赖失败`)
+        exit()
+    }
+}
+
 /** 写入开发依赖 */
 export async function addDevDependencies(packageJson: Record<string, any>, packageName: string, version?: string) {
     try {
         packageJson.devDependencies ??= {}
         packageJson.devDependencies[packageName] ??= version?.trim() || `^${await getPackageLatestVersion(packageName)}`
+        const keys = Object.keys(packageJson.devDependencies)
+        keys.sort()
+        const sortedDevDependencies: Record<string, string> = {}
+        for (const key of keys) {
+            sortedDevDependencies[key] = packageJson.devDependencies[key]
+        }
+        packageJson.devDependencies = sortedDevDependencies
+        consola.success(`添加 ${packageName} 至开发依赖成功`)
+    } catch (error) {
+        consola.fail(`添加 ${packageName} 至开发依赖失败`)
+        exit()
+    }
+}
+
+/** 写入最新开发依赖 */
+export async function addLatestDevDependencies(packageJson: Record<string, any>, packageName: string) {
+    try {
+        packageJson.devDependencies ??= {}
+        packageJson.devDependencies[packageName] = `^${await getPackageLatestVersion(packageName)}`
         const keys = Object.keys(packageJson.devDependencies)
         keys.sort()
         const sortedDevDependencies: Record<string, string> = {}
