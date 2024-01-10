@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Argument, Command } from "commander"
-import { Module, ModuleResolution, Target, addPrettierConfig, readPackageJson, removeComment, removeESLint, setTsConfig, tailwind, vite } from "./utils"
+import { Module, ModuleResolution, Target, addDependencies, addPrettierConfig, getPackageLatestVersion, readPackageJson, removeComment, removeESLint, setTsConfig, tailwind, vite, writePackageJson } from "./utils"
 import { resolve } from "path"
 import consola from "consola"
 
@@ -63,6 +63,57 @@ program
             initial: ModuleResolution.NodeNext
         })
         setTsConfig("moduleResolution", moduleResolution)
+    })
+
+interface NpmPackage {
+    name: string
+    description: string
+}
+
+const packages: NpmPackage[] = [
+    {
+        name: "deepsea-tools",
+        description: "格数工具库"
+    },
+    {
+        name: "deepsea-components",
+        description: "格数组件库"
+    },
+    {
+        name: "react-soda",
+        description: "简单的状态管理库"
+    },
+    {
+        name: "type-request",
+        description: "基于 TypeScript 和 fetch 的类型请求库"
+    },
+    {
+        name: "use-abort-signal",
+        description: "在 useEffect 中安全地取消 fetch 请求"
+    },
+    {
+        name: "react-viewer-soda",
+        description: "基于 viewerjs 的图片预览组件"
+    },
+    {
+        name: "viewerjs-soda",
+        description: "基于 viewerjs 的图片预览库"
+    }
+]
+
+program
+    .command("npm")
+    .description("一键添加 npm 包")
+    .action(async () => {
+        const packageNames = (await consola.prompt("请选择需要安装的包", {
+            type: "multiselect",
+            options: packages.map(pkg => ({ label: pkg.name, value: pkg.name, hint: pkg.description }))
+        })) as unknown as string[]
+        const packageJson = readPackageJson()
+        for (const pkg of packageNames) {
+            await addDependencies(packageJson, pkg)
+        }
+        writePackageJson(packageJson)
     })
 
 program.parse()
