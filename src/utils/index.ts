@@ -399,3 +399,22 @@ export function setTsConfig(key: string, value?: string | undefined) {
     writeFileSync(getTsConfigJsonPath(), JSON.stringify(tsconfig, undefined, 4), "utf-8")
     consola.success(`修改 ${key} 成功`)
 }
+
+export function sortArrayOrObject(data: any) {
+    if (typeof data !== "object" || data === null) return data
+    if (Array.isArray(data)) {
+        const _data = [...data]
+        _data.sort()
+        return _data
+    }
+    if (Object.getPrototypeOf(data) === Object.prototype) {
+        const keys = Object.keys(data)
+        keys.sort()
+        const _data: Record<string, any> = {}
+        for (const key of keys) {
+            _data[key] = data[key]
+        }
+        return _data
+    }
+    return data
+}

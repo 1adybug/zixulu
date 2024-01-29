@@ -3,8 +3,9 @@
 import { Argument, Command } from "commander"
 import consola from "consola"
 import { resolve } from "path"
-import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, readPackageJson, removeComment, removeESLint, setTsConfig, tailwind, vite, writePackageJson } from "./utils"
+import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, tailwind, vite, writePackageJson } from "./utils"
 import { exec } from "child_process"
+import { readFileSync, writeFileSync } from "fs"
 
 const program = new Command()
 
@@ -134,6 +135,69 @@ program
                 }
             })
         }
+    })
+
+program
+    .command("father")
+    .description("修改 father 项目配置")
+    .action(async () => {
+        let packageJson = readPackageJson()
+        packageJson.publishConfig ??= {}
+        packageJson.publishConfig.access = "public"
+        packageJson.publishConfig.registry = "https://registry.npmjs.org/"
+        packageJson.publishConfig = sortArrayOrObject(packageJson.publishConfig)
+        packageJson.files ??= []
+        if (!packageJson.files.includes("src")) packageJson.files.push("src")
+        packageJson.files = sortArrayOrObject(packageJson.files)
+        const dependencies = packageJson.dependencies
+        const devDependencies = packageJson.devDependencies
+        const peerDependencies = packageJson.peerDependencies
+        if (packageJson.repository?.url && !packageJson.repository.url.startsWith("git+")) packageJson.repository.url = `git+${packageJson.repository.url}.git`
+        packageJson.repository ??= {}
+        packageJson.repository.type ??= "git"
+        packageJson.repository.url ??= `git+https://github.com/1adybug/${packageJson.name}.git`
+        if (!packageJson.types) {
+            packageJson = Object.entries(packageJson).reduce((prev: Record<string, any>, [key, value]) => {
+                prev[key] = value
+                if (Object.hasOwn(packageJson, "module")) {
+                    if (key === "module") prev.types = value.replace(/\.js$/, ".d.ts")
+                } else if (Object.hasOwn(packageJson, "main")) {
+                    if (key === "main") prev.types = value.replace(/\.js$/, ".d.ts")
+                }
+                return prev
+            }, {})
+        }
+        delete packageJson.dependencies
+        delete packageJson.devDependencies
+        delete packageJson.peerDependencies
+        packageJson.dependencies = sortArrayOrObject(dependencies)
+        packageJson.devDependencies = sortArrayOrObject(devDependencies)
+        packageJson.peerDependencies = sortArrayOrObject(peerDependencies)
+        const fatherrc = JSON.parse(
+            readFileSync("./.fatherrc.ts", "utf-8")
+                .match(/export default defineConfig\((.+)\)/s)![1]!
+                .replace(/([^\n" ]+):/gm, '"$1":')
+        )
+        fatherrc.prebundle = undefined
+        fatherrc.targets ??= {}
+        fatherrc.targets.node ??= 18
+        fatherrc.targets.chrome ??= 90
+        delete fatherrc.sourcemap
+        fatherrc.sourcemap = true
+        const fatherrcCode = `import { defineConfig } from "father"
+
+export default defineConfig(${JSON.stringify(fatherrc, null, 4).replace(/^( +?)"(.+?)":/gm, "$1$2:")})
+`
+        const gitignore = readFileSync(".gitignore", "utf-8").split("\n").map(line => line.trim()).filter(Boolean)
+        if (!gitignore.some(line => /^\/dist$/.test(line)) ) gitignore.push("dist")
+        if (!gitignore.some(line => /^\/yarn\.lock$/.test(line)) ) gitignore.push("yarn.lock")
+        if (!gitignore.some(line => /^\/pnpm-lock\.yaml$/.test(line)) ) gitignore.push("pnpm-lock.yaml")
+        if (!gitignore.some(line => /^\/node_modules$/.test(line)) ) gitignore.push("node_modules")
+        if (!gitignore.some(line => /^\/package-lock\.json$/.test(line)) ) gitignore.push("package-lock.json")
+        if (!gitignore.some(line => /^\/yarn-error\.log$/.test(line)) ) gitignore.push("yarn-error.log")
+        writePackageJson(packageJson)
+        writeFileSync(".fatherrc.ts", fatherrcCode)
+        writeFileSync(".gitignore", gitignore.join("\n"))
     })
 
 program.parse()
