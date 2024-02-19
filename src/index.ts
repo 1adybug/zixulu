@@ -3,7 +3,7 @@
 import { Argument, Command } from "commander"
 import consola from "consola"
 import { resolve } from "path"
-import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, tailwind, vite, writePackageJson } from "./utils"
+import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getPackageUpgradeVersion, getVersionFromRequiredVersion, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, tailwind, vite, writePackageJson } from "./utils"
 import { exec } from "child_process"
 import { readFileSync, writeFileSync } from "fs"
 
@@ -199,6 +199,48 @@ export default defineConfig({
         writeFileSync(".fatherrc.ts", fatherrcCode)
         writeFileSync(".gitignore", gitignore.join("\n"))
         setTsConfig("target", Target.ESNext)
+    })
+
+program
+    .command("upgrade")
+    .description("升级所有依赖")
+    .action(async () => {
+        const level = (await consola.prompt("请选择升级的级别", {
+            type: "select",
+            options: ["major", "minor", "patch"]
+        })) as "major" | "minor" | "patch"
+        const packageJson = readPackageJson()
+        const upgrades: { package: string; oldVersion: string; newVersion: string }[] = []
+        if (packageJson.dependencies) {
+            const pkgs = Object.keys(packageJson.dependencies)
+            for (let i = 0; i < pkgs.length; i++) {
+                const pkg = pkgs[i]
+                const rv = packageJson.dependencies[pkg]
+                const s = rv.match(/^\D*/)![0]
+                const cv = getVersionFromRequiredVersion(rv)
+                const version = await getPackageUpgradeVersion(pkg, cv, level)
+                if (!version) continue
+                packageJson.dependencies[pkg] = `${s}${version}`
+                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version })
+            }
+        }
+        if (packageJson.devDependencies) {
+            const pkgs = Object.keys(packageJson.devDependencies)
+            for (let i = 0; i < pkgs.length; i++) {
+                const pkg = pkgs[i]
+                const rv = packageJson.devDependencies[pkg]
+                const s = rv.match(/^\D*/)![0]
+                const cv = getVersionFromRequiredVersion(rv)
+                const version = await getPackageUpgradeVersion(pkg, cv, level)
+                if (!version) continue
+                packageJson.devDependencies[pkg] = `${s}${version}`
+                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version })
+            }
+        }
+        upgrades.forEach(upgrade => {
+            consola.success(`${upgrade.package} ${upgrade.oldVersion} => ${upgrade.newVersion}`)
+        })
+        writePackageJson(packageJson)
     })
 
 program.parse()
