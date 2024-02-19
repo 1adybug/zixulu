@@ -198,6 +198,7 @@ export default defineConfig({
         writePackageJson(packageJson)
         writeFileSync(".fatherrc.ts", fatherrcCode)
         writeFileSync(".gitignore", gitignore.join("\n"))
+        setTsConfig("module", Module.ESNext)
     })
 
 program.parse()

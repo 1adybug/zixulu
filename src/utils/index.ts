@@ -46,7 +46,7 @@ export function readPackageJson(path?: string): Record<string, any> {
 }
 
 /** 读取 tsconfig.json */
-export function readTsconfigJSON(path?: string): Record<string, any> {
+export function readTsConfigJSON(path?: string): Record<string, any> {
     try {
         const result = JSON5.parse(readFileSync(getTsConfigJsonPath(path), "utf-8"))
         consola.success("读取 tsconfig.json 成功")
@@ -366,7 +366,7 @@ export enum ModuleResolution {
 }
 
 export function setTsConfig(key: string, value?: string | undefined) {
-    const tsconfig = readTsconfigJSON()
+    const tsconfig = readTsConfigJSON()
     if (value === undefined) {
         delete tsconfig.compilerOptions[key]
     } else {
