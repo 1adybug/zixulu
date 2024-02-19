@@ -184,7 +184,6 @@ export default defineConfig({
     },
     sourcemap: true
 })
-
 `
         const gitignore = readFileSync(".gitignore", "utf-8")
             .split("\n")
