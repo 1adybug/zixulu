@@ -6,7 +6,7 @@ export default defineConfig({
     },
     targets: {
         node: 18,
-        chrome: 90
+        chrome: 100
     },
     sourcemap: true
 })
