@@ -1,9 +1,9 @@
 import consola from "consola"
 import { Stats, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "fs"
+import * as JSON5 from "json5"
 import { ParsedPath, isAbsolute, join, parse } from "path"
 import { Config } from "prettier"
 import { cwd, exit } from "process"
-import * as JSON5 from "json5"
 
 function getAbsolutePath(path: string) {
     return isAbsolute(path) ? path : join(cwd(), path)
@@ -20,11 +20,9 @@ export function getTsConfigJsonPath(path?: string) {
 /** 获取包的最新版本 */
 export async function getPackageLatestVersion(packageName: string) {
     try {
-        consola.start(`开始获取 ${packageName} 最新版本号...`)
         const url = `https://registry.npmjs.org/${packageName}/latest`
         const response = await fetch(url)
         const data = await response.json()
-        consola.success(`获取 ${packageName} 最新版本号成功`)
         return data.version as string
     } catch (error) {
         consola.fail(`获取 ${packageName} 最新版本号失败`)
@@ -32,11 +30,52 @@ export async function getPackageLatestVersion(packageName: string) {
     }
 }
 
+export async function getPackageVersions(packageName: string) {
+    try {
+        const url = `https://registry.npmjs.org/${packageName}`
+        const response = await fetch(url)
+        const data = await response.json()
+        return Object.keys(data.versions) as string[]
+    } catch (error) {
+        consola.fail(`获取 ${packageName} 版本号失败`)
+        exit()
+    }
+}
+
+export function getVersionFromRequiredVersion(requiredVersion: string) {
+    return requiredVersion.replace(/^\D*/, "")
+}
+
+export function getVersionNum(version: string) {
+    const nums = version.split(".").map(Number)
+    if (nums.some(num => !Number.isInteger(num) || num < 0) || nums.length < 3) {
+        consola.fail(`无效的版本号 ${version}`)
+        exit()
+    }
+    return nums
+}
+
+export async function getPackageUpgradeVersion(packageName: string, version: string, level: "major" | "minor" | "patch") {
+    if (level === "major") {
+        const latestVersion = await getPackageLatestVersion(packageName)
+        if (version === latestVersion) return undefined
+        return latestVersion
+    }
+    const [major, minor, patch] = getVersionNum(version)
+    const versions = await getPackageVersions(packageName)
+    return versions.find((item, index) => {
+        const [a, b, c] = getVersionNum(item)
+        if (index === 0) {
+            if ((a > major && level === "minor") || (a >= major && b > minor && level === "patch")) consola.log(`发现 ${packageName} 的新版本 ${item}`)
+        }
+        return (level === "minor" && a === major && b > minor) || (level === "patch" && a === major && b === minor && c > patch)
+    })
+}
+
 /** 读取 package.json */
 export function readPackageJson(path?: string): Record<string, any> {
     try {
         const result = JSON.parse(readFileSync(getPackageJsonPath(path), "utf-8"))
-        consola.success("读取 package.json 成功")
         return result
     } catch (error) {
         consola.error(error)
@@ -49,7 +88,6 @@ export function readPackageJson(path?: string): Record<string, any> {
 export function readTsConfigJSON(path?: string): Record<string, any> {
     try {
         const result = JSON5.parse(readFileSync(getTsConfigJsonPath(path), "utf-8"))
-        consola.success("读取 tsconfig.json 成功")
         return result
     } catch (error) {
         consola.error(error)
