@@ -1,3 +1,4 @@
+import { spawn } from "child_process"
 import consola from "consola"
 import { Stats, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "fs"
 import * as JSON5 from "json5"
@@ -455,4 +456,15 @@ export function sortArrayOrObject(data: any) {
         return _data
     }
     return data
+}
+
+export async function install() {
+    const install = await consola.prompt("是否立即安装", {
+        type: "select",
+        options: ["yarn", "pnpm", "npm", "no"],
+        initial: "yarn"
+    })
+    if (install === "no") return
+    const child = spawn(`${install} install`, { shell: true, stdio: "inherit" })
+    await new Promise(resolve => child.on("close", resolve))
 }

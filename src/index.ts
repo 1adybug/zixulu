@@ -3,8 +3,8 @@
 import { Argument, Command } from "commander"
 import consola from "consola"
 import { resolve } from "path"
-import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getPackageUpgradeVersion, getVersionFromRequiredVersion, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, tailwind, vite, writePackageJson } from "./utils"
-import { exec } from "child_process"
+import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getPackageUpgradeVersion, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, tailwind, vite, writePackageJson } from "./utils"
+import { exec, spawn } from "child_process"
 import { readFileSync, writeFileSync } from "fs"
 
 const program = new Command()
@@ -120,21 +120,7 @@ program
             await (latest ? addLatestDependencies : addDependencies)(packageJson, pkg)
         }
         writePackageJson(packageJson)
-        const install = await consola.prompt("是否立即安装", {
-            type: "select",
-            options: ["yarn", "pnpm", "npm", "no"],
-            initial: "yarn"
-        })
-        if (install !== "no") {
-            consola.start("正在安装")
-            exec(`${install} install`, err => {
-                if (err) {
-                    consola.error(err)
-                } else {
-                    consola.success("安装成功")
-                }
-            })
-        }
+        install()
     })
 
 program
@@ -241,6 +227,29 @@ program
             consola.success(`${upgrade.package} ${upgrade.oldVersion} => ${upgrade.newVersion}`)
         })
         writePackageJson(packageJson)
+        install()
+    })
+
+enum Registry {
+    npm = "https://registry.npmjs.org/",
+    taobao = "https://registry.npmmirror.com/",
+    tencent = "https://mirrors.cloud.tencent.com/npm/"
+}
+
+program
+    .command("registry")
+    .description("设置 npm registry")
+    .action(async () => {
+        const manager = await consola.prompt("请选择包管理器", {
+            type: "select",
+            options: ["npm", "yarn", "pnpm"]
+        })
+        const registry = await consola.prompt("请选择要更换的源", {
+            type: "select",
+            options: ["npm", "taobao", "tencent"]
+        })
+        const command = `${manager} config set registry ${Registry[registry as keyof typeof Registry]}`
+        spawn(command, { shell: true, stdio: "inherit" })
     })
 
 program.parse()
