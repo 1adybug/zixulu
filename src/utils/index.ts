@@ -288,12 +288,13 @@ export function addPostCSSConfig() {
         tailwindcss: {},
         autoprefixer: {}
     }
-}`,
+}
+`,
             "utf-8"
         )
-        consola.success("添加 postcss.config.js 配置成功")
+        consola.success("添加 postcss.config.cjs 配置成功")
     } catch (error) {
-        consola.fail("添加 postcss.config.js 配置失败")
+        consola.fail("添加 postcss.config.cjs 配置失败")
     }
 }
 
@@ -332,15 +333,35 @@ export const prettierConfig: Config = {
     trailingComma: "none"
 }
 
-export const prettierConfigText = `module.exports = ${JSON.stringify(prettierConfig, undefined, 4)}`
+export const prettierConfigText = `module.exports = {
+    semi: false,
+    tabWidth: 4,
+    arrowParens: "avoid",
+    printWidth: 800,
+    trailingComma: "none"
+}
+`
 
-export const prettierConfigTextWithTailwind = `module.exports = ${JSON.stringify({ plugins: ["prettier-plugin-tailwindcss"], ...prettierConfig }, undefined, 4)}`
+export const prettierConfigTextWithTailwind = `module.exports = {
+    plugins: ["prettier-plugin-tailwindcss"],
+    semi: false,
+    tabWidth: 4,
+    arrowParens: "avoid",
+    printWidth: 800,
+    trailingComma: "none"
+}
+`
 
 /** 添加 prettier 配置成功 */
-export function addPrettierConfig(tailwind?: boolean) {
+export async function addPrettierConfig(tailwind?: boolean) {
     try {
         writeFileSync(getAbsolutePath("./prettier.config.cjs"), tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
+        const pkg = readPackageJson()
+        await addDevDependencies(pkg, "prettier")
+        await addDevDependencies(pkg, "prettier-plugin-tailwindcss")
+        writePackageJson(pkg)
         consola.success("添加 prettier 配置成功")
+        install()
     } catch (error) {
         consola.fail("添加 prettier 配置失败")
     }
@@ -359,6 +380,7 @@ export async function tailwind() {
     addPostCSSConfig()
     addTailwindToCSS()
     addPrettierConfig(true)
+    install()
 }
 
 export function removeComment(path: string) {
