@@ -353,7 +353,7 @@ export const prettierConfigTextWithTailwind = `module.exports = {
 `
 
 /** 添加 prettier 配置成功 */
-export async function addPrettierConfig(tailwind?: boolean) {
+export async function addPrettierConfig(tailwind?: boolean, installNow = true) {
     try {
         writeFileSync(getAbsolutePath("./prettier.config.cjs"), tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
         const pkg = readPackageJson()
@@ -361,7 +361,7 @@ export async function addPrettierConfig(tailwind?: boolean) {
         await addDevDependencies(pkg, "prettier-plugin-tailwindcss")
         writePackageJson(pkg)
         consola.success("添加 prettier 配置成功")
-        install()
+        if (installNow) await install()
     } catch (error) {
         consola.fail("添加 prettier 配置失败")
     }
@@ -380,7 +380,7 @@ export async function tailwind() {
     addPostCSSConfig()
     addTailwindToCSS()
     addPrettierConfig(true)
-    install()
+    await install()
 }
 
 export function removeComment(path: string) {
