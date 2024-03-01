@@ -379,7 +379,7 @@ export async function tailwind() {
     addTailwindConfig()
     addPostCSSConfig()
     addTailwindToCSS()
-    addPrettierConfig(true)
+    addPrettierConfig(true, false)
     await install()
 }
 
