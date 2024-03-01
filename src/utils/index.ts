@@ -282,13 +282,13 @@ export default {
 export function addPostCSSConfig() {
     try {
         writeFileSync(
-            getAbsolutePath("postcss.config.js"),
-            `export default {
-        plugins: {
-            tailwindcss: {},
-            autoprefixer: {}
-        }
-    }`,
+            getAbsolutePath("postcss.config.cjs"),
+            `module.exports = {
+    plugins: {
+        tailwindcss: {},
+        autoprefixer: {}
+    }
+}`,
             "utf-8"
         )
         consola.success("添加 postcss.config.js 配置成功")
@@ -300,7 +300,15 @@ export function addPostCSSConfig() {
 /** 添加 tailwind 至 index.css 成功 */
 export function addTailwindToCSS() {
     try {
-        const css = readFileSync(getAbsolutePath("./src/index.css"), "utf-8")
+        const dir = getAbsolutePath("./src")
+        const files = getFiles(dir, (path, stats) => (path.base.toLowerCase() === "index.css" || path.base.toLowerCase() === "app.css") && stats.isFile(), { depth: 1 })
+        if (files.length === 0) throw new Error("未找到 index.css 或 app.css")
+        const file = files.find(file => file.endsWith("index.css") || file.endsWith("app.css"))!
+        const css = readFileSync(file, "utf-8")
+        if (css.includes("@tailwind")) {
+            consola.warn("index.css 或 app.css 已经包含 @tailwind")
+            return
+        }
         writeFileSync(
             getAbsolutePath("./src/index.css"),
             `@tailwind base;    
