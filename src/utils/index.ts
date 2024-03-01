@@ -304,14 +304,15 @@ export function addTailwindToCSS() {
         const dir = getAbsolutePath("./src")
         const files = getFiles(dir, (path, stats) => (path.base.toLowerCase() === "index.css" || path.base.toLowerCase() === "app.css") && stats.isFile(), { depth: 1 })
         if (files.length === 0) throw new Error("未找到 index.css 或 app.css")
-        const file = files.find(file => file.endsWith("index.css") || file.endsWith("app.css"))!
+        const file = files.find(item => item.toLowerCase().endsWith("index.css")) || files.find(item => item.toLowerCase().endsWith("app.css"))!
+        const { base } = parse(file)
         const css = readFileSync(file, "utf-8")
         if (css.includes("@tailwind")) {
-            consola.warn("index.css 或 app.css 已经包含 @tailwind")
+            consola.warn(`${base} 已经包含 tailwind`)
             return
         }
         writeFileSync(
-            getAbsolutePath("./src/index.css"),
+            file,
             `@tailwind base;    
 @tailwind components;
 @tailwind utilities;
@@ -319,9 +320,10 @@ export function addTailwindToCSS() {
 ${css}`,
             "utf-8"
         )
-        consola.success("添加 tailwind 至 index.css 成功")
+        consola.success(`添加 tailwind 成功`)
     } catch (error) {
-        consola.fail("添加 tailwind 至 index.css 失败")
+        console.log(error)
+        consola.fail(`添加 tailwind 失败`)
     }
 }
 
