@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
+import { spawn } from "child_process"
 import { Argument, Command } from "commander"
 import consola from "consola"
+import { readFileSync, writeFileSync } from "fs"
 import { resolve } from "path"
 import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getPackageUpgradeVersion, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, tailwind, vite, writePackageJson } from "./utils"
-import { exec, spawn } from "child_process"
-import { readFileSync, writeFileSync } from "fs"
 
 const program = new Command()
 
@@ -191,48 +191,55 @@ program
     .command("upgrade")
     .description("升级所有依赖")
     .action(async () => {
-        const level = (await consola.prompt("请选择升级的级别", {
-            type: "select",
-            options: ["major", "minor", "patch"]
-        })) as "major" | "minor" | "patch"
+        const { default: inquirer } = await import("inquirer")
+
         const packageJson = readPackageJson()
-        const upgrades: { package: string; oldVersion: string; newVersion: string; type: "dependencies" | "devDependencies"; strVersion: string }[] = []
-        if (packageJson.dependencies) {
-            const pkgs = Object.keys(packageJson.dependencies)
-            for (let i = 0; i < pkgs.length; i++) {
-                const pkg = pkgs[i]
-                const rv = packageJson.dependencies[pkg]
-                const s = rv.match(/^\D*/)![0]
-                const cv = getVersionFromRequiredVersion(rv)
-                const version = await getPackageUpgradeVersion(pkg, cv, level)
-                if (!version) continue
-                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, type: "dependencies", strVersion: `${s}${version}` })
-            }
-        }
-        if (packageJson.devDependencies) {
-            const pkgs = Object.keys(packageJson.devDependencies)
-            for (let i = 0; i < pkgs.length; i++) {
-                const pkg = pkgs[i]
-                const rv = packageJson.devDependencies[pkg]
-                const s = rv.match(/^\D*/)![0]
-                const cv = getVersionFromRequiredVersion(rv)
-                const version = await getPackageUpgradeVersion(pkg, cv, level)
-                if (!version) continue
-                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, type: "dependencies", strVersion: `${s}${version}` })
-            }
-        }
 
-        const pkgs = (await consola.prompt("请选择要升级的包", {
-            type: "multiselect",
-            options: upgrades.map(upgrade => ({ label: `${upgrade.package} ${upgrade.oldVersion} => ${upgrade.newVersion}`, value: upgrade.package }))
-        })) as unknown as string[]
-
-        pkgs.forEach(pkg => {
-            const upgrade = upgrades.find(upgrade => upgrade.package === pkg)!
-            packageJson[upgrade.type][pkg] = upgrade.strVersion
+        const { types } = await inquirer.prompt({
+            type: "checkbox",
+            name: "types",
+            message: "请选择要升级的依赖类型",
+            choices: ["dependencies", "devDependencies"].filter(type => !!packageJson[type])
         })
 
+        const { level } = await inquirer.prompt({
+            type: "list",
+            name: "level",
+            message: "请选择升级的级别",
+            choices: ["major", "minor", "patch"]
+        })
+
+        for (const type of types) {
+            const upgrades: { package: string; oldVersion: string; newVersion: string; strVersion: string }[] = []
+            const allPkgs = Object.keys(packageJson[type])
+
+            for (let i = 0; i < allPkgs.length; i++) {
+                const pkg = allPkgs[i]
+                const rv = packageJson[type][pkg]
+                const s = rv.match(/^\D*/)![0]
+                const cv = getVersionFromRequiredVersion(rv)
+                const version = await getPackageUpgradeVersion(pkg, cv, level)
+                if (!version) continue
+                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, strVersion: `${s}${version}` })
+            }
+
+            if (upgrades.length === 0) continue
+
+            const { pkgs } = await inquirer.prompt({
+                type: "checkbox",
+                name: "pkgs",
+                message: "请选择要升级的包",
+                choices: upgrades.map(upgrade => ({ name: `${upgrade.package} ${upgrade.oldVersion} => ${upgrade.newVersion}`, value: upgrade.package }))
+            })
+
+            pkgs.forEach((pkg: string) => {
+                const upgrade = upgrades.find(upgrade => upgrade.package === pkg)!
+                packageJson[type][pkg] = upgrade.strVersion
+            })
+        }
+
         writePackageJson(packageJson)
+
         install()
     })
 
@@ -246,14 +253,22 @@ program
     .command("registry")
     .description("设置 npm registry")
     .action(async () => {
-        const manager = await consola.prompt("请选择包管理器", {
-            type: "select",
-            options: ["npm", "yarn", "pnpm"]
+        const { default: inquirer } = await import("inquirer")
+
+        const { manager } = await inquirer.prompt({
+            type: "list",
+            name: "manager",
+            message: "请选择包管理器",
+            choices: ["npm", "yarn", "pnpm"]
         })
-        const registry = await consola.prompt("请选择要更换的源", {
-            type: "select",
-            options: ["npm", "taobao", "tencent"]
+
+        const { registry } = await inquirer.prompt({
+            type: "list",
+            name: "registry",
+            message: "请选择要更换的源",
+            choices: Object.keys(Registry)
         })
+
         const command = `${manager} config set registry ${Registry[registry as keyof typeof Registry]}`
         spawn(command, { shell: true, stdio: "inherit" })
     })

@@ -5,6 +5,7 @@
         "skipLibCheck": true,
         "baseUrl": "./",
         "target": "ESNext",
-        "moduleResolution": "Bundler"
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
     }
 }
