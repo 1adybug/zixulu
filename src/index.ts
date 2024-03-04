@@ -196,7 +196,7 @@ program
             options: ["major", "minor", "patch"]
         })) as "major" | "minor" | "patch"
         const packageJson = readPackageJson()
-        const upgrades: { package: string; oldVersion: string; newVersion: string }[] = []
+        const upgrades: { package: string; oldVersion: string; newVersion: string; type: "dependencies" | "devDependencies"; strVersion: string }[] = []
         if (packageJson.dependencies) {
             const pkgs = Object.keys(packageJson.dependencies)
             for (let i = 0; i < pkgs.length; i++) {
@@ -206,8 +206,7 @@ program
                 const cv = getVersionFromRequiredVersion(rv)
                 const version = await getPackageUpgradeVersion(pkg, cv, level)
                 if (!version) continue
-                packageJson.dependencies[pkg] = `${s}${version}`
-                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version })
+                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, type: "dependencies", strVersion: `${s}${version}` })
             }
         }
         if (packageJson.devDependencies) {
@@ -219,13 +218,20 @@ program
                 const cv = getVersionFromRequiredVersion(rv)
                 const version = await getPackageUpgradeVersion(pkg, cv, level)
                 if (!version) continue
-                packageJson.devDependencies[pkg] = `${s}${version}`
-                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version })
+                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, type: "dependencies", strVersion: `${s}${version}` })
             }
         }
-        upgrades.forEach(upgrade => {
-            consola.success(`${upgrade.package} ${upgrade.oldVersion} => ${upgrade.newVersion}`)
+
+        const pkgs = (await consola.prompt("请选择要升级的包", {
+            type: "multiselect",
+            options: upgrades.map(upgrade => ({ label: `${upgrade.package} ${upgrade.oldVersion} => ${upgrade.newVersion}`, value: upgrade.package }))
+        })) as unknown as string[]
+
+        pkgs.forEach(pkg => {
+            const upgrade = upgrades.find(upgrade => upgrade.package === pkg)!
+            packageJson[upgrade.type][pkg] = upgrade.strVersion
         })
+
         writePackageJson(packageJson)
         install()
     })
@@ -250,6 +256,17 @@ program
         })
         const command = `${manager} config set registry ${Registry[registry as keyof typeof Registry]}`
         spawn(command, { shell: true, stdio: "inherit" })
+    })
+
+program
+    .command("sort")
+    .description("对 package.json 中的依赖进行排序")
+    .action(() => {
+        const packageJson = readPackageJson()
+        packageJson.dependencies = sortArrayOrObject(packageJson.dependencies)
+        packageJson.devDependencies = sortArrayOrObject(packageJson.devDependencies)
+        packageJson.peerDependencies = sortArrayOrObject(packageJson.peerDependencies)
+        writePackageJson(packageJson)
     })
 
 program.parse()
