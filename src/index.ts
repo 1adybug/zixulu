@@ -5,6 +5,7 @@ import { Argument, Command } from "commander"
 import consola from "consola"
 import { readFileSync, writeFileSync } from "fs"
 import { resolve } from "path"
+import { Manager, Registry } from "./constant"
 import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getPackageUpgradeVersion, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, tailwind, vite, writePackageJson } from "./utils"
 
 const program = new Command()
@@ -243,12 +244,6 @@ program
         install()
     })
 
-enum Registry {
-    npm = "https://registry.npmjs.org/",
-    taobao = "https://registry.npmmirror.com/",
-    tencent = "https://mirrors.cloud.tencent.com/npm/"
-}
-
 program
     .command("registry")
     .description("设置 npm registry")
@@ -259,7 +254,7 @@ program
             type: "list",
             name: "manager",
             message: "请选择包管理器",
-            choices: ["npm", "yarn", "pnpm"]
+            choices: Object.keys(Manager)
         })
 
         const { registry } = await inquirer.prompt({
@@ -281,6 +276,7 @@ program
         packageJson.dependencies = sortArrayOrObject(packageJson.dependencies)
         packageJson.devDependencies = sortArrayOrObject(packageJson.devDependencies)
         packageJson.peerDependencies = sortArrayOrObject(packageJson.peerDependencies)
+        packageJson.peerDevDependencies = sortArrayOrObject(packageJson.peerDevDependencies)
         writePackageJson(packageJson)
     })
 
