@@ -191,7 +191,7 @@ export interface GetFilesOptions {
 
 export function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) => boolean, depthOrOptions?: number | GetFilesOptions) {
     const result: string[] = []
-    function _getFiles(path: string, judge: (path: ParsedPath, stats: Stats) => boolean, depthOrOptions?: number | GetFilesOptions) {
+    function _getFiles(path: string, depthOrOptions?: number | GetFilesOptions) {
         const options: GetFilesOptions = typeof depthOrOptions === "number" ? { depth: depthOrOptions } : depthOrOptions ?? {}
         const { depth, exclude } = options
         path = getAbsolutePath(path)
@@ -204,11 +204,11 @@ export function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) =
                 result.push(filePath)
             }
             if (stat.isDirectory() && (!exclude || exclude(parsedPath, stat)) && (depth === undefined || depth > 0)) {
-                getFiles(filePath, judge, depth === undefined ? undefined : depth - 1)
+                _getFiles(filePath, depth === undefined ? undefined : depth - 1)
             }
         }
     }
-    _getFiles(path, judge, depthOrOptions)
+    _getFiles(path, depthOrOptions)
     return result
 }
 
@@ -497,6 +497,34 @@ export async function install() {
         initial: "yarn"
     })
     if (install === "no") return
-    const child = spawn(`${install} install`, { shell: true, stdio: "inherit" })
-    await new Promise(resolve => child.on("close", resolve))
+    await spawnShell(`${install} install`)
+}
+
+export function getTypeInGenerics(str: string, start = 0) {
+    if (str[start] !== "<") throw new Error("无效的泛型")
+    let count = 1
+    let index: number | undefined = undefined
+    for (let i = start + 1; i < str.length; i++) {
+        const w = str[i]
+        if (w === "<") {
+            count++
+            continue
+        }
+        if (w === ">") {
+            count--
+            if (count === 0) {
+                index = i
+                break
+            }
+        }
+    }
+    if (index === undefined) throw new Error("无效的泛型")
+    return str.slice(start + 1, index)
+}
+
+export function spawnShell(command: string) {
+    return new Promise<void>(resolve => {
+        const child = spawn(command, { shell: true, stdio: "inherit" })
+        child.on("close", resolve)
+    })
 }

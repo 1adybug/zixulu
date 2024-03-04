@@ -6,7 +6,7 @@ import consola from "consola"
 import { readFileSync, writeFileSync } from "fs"
 import { resolve } from "path"
 import { Manager, Registry } from "./constant"
-import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getPackageUpgradeVersion, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, tailwind, vite, writePackageJson } from "./utils"
+import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnShell, tailwind, vite, writePackageJson } from "./utils"
 
 const program = new Command()
 
@@ -265,7 +265,7 @@ program
         })
 
         const command = `${manager} config set registry ${Registry[registry as keyof typeof Registry]}`
-        spawn(command, { shell: true, stdio: "inherit" })
+        await spawnShell(command)
     })
 
 program
@@ -278,6 +278,220 @@ program
         packageJson.peerDependencies = sortArrayOrObject(packageJson.peerDependencies)
         packageJson.peerDevDependencies = sortArrayOrObject(packageJson.peerDevDependencies)
         writePackageJson(packageJson)
+    })
+
+type Choice = {
+    value: string
+    short: string
+    name: string
+    checked: boolean
+}
+
+program
+    .command("arrow")
+    .description("将箭头函数组件转换为函数组件")
+    .action(async () => {
+        consola.warn("请在使用本功能前提交或备份代码")
+        const { default: inquirer } = await import("inquirer")
+        const files = getFiles("./src", (path, stats) => path.ext === ".tsx" && stats.isFile())
+        const reg = /^(export )?const \w+?: FC.+?$/gm
+        const { auto } = await inquirer.prompt({
+            type: "confirm",
+            name: "auto",
+            message: "是否自动选择要转换的组件"
+        })
+
+        const warnFiles: Set<string> = new Set()
+        const modifiedFiles: Set<string> = new Set()
+
+        if (auto) {
+            for (const file of files) {
+                const code = readFileSync(file, "utf-8")
+                const newCode = code.replace(reg, match => {
+                    if (match.includes("memo(") || match.includes("forwardRef(")) {
+                        warnFiles.add(file)
+                        return match
+                    }
+                    modifiedFiles.add(file)
+                    const hasExport = match.startsWith("export ")
+                    const name = match.match(/const (\w+?):/)![1]
+                    const typeIndex = match.indexOf("FC<")
+                    if (typeIndex > 0) {
+                        const type = getTypeInGenerics(match, typeIndex + 2)
+                        return `${hasExport ? "export " : ""}function ${name}(props: ${type}) {`
+                    }
+                    return `${hasExport ? "export " : ""}function ${name}() {`
+                })
+                writeFileSync(file, newCode, "utf-8")
+            }
+        } else {
+            for (const file of files) {
+                const code = readFileSync(file, "utf-8")
+                const matches = code.match(reg)
+                if (!matches) continue
+                consola.start(file)
+                const choices = Array.from(matches).reduce((prev: Choice[], match, index) => {
+                    if (match.includes("memo(") || match.includes("forwardRef(")) {
+                        warnFiles.add(file)
+                        return prev
+                    }
+                    modifiedFiles.add(file)
+                    const hasExport = match.startsWith("export ")
+                    const funName = match.match(/const (\w+?):/)![1]
+                    const typeIndex = match.indexOf("FC<")
+                    if (typeIndex > 0) {
+                        const type = getTypeInGenerics(match, typeIndex + 2)
+                        const name = `◆ ${match}
+     ◆ ${hasExport ? "export " : ""}function ${funName}(props: ${type}) {`
+                        prev.push({ value: index.toString(), short: funName, name, checked: true })
+                    } else {
+                        const name = `◆ ${match}
+     ◆ ${hasExport ? "export " : ""}function ${funName}() {`
+                        prev.push({ value: index.toString(), short: funName, name, checked: true })
+                    }
+
+                    return prev
+                }, [])
+
+                const length = choices.length.toString().length
+
+                choices.forEach((choice, index) => {
+                    let first = true
+                    choice.name = choice.name.replace(/◆/g, () => {
+                        if (first) {
+                            first = false
+                            return `◆ ${(index + 1).toString().padStart(length, "0")}.`
+                        }
+                        return "".padStart(length + 3, " ")
+                    })
+                })
+
+                const { indexs } = await inquirer.prompt({
+                    type: "checkbox",
+                    name: "indexs",
+                    message: `total ${choices.length} component${choices.length > 1 ? "s" : ""}`,
+                    choices
+                })
+
+                let index = 0
+
+                const newCode = code.replace(reg, match => {
+                    if (!indexs.includes(index.toString())) return match
+                    const hasExport = match.startsWith("export ")
+                    const name = match.match(/const (\w+?):/)![1]
+                    const typeIndex = match.indexOf("FC<")
+                    if (typeIndex > 0) {
+                        const type = getTypeInGenerics(match, typeIndex + 2)
+                        return `${hasExport ? "export " : ""}function ${name}(props: ${type}) {`
+                    }
+                    return `${hasExport ? "export " : ""}function ${name}() {`
+                })
+
+                console.log()
+
+                writeFileSync(file, newCode, "utf-8")
+            }
+        }
+
+        if (modifiedFiles.size > 0) consola.success(`以下文件中的箭头函数组件已经转换为函数组件：\n\n${Array.from(modifiedFiles).join("\n")}`)
+
+        if (warnFiles.size > 0) consola.warn(`以下文件中存在 memo 或 forwardRef，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`)
+
+        consola.start("检查项目是否存在 TypeScript 错误")
+
+        await spawnShell("npx tsc --noEmit")
+    })
+
+program
+    .command("interface")
+    .description("将 interface 转换为 type")
+    .action(async () => {
+        consola.warn("请在使用本功能前提交或备份代码")
+        const { default: inquirer } = await import("inquirer")
+        const files = getFiles("./src", (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile())
+
+        const { auto } = await inquirer.prompt({
+            type: "confirm",
+            name: "auto",
+            message: "是否自动选择要转换的类型"
+        })
+
+        const withoutExtendsReg = /^ *?(export )?interface (\w+?) {$/gm
+        const withExtendsReg = /^ *?(export )?interface (\w+?) extends .+? {$/gm
+        const interfaceReg = /^ *?(export )?interface (\w+?) (extends .+? )?{$/gm
+        const replaceReg = /interface (\w+?) {$/
+        const warnFiles: Set<string> = new Set()
+        const modifiedFiles: Set<string> = new Set()
+
+        if (auto) {
+            for (const file of files) {
+                const code = readFileSync(file, "utf-8")
+                if (withExtendsReg.test(code)) warnFiles.add(file)
+                const newCode = code.replace(withoutExtendsReg, match => {
+                    modifiedFiles.add(file)
+                    return match.replace(replaceReg, "type $1 = {")
+                })
+                writeFileSync(file, newCode, "utf-8")
+            }
+            console.log()
+        } else {
+            for (const file of files) {
+                const code = readFileSync(file, "utf-8")
+                if (!interfaceReg.test(code)) continue
+                consola.start(file)
+                if (withExtendsReg.test(code)) warnFiles.add(file)
+                const matches = code.match(withoutExtendsReg)
+                if (!matches) {
+                    console.log()
+                    continue
+                }
+                const choices = Array.from(matches).reduce((prev: Choice[], match, index) => {
+                    const short = match.match(/interface (\w+?) {/)![1]
+                    const name = `◆ ${match}
+     ◆ ${match.replace(replaceReg, "type $1 = {")}`
+                    prev.push({ value: index.toString(), short, name, checked: true })
+                    return prev
+                }, [])
+
+                const length = choices.length.toString().length
+
+                choices.forEach((choice, index) => {
+                    let first = true
+                    choice.name = choice.name.replace(/◆/g, () => {
+                        if (first) {
+                            first = false
+                            return `◆ ${(index + 1).toString().padStart(length, "0")}.`
+                        }
+                        return "".padStart(length + 3, " ")
+                    })
+                })
+
+                const { indexs } = await inquirer.prompt({
+                    type: "checkbox",
+                    name: "indexs",
+                    message: `total ${choices.length} interface${choices.length > 1 ? "s" : ""}`,
+                    choices
+                })
+
+                let index = 0
+
+                const newCode = code.replace(withoutExtendsReg, match => {
+                    if (!indexs.includes(index.toString())) return match
+                    return match.replace(replaceReg, "type $1 = {")
+                })
+
+                console.log()
+
+                writeFileSync(file, newCode, "utf-8")
+            }
+        }
+
+        if (modifiedFiles.size > 0) consola.success(`以下文件中的 interface 已经转换为 type：\n\n${Array.from(modifiedFiles).join("\n")}`)
+        if (warnFiles.size > 0) consola.warn(`以下文件中存在 extends，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`)
+
+        consola.start("检查项目是否存在 TypeScript 错误")
+
+        await spawnShell("npx tsc --noEmit")
     })
 
 program.parse()
