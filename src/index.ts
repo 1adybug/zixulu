@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import { spawn } from "child_process"
 import { Argument, Command } from "commander"
 import consola from "consola"
 import { readFileSync, writeFileSync } from "fs"
 import { resolve } from "path"
 import { Manager, Registry } from "./constant"
 import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnShell, tailwind, vite, writePackageJson } from "./utils"
+import { execSync } from "child_process"
 
 const program = new Command()
 
@@ -19,15 +19,20 @@ program.command("eslint").description("删除 ESLint 配置文件").action(remov
 program
     .command("prettier")
     .description("添加 prettier 配置文件")
-    .option("-t, --tailwind", "是否添加 tailwind 插件")
-    .action(options => {
-        const { tailwind } = options
-        addPrettierConfig(tailwind)
+    .action(async () => {
+        await addPrettierConfig()
+        await install()
     })
 
 program.command("vite").description("删除 vite 模板中的某些配置").action(vite)
 
-program.command("tailwind").description("添加 tailwind 配置文件").action(tailwind)
+program
+    .command("tailwind")
+    .description("添加 tailwind 配置文件")
+    .action(async () => {
+        await tailwind()
+        await install()
+    })
 
 program.command("remove-comment").description("删除所有注释").addArgument(new Argument("path")).action(removeComment)
 
@@ -306,8 +311,9 @@ program
 
         if (auto) {
             for (const file of files) {
-                const code = readFileSync(file, "utf-8")
-                const newCode = code.replace(reg, match => {
+                let code = readFileSync(file, "utf-8")
+                let exportDefaultReg: RegExp | undefined = undefined
+                code = code.replace(reg, match => {
                     if (match.includes("memo(") || match.includes("forwardRef(")) {
                         warnFiles.add(file)
                         return match
@@ -315,18 +321,25 @@ program
                     modifiedFiles.add(file)
                     const hasExport = match.startsWith("export ")
                     const name = match.match(/const (\w+?):/)![1]
+                    const edReg = new RegExp(`^export default ${name}$`, "m")
+                    let hasExportDefault = false
+                    if (!exportDefaultReg && !hasExport && edReg.test(code)) {
+                        exportDefaultReg = edReg
+                        hasExportDefault = true
+                    }
                     const typeIndex = match.indexOf("FC<")
                     if (typeIndex > 0) {
                         const type = getTypeInGenerics(match, typeIndex + 2)
-                        return `${hasExport ? "export " : ""}function ${name}(props: ${type}) {`
+                        return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}(props: ${type}) {`
                     }
-                    return `${hasExport ? "export " : ""}function ${name}() {`
+                    return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}() {`
                 })
-                writeFileSync(file, newCode, "utf-8")
+                if (exportDefaultReg) code = code.replace(exportDefaultReg, "")
+                writeFileSync(file, code, "utf-8")
             }
         } else {
             for (const file of files) {
-                const code = readFileSync(file, "utf-8")
+                let code = readFileSync(file, "utf-8")
                 const matches = code.match(reg)
                 if (!matches) continue
                 consola.start(file)
@@ -375,27 +388,45 @@ program
 
                 let index = 0
 
-                const newCode = code.replace(reg, match => {
+                let exportDefaultReg: RegExp | undefined = undefined
+
+                code = code.replace(reg, match => {
                     if (!indexs.includes(index.toString())) return match
                     const hasExport = match.startsWith("export ")
                     const name = match.match(/const (\w+?):/)![1]
+                    const edReg = new RegExp(`^export default ${name}$`, "m")
+                    let hasExportDefault = false
+                    if (!exportDefaultReg && !hasExport && edReg.test(code)) {
+                        exportDefaultReg = edReg
+                        hasExportDefault = true
+                    }
                     const typeIndex = match.indexOf("FC<")
                     if (typeIndex > 0) {
                         const type = getTypeInGenerics(match, typeIndex + 2)
-                        return `${hasExport ? "export " : ""}function ${name}(props: ${type}) {`
+                        return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}(props: ${type}) {`
                     }
-                    return `${hasExport ? "export " : ""}function ${name}() {`
+                    return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}() {`
                 })
+
+                if (exportDefaultReg) code = code.replace(exportDefaultReg, "")
 
                 console.log()
 
-                writeFileSync(file, newCode, "utf-8")
+                writeFileSync(file, code, "utf-8")
             }
         }
 
         if (modifiedFiles.size > 0) consola.success(`以下文件中的箭头函数组件已经转换为函数组件：\n\n${Array.from(modifiedFiles).join("\n")}`)
 
         if (warnFiles.size > 0) consola.warn(`以下文件中存在 memo 或 forwardRef，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`)
+
+        consola.start("格式化代码")
+
+        await addPrettierConfig()
+
+        execSync("yarn")
+
+        execSync("npx prettier --write ./src")
 
         consola.start("检查项目是否存在 TypeScript 错误")
 
@@ -488,6 +519,14 @@ program
 
         if (modifiedFiles.size > 0) consola.success(`以下文件中的 interface 已经转换为 type：\n\n${Array.from(modifiedFiles).join("\n")}`)
         if (warnFiles.size > 0) consola.warn(`以下文件中存在 extends，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`)
+
+        consola.start("格式化代码")
+
+        await addPrettierConfig()
+
+        execSync("yarn")
+
+        execSync("npx prettier --write ./src")
 
         consola.start("检查项目是否存在 TypeScript 错误")
 
