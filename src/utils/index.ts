@@ -203,8 +203,11 @@ export function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) =
             if (judge(parsedPath, stat)) {
                 result.push(filePath)
             }
-            if (stat.isDirectory() && (!exclude || exclude(parsedPath, stat)) && (depth === undefined || depth > 0)) {
-                _getFiles(filePath, depth === undefined ? undefined : depth - 1)
+            if (stat.isDirectory() && (!exclude || !exclude(parsedPath, stat)) && (depth === undefined || depth > 0)) {
+                _getFiles(filePath, {
+                    depth: depth === undefined ? undefined : depth - 1,
+                    exclude
+                })
             }
         }
     }
@@ -527,4 +530,23 @@ export function spawnShell(command: string) {
         const child = spawn(command, { shell: true, stdio: "inherit" })
         child.on("close", resolve)
     })
+}
+
+export function splitExtendsType(str: string) {
+    const types: string[] = []
+    let index = 0
+    for (let i = 0; i < str.length; i++) {
+        const w = str[i]
+        if (w === "<") {
+            const type = getTypeInGenerics(str, i)
+            i += type.length + 1
+            continue
+        }
+        if (w === ",") {
+            types.push(str.slice(index, i))
+            index = i + 1
+        }
+    }
+    types.push(str.slice(index))
+    return types.map(v => v.trim()).filter(v => v)
 }

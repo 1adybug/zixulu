@@ -5,7 +5,7 @@ import consola from "consola"
 import { readFileSync, writeFileSync } from "fs"
 import { resolve } from "path"
 import { Manager, Registry } from "./constant"
-import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnShell, tailwind, vite, writePackageJson } from "./utils"
+import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnShell, splitExtendsType, tailwind, vite, writePackageJson } from "./utils"
 
 const program = new Command()
 
@@ -292,7 +292,7 @@ type Choice = {
 }
 
 program
-    .command("arrow")
+    .command("experimental-arrow")
     .description("将箭头函数组件转换为函数组件")
     .action(async () => {
         consola.warn("请在使用本功能前提交或备份代码")
@@ -437,93 +437,44 @@ program
     .description("将 interface 转换为 type")
     .action(async () => {
         consola.warn("请在使用本功能前提交或备份代码")
-        const { default: inquirer } = await import("inquirer")
-        const files = getFiles("./src", (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile())
-
-        const { auto } = await inquirer.prompt({
-            type: "confirm",
-            name: "auto",
-            message: "是否自动选择要转换的类型"
+        const files = getFiles(".", (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile(), {
+            exclude: (path, stats) => stats.isDirectory() && path.base === "node_modules"
         })
 
-        const withoutExtendsReg = /^ *?(export )?interface (\w+?) {$/gm
-        const withExtendsReg = /^ *?(export )?interface (\w+?) extends .+? {$/gm
-        const interfaceReg = /^ *?(export )?interface (\w+?) (extends .+? )?{$/gm
-        const replaceReg = /interface (\w+?) {$/
-        const warnFiles: Set<string> = new Set()
+        const reg = /(export )?interface (.+?) {/gm
+        const reg1 = /\bexport\b/
+        const reg2 = /(\w+?) extends (.+)/
         const modifiedFiles: Set<string> = new Set()
-
-        if (auto) {
-            for (const file of files) {
-                const code = readFileSync(file, "utf-8")
-                if (withExtendsReg.test(code)) warnFiles.add(file)
-                const newCode = code.replace(withoutExtendsReg, match => {
-                    modifiedFiles.add(file)
-                    return match.replace(replaceReg, "type $1 = {")
-                })
-                writeFileSync(file, newCode, "utf-8")
-            }
-            console.log()
-        } else {
-            for (const file of files) {
-                const code = readFileSync(file, "utf-8")
-                if (!interfaceReg.test(code)) continue
-                consola.start(file)
-                if (withExtendsReg.test(code)) warnFiles.add(file)
-                const matches = code.match(withoutExtendsReg)
-                if (!matches) {
-                    console.log()
-                    continue
-                }
-                const choices = Array.from(matches).reduce((prev: Choice[], match, index) => {
-                    const short = match.match(/interface (\w+?) {/)![1]
-                    const name = `◆ ${match}
-     ◆ ${match.replace(replaceReg, "type $1 = {")}`
-                    prev.push({ value: index.toString(), short, name, checked: true })
-                    return prev
-                }, [])
-
-                const length = choices.length.toString().length
-
-                choices.forEach((choice, index) => {
-                    let first = true
-                    choice.name = choice.name.replace(/◆/g, () => {
-                        if (first) {
-                            first = false
-                            return `◆ ${(index + 1).toString().padStart(length, "0")}.`
-                        }
-                        return "".padStart(length + 3, " ")
-                    })
-                })
-
-                const { indexs } = await inquirer.prompt({
-                    type: "checkbox",
-                    name: "indexs",
-                    message: `total ${choices.length} interface${choices.length > 1 ? "s" : ""}`,
-                    choices
-                })
-
-                let index = 0
-
-                const newCode = code.replace(withoutExtendsReg, match => {
-                    if (!indexs.includes(index.toString())) return match
-                    return match.replace(replaceReg, "type $1 = {")
-                })
-
-                console.log()
-
-                writeFileSync(file, newCode, "utf-8")
-            }
-        }
-
-        if (modifiedFiles.size > 0) consola.success(`以下文件中的 interface 已经转换为 type：\n\n${Array.from(modifiedFiles).join("\n")}`)
-        if (warnFiles.size > 0) consola.warn(`以下文件中存在 extends，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`)
 
         consola.start("格式化代码")
 
         await addPrettierConfig()
 
         await spawnShell("yarn")
+
+        await spawnShell("npx prettier --write ./src")
+
+        for (const file of files) {
+            const code = readFileSync(file, "utf-8")
+            const newCode = code.replace(reg, match => {
+                modifiedFiles.add(file)
+                const hasExport = reg1.test(match)
+                const $2 = match.replace(reg, "$2")
+                const matches = $2.match(reg2)
+                if (matches) {
+                    const name = matches[1]
+                    const extendsTypes = splitExtendsType(matches[2]).join(" & ")
+
+                    return `${hasExport ? "export " : ""}type ${name} = ${extendsTypes} & {`
+                }
+                return `${hasExport ? "export " : ""}type ${$2} = {`
+            })
+            writeFileSync(file, newCode, "utf-8")
+        }
+
+        if (modifiedFiles.size > 0) consola.success(`以下文件中的 interface 已经转换为 type：\n\n${Array.from(modifiedFiles).join("\n")}`)
+
+        consola.start("格式化代码")
 
         await spawnShell("npx prettier --write ./src")
 
