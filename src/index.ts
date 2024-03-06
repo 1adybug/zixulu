@@ -6,7 +6,6 @@ import { readFileSync, writeFileSync } from "fs"
 import { resolve } from "path"
 import { Manager, Registry } from "./constant"
 import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnShell, tailwind, vite, writePackageJson } from "./utils"
-import { execSync } from "child_process"
 
 const program = new Command()
 
@@ -424,9 +423,9 @@ program
 
         await addPrettierConfig()
 
-        execSync("yarn")
+        await spawnShell("yarn")
 
-        execSync("npx prettier --write ./src")
+        await spawnShell("npx prettier --write ./src")
 
         consola.start("检查项目是否存在 TypeScript 错误")
 
@@ -524,9 +523,9 @@ program
 
         await addPrettierConfig()
 
-        execSync("yarn")
+        await spawnShell("yarn")
 
-        execSync("npx prettier --write ./src")
+        await spawnShell("npx prettier --write ./src")
 
         consola.start("检查项目是否存在 TypeScript 错误")
 
