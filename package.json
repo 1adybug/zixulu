@@ -31,11 +31,13 @@
         "consola": "^3.2.3",
         "inquirer": "^9.2.15",
         "json5": "^2.2.3",
-        "prettier": "^3.2.5"
+        "prettier": "^3.2.5",
+        "tar": "^6.2.0"
     },
     "devDependencies": {
         "@types/inquirer": "^9.0.7",
         "@types/node": "^20.11.19",
+        "@types/tar": "^6.1.11",
         "father": "^4.4.0"
     }
 }

@@ -500,7 +500,7 @@ export async function install() {
         initial: "yarn"
     })
     if (install === "no") return
-    await spawnShell(`${install} install`)
+    await spawnAsync(`${install} install`)
 }
 
 export function getTypeInGenerics(str: string, start = 0) {
@@ -525,10 +525,22 @@ export function getTypeInGenerics(str: string, start = 0) {
     return str.slice(start + 1, index)
 }
 
-export function spawnShell(command: string) {
-    return new Promise<void>(resolve => {
-        const child = spawn(command, { shell: true, stdio: "inherit" })
-        child.on("close", resolve)
+export type SpawnAsyncOptions = {
+    ignoreError?: boolean
+    cwd?: string | URL | undefined
+}
+
+export function spawnAsync(command: string, options?: SpawnAsyncOptions) {
+    const { ignoreError = false, cwd } = options || {}
+    return new Promise<void>((resolve, reject) => {
+        const child = spawn(command, { shell: true, stdio: "inherit", cwd })
+        child.on("exit", code => {
+            if (code !== 0 && !ignoreError) {
+                reject(new Error(`Command failed with code ${code}`))
+                return
+            }
+            resolve()
+        })
     })
 }
 
