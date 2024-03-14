@@ -2,10 +2,10 @@
 
 import { Argument, Command } from "commander"
 import consola from "consola"
-import { readFileSync, writeFileSync } from "fs"
+import { readFile, writeFile } from "fs/promises"
 import { resolve } from "path"
 import { Manager, Registry } from "./constant"
-import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnShell, splitExtendsType, tailwind, vite, writePackageJson } from "./utils"
+import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writePackageJson } from "./utils"
 
 const program = new Command()
 
@@ -176,7 +176,7 @@ export default defineConfig({
     sourcemap: true
 })
 `
-        const gitignore = readFileSync(".gitignore", "utf-8")
+        const gitignore = (await readFile(".gitignore", "utf-8"))
             .split("\n")
             .map(line => line.trim())
             .filter(Boolean)
@@ -187,8 +187,8 @@ export default defineConfig({
         if (!gitignore.some(line => /^\/?package-lock\.json$/.test(line))) gitignore.push("package-lock.json")
         if (!gitignore.some(line => /^\/?yarn-error\.log$/.test(line))) gitignore.push("yarn-error.log")
         writePackageJson(packageJson)
-        writeFileSync(".fatherrc.ts", fatherrcCode)
-        writeFileSync(".gitignore", gitignore.join("\n"))
+        await writeFile(".fatherrc.ts", fatherrcCode)
+        await writeFile(".gitignore", gitignore.join("\n"))
         setTsConfig("target", Target.ESNext)
     })
 
@@ -269,7 +269,7 @@ program
         })
 
         const command = `${manager} config set registry ${Registry[registry as keyof typeof Registry]}`
-        await spawnShell(command)
+        await spawnAsync(command)
     })
 
 program
@@ -310,7 +310,7 @@ program
 
         if (auto) {
             for (const file of files) {
-                let code = readFileSync(file, "utf-8")
+                let code = await readFile(file, "utf-8")
                 let exportDefaultReg: RegExp | undefined = undefined
                 code = code.replace(reg, match => {
                     if (match.includes("memo(") || match.includes("forwardRef(")) {
@@ -334,11 +334,11 @@ program
                     return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}() {`
                 })
                 if (exportDefaultReg) code = code.replace(exportDefaultReg, "")
-                writeFileSync(file, code, "utf-8")
+                await writeFile(file, code, "utf-8")
             }
         } else {
             for (const file of files) {
-                let code = readFileSync(file, "utf-8")
+                let code = await readFile(file, "utf-8")
                 const matches = code.match(reg)
                 if (!matches) continue
                 consola.start(file)
@@ -411,7 +411,7 @@ program
 
                 console.log()
 
-                writeFileSync(file, code, "utf-8")
+                await writeFile(file, code, "utf-8")
             }
         }
 
@@ -423,13 +423,13 @@ program
 
         await addPrettierConfig()
 
-        await spawnShell("yarn")
+        await spawnAsync("yarn")
 
-        await spawnShell("npx prettier --write ./src")
+        await spawnAsync("npx prettier --write ./src")
 
         consola.start("检查项目是否存在 TypeScript 错误")
 
-        await spawnShell("npx tsc --noEmit")
+        await spawnAsync("npx tsc --noEmit")
     })
 
 program
@@ -450,12 +450,12 @@ program
 
         await addPrettierConfig()
 
-        await spawnShell("yarn")
+        await spawnAsync("yarn")
 
-        await spawnShell("npx prettier --write ./src")
+        await spawnAsync("npx prettier --write ./src")
 
         for (const file of files) {
-            const code = readFileSync(file, "utf-8")
+            const code = await readFile(file, "utf-8")
             const newCode = code.replace(reg, match => {
                 modifiedFiles.add(file)
                 const hasExport = reg1.test(match)
@@ -469,18 +469,18 @@ program
                 }
                 return `${hasExport ? "export " : ""}type ${$2} = {`
             })
-            writeFileSync(file, newCode, "utf-8")
+            await writeFile(file, newCode, "utf-8")
         }
 
         if (modifiedFiles.size > 0) consola.success(`以下文件中的 interface 已经转换为 type：\n\n${Array.from(modifiedFiles).join("\n")}`)
 
         consola.start("格式化代码")
 
-        await spawnShell("npx prettier --write ./src")
+        await spawnAsync("npx prettier --write ./src")
 
         consola.start("检查项目是否存在 TypeScript 错误")
 
-        await spawnShell("npx tsc --noEmit")
+        await spawnAsync("npx tsc --noEmit")
     })
 
 program.parse()
