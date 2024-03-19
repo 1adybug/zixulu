@@ -48,12 +48,10 @@ export function getVersionFromRequiredVersion(requiredVersion: string) {
 }
 
 export function getVersionNum(version: string) {
-    const nums = version.split(".").map(Number)
-    if (nums.some(num => !Number.isInteger(num) || num < 0) || nums.length < 3) {
-        consola.fail(`无效的版本号 ${version}`)
-        exit()
-    }
-    return nums
+    const reg = /^(\d+)\.(\d+)\.(\d+)/
+    const result = version.match(reg)
+    if (!result) throw new Error("无效的版本号")
+    return Array.from(result).slice(1).map(Number)
 }
 
 export async function getPackageUpgradeVersion(packageName: string, version: string, level: "latest" | "major" | "minor" | "patch") {
