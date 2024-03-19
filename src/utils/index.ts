@@ -55,33 +55,38 @@ export function getVersionNum(version: string) {
     return Array.from(result).slice(1).map(Number)
 }
 
-export async function getPackageUpgradeVersion(packageName: string, version: string, level: "latest" | "major" | "minor" | "patch") {
-    if (level === "latest") {
-        const latestVersion = await getPackageLatestVersion(packageName)
-        if (version === latestVersion) return undefined
-        return latestVersion
-    }
+export async function getPackageUpgradeVersion(packageName: string, version: string, level: "major" | "minor" | "patch") {
     const current = getVersionNum(version)
     const versions = await getPackageVersions(packageName)
     const reg = /^\d+\.\d+\.\d+$/
-    return versions.find(item => {
-        if (!reg.test(item)) return false
-        const latest = getVersionNum(item)
-        let index = -1
-        for (let i = 0; i < latest.length; i++) {
-            const cv = current[i]
-            const lv = latest[i]
-            if (lv < cv) break
-            if (lv > cv) {
-                index = i
-                break
+    const result = versions
+        .filter(item => {
+            if (!reg.test(item)) return false
+            const latest = getVersionNum(item)
+            let index = -1
+            for (let i = 0; i < latest.length; i++) {
+                const cv = current[i]
+                const lv = latest[i]
+                if (lv < cv) break
+                if (lv > cv) {
+                    index = i
+                    break
+                }
             }
+            if (index === -1) return false
+            if (level === "major") return index >= 0
+            if (level === "minor") return index >= 1
+            if (level === "patch") return index >= 2
+        })
+        .map(item => getVersionNum(item))
+    result.sort((a, b) => {
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] < b[i]) return 1
+            if (a[i] > b[i]) return -1
         }
-        if (index === -1) return false
-        if (level === "major") return index >= 0
-        if (level === "minor") return index >= 1
-        if (level === "patch") return index >= 2
+        return 0
     })
+    return result[0]?.join(".")
 }
 
 /** 读取 package.json */
