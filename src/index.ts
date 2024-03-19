@@ -482,13 +482,15 @@ program
         await spawnAsync("npx tsc --noEmit")
     })
 
+program.command("gitignore").description("添加 .gitignore 文件").action(addGitignore)
+
 program
     .command("rsbuild")
     .description("rsbuild 常用设置")
     .action(async () => {
         await writeRsbuildConfig()
         await createIndexHtml()
-        await setTsConfig("noEmit", false)
+        await setTsConfig("noEmit", true)
         await addGitignore()
         const packageJson = await readPackageJson()
         await addDependencies(packageJson, "@ant-design/cssinjs")
