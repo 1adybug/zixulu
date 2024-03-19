@@ -211,7 +211,7 @@ program
             type: "list",
             name: "level",
             message: "请选择升级的级别",
-            choices: ["latest", "major", "minor", "patch"]
+            choices: ["major", "minor", "patch"]
         })
 
         for (const type of types) {
