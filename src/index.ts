@@ -211,7 +211,7 @@ program
             type: "list",
             name: "level",
             message: "请选择升级的级别",
-            choices: ["major", "minor", "patch"]
+            choices: ["latest", "major", "minor", "patch"]
         })
 
         for (const type of types) {
@@ -437,22 +437,25 @@ program
     .description("将 interface 转换为 type")
     .action(async () => {
         consola.warn("请在使用本功能前提交或备份代码")
+
         const files = getFiles(".", (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile(), {
             exclude: (path, stats) => stats.isDirectory() && path.base === "node_modules"
         })
+
+        const { default: inquirer } = await import("inquirer")
+
+        const { ifContinue } = await inquirer.prompt({
+            type: "confirm",
+            name: "ifContinue",
+            message: "是否继续"
+        })
+
+        if (!ifContinue) return
 
         const reg = /(export )?interface (.+?) {/gm
         const reg1 = /\bexport\b/
         const reg2 = /(\w+?) extends (.+)/
         const modifiedFiles: Set<string> = new Set()
-
-        consola.start("格式化代码")
-
-        await addPrettierConfig()
-
-        await spawnAsync("yarn")
-
-        await spawnAsync("npx prettier --write ./src")
 
         for (const file of files) {
             const code = await readFile(file, "utf-8")
@@ -473,10 +476,6 @@ program
         }
 
         if (modifiedFiles.size > 0) consola.success(`以下文件中的 interface 已经转换为 type：\n\n${Array.from(modifiedFiles).join("\n")}`)
-
-        consola.start("格式化代码")
-
-        await spawnAsync("npx prettier --write ./src")
 
         consola.start("检查项目是否存在 TypeScript 错误")
 

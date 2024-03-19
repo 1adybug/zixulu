@@ -56,20 +56,21 @@ export function getVersionNum(version: string) {
     return nums
 }
 
-export async function getPackageUpgradeVersion(packageName: string, version: string, level: "major" | "minor" | "patch") {
-    if (level === "major") {
+export async function getPackageUpgradeVersion(packageName: string, version: string, level: "latest" | "major" | "minor" | "patch") {
+    if (level === "latest") {
         const latestVersion = await getPackageLatestVersion(packageName)
         if (version === latestVersion) return undefined
         return latestVersion
     }
-    const [major, minor, patch] = getVersionNum(version)
+    const current = getVersionNum(version)
     const versions = await getPackageVersions(packageName)
-    return versions.find((item, index) => {
-        const [a, b, c] = getVersionNum(item)
-        if (index === 0) {
-            if ((a > major && level === "minor") || (a >= major && b > minor && level === "patch")) consola.log(`发现 ${packageName} 的新版本 ${item}`)
-        }
-        return (level === "minor" && a === major && b > minor) || (level === "patch" && a === major && b === minor && c > patch)
+    return versions.find(item => {
+        const latest = getVersionNum(item)
+        const index = latest.findIndex((num, index) => num > current[index])
+        if (index === -1) return false
+        if (level === "major") return index >= 0
+        if (level === "minor") return index >= 1
+        if (level === "patch") return index >= 2
     })
 }
 
