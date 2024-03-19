@@ -62,9 +62,20 @@ export async function getPackageUpgradeVersion(packageName: string, version: str
     }
     const current = getVersionNum(version)
     const versions = await getPackageVersions(packageName)
+    const reg = /^\d+\.\d+\.\d+$/
     return versions.find(item => {
+        if (!reg.test(item)) return false
         const latest = getVersionNum(item)
-        const index = latest.findIndex((num, index) => num > current[index])
+        let index = -1
+        for (let i = 0; i < latest.length; i++) {
+            const cv = current[i]
+            const lv = latest[i]
+            if (lv < cv) break
+            if (lv > cv) {
+                index = i
+                break
+            }
+        }
         if (index === -1) return false
         if (level === "major") return index >= 0
         if (level === "minor") return index >= 1
