@@ -5,11 +5,11 @@ import consola from "consola"
 import { readFile, writeFile } from "fs/promises"
 import { resolve } from "path"
 import { Manager, Registry } from "./constant"
-import { Module, ModuleResolution, Target, addDependencies, addLatestDependencies, addPrettierConfig, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writePackageJson } from "./utils"
+import { Module, ModuleResolution, Target, addDependencies, addDevDependencies, addGitignore, addLatestDependencies, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writePackageJson, writeRsbuildConfig } from "./utils"
 
 const program = new Command()
 
-const pkg = readPackageJson(resolve(__dirname, "../"))
+const pkg = readPackageJsonSync(resolve(__dirname, "../"))
 
 program.name("格数科技").version(pkg.version)
 
@@ -44,7 +44,7 @@ program
             options: Object.values(Target),
             initial: Target.ESNext
         })
-        setTsConfig("target", target)
+        await setTsConfig("target", target)
     })
 
 program
@@ -56,7 +56,7 @@ program
             options: Object.values(Module),
             initial: Module.ESNext
         })
-        setTsConfig("module", module)
+        await setTsConfig("module", module)
     })
 
 program
@@ -69,7 +69,7 @@ program
             options: Object.values(ModuleResolution),
             initial: ModuleResolution.NodeNext
         })
-        setTsConfig("moduleResolution", moduleResolution)
+        await setTsConfig("moduleResolution", moduleResolution)
     })
 
 interface NpmPackage {
@@ -120,11 +120,11 @@ program
             type: "confirm",
             initial: true
         })
-        const packageJson = readPackageJson()
+        const packageJson = await readPackageJson()
         for (const pkg of packageNames) {
             await (latest ? addLatestDependencies : addDependencies)(packageJson, pkg)
         }
-        writePackageJson(packageJson)
+        await writePackageJson(packageJson)
         install()
     })
 
@@ -132,7 +132,7 @@ program
     .command("father")
     .description("修改 father 项目配置")
     .action(async () => {
-        let packageJson = readPackageJson()
+        let packageJson = await readPackageJson()
         packageJson.publishConfig ??= {}
         packageJson.publishConfig.access = "public"
         packageJson.publishConfig.registry = "https://registry.npmjs.org/"
@@ -186,10 +186,10 @@ export default defineConfig({
         if (!gitignore.some(line => /^\/?node_modules$/.test(line))) gitignore.push("node_modules")
         if (!gitignore.some(line => /^\/?package-lock\.json$/.test(line))) gitignore.push("package-lock.json")
         if (!gitignore.some(line => /^\/?yarn-error\.log$/.test(line))) gitignore.push("yarn-error.log")
-        writePackageJson(packageJson)
+        await writePackageJson(packageJson)
         await writeFile(".fatherrc.ts", fatherrcCode)
         await writeFile(".gitignore", gitignore.join("\n"))
-        setTsConfig("target", Target.ESNext)
+        await setTsConfig("target", Target.ESNext)
     })
 
 program
@@ -198,7 +198,7 @@ program
     .action(async () => {
         const { default: inquirer } = await import("inquirer")
 
-        const packageJson = readPackageJson()
+        const packageJson = await readPackageJson()
 
         const { types } = await inquirer.prompt({
             type: "checkbox",
@@ -243,7 +243,7 @@ program
             })
         }
 
-        writePackageJson(packageJson)
+        await writePackageJson(packageJson)
 
         install()
     })
@@ -275,13 +275,13 @@ program
 program
     .command("sort")
     .description("对 package.json 中的依赖进行排序")
-    .action(() => {
-        const packageJson = readPackageJson()
+    .action(async () => {
+        const packageJson = await readPackageJson()
         packageJson.dependencies = sortArrayOrObject(packageJson.dependencies)
         packageJson.devDependencies = sortArrayOrObject(packageJson.devDependencies)
         packageJson.peerDependencies = sortArrayOrObject(packageJson.peerDependencies)
         packageJson.peerDevDependencies = sortArrayOrObject(packageJson.peerDevDependencies)
-        writePackageJson(packageJson)
+        await writePackageJson(packageJson)
     })
 
 type Choice = {
@@ -297,7 +297,7 @@ program
     .action(async () => {
         consola.warn("请在使用本功能前提交或备份代码")
         const { default: inquirer } = await import("inquirer")
-        const files = getFiles("./src", (path, stats) => path.ext === ".tsx" && stats.isFile())
+        const files = await getFiles("./src", (path, stats) => path.ext === ".tsx" && stats.isFile())
         const reg = /^(export )?const \w+?: FC.+?$/gm
         const { auto } = await inquirer.prompt({
             type: "confirm",
@@ -438,7 +438,7 @@ program
     .action(async () => {
         consola.warn("请在使用本功能前提交或备份代码")
 
-        const files = getFiles(".", (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile(), {
+        const files = await getFiles(".", (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile(), {
             exclude: (path, stats) => stats.isDirectory() && path.base === "node_modules"
         })
 
@@ -480,6 +480,36 @@ program
         consola.start("检查项目是否存在 TypeScript 错误")
 
         await spawnAsync("npx tsc --noEmit")
+    })
+
+program
+    .command("rsbuild")
+    .description("rsbuild 常用设置")
+    .action(async () => {
+        await writeRsbuildConfig()
+        await createIndexHtml()
+        await setTsConfig("noEmit", false)
+        await addGitignore()
+        const packageJson = await readPackageJson()
+        await addDependencies(packageJson, "@ant-design/cssinjs")
+        await addDependencies(packageJson, "@ant-design/icons")
+        await addDependencies(packageJson, "@emotion/css")
+        await addDependencies(packageJson, "ahooks")
+        await addDependencies(packageJson, "antd")
+        await addDependencies(packageJson, "deepsea-components")
+        await addDependencies(packageJson, "deepsea-tools")
+        await addDependencies(packageJson, "react-router-dom")
+        await addDependencies(packageJson, "react-soda")
+        await addDevDependencies(packageJson, "@types/node")
+        await addDevDependencies(packageJson, "prettier")
+        await addDevDependencies(packageJson, "prettier-plugin-tailwindcss")
+        await addDevDependencies(packageJson, "tailwindcss")
+        await writePackageJson(packageJson)
+        await addTailwindConfig()
+        await addPostCSSConfig()
+        await addTailwindToCSS()
+        await addPrettierConfig()
+        await install()
     })
 
 program.parse()

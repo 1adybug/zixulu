@@ -1,6 +1,7 @@
 import { spawn } from "child_process"
 import consola from "consola"
-import { Stats, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "fs"
+import { Stats, readFileSync } from "fs"
+import { access, mkdir, readFile, readdir, rm, stat, writeFile } from "fs/promises"
 import * as JSON5 from "json5"
 import { ParsedPath, isAbsolute, join, parse } from "path"
 import { Config } from "prettier"
@@ -84,7 +85,7 @@ export async function getPackageUpgradeVersion(packageName: string, version: str
 }
 
 /** 读取 package.json */
-export function readPackageJson(path?: string): Record<string, any> {
+export function readPackageJsonSync(path?: string): Record<string, any> {
     try {
         const result = JSON.parse(readFileSync(getPackageJsonPath(path), "utf-8"))
         return result
@@ -95,10 +96,22 @@ export function readPackageJson(path?: string): Record<string, any> {
     }
 }
 
-/** 读取 tsconfig.json */
-export function readTsConfigJSON(path?: string): Record<string, any> {
+/** 读取 package.json */
+export async function readPackageJson(path?: string): Promise<Record<string, any>> {
     try {
-        const result = JSON5.parse(readFileSync(getTsConfigJsonPath(path), "utf-8"))
+        const result = JSON.parse(await readFile(getPackageJsonPath(path), "utf-8"))
+        return result
+    } catch (error) {
+        consola.error(error)
+        consola.fail("读取 package.json 失败")
+        exit()
+    }
+}
+
+/** 读取 tsconfig.json */
+export async function readTsConfigJSON(path?: string): Promise<Record<string, any>> {
+    try {
+        const result = JSON5.parse(await readFile(getTsConfigJsonPath(path), "utf-8"))
         return result
     } catch (error) {
         consola.error(error)
@@ -184,9 +197,9 @@ export async function addLatestDevDependencies(packageJson: Record<string, any>,
 }
 
 /** 写回 package.json */
-export function writePackageJson(packageJson: Record<string, any>, path?: string) {
+export async function writePackageJson(packageJson: Record<string, any>, path?: string) {
     try {
-        writeFileSync(getPackageJsonPath(path), JSON.stringify(packageJson, undefined, 4), "utf-8")
+        await writeFile(getPackageJsonPath(path), JSON.stringify(packageJson, undefined, 4), "utf-8")
         consola.success("修改 package.json 成功")
     } catch (error) {
         consola.fail("修改 package.json 失败")
@@ -199,78 +212,78 @@ export interface GetFilesOptions {
     exclude?: (path: ParsedPath, stats: Stats) => boolean
 }
 
-export function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) => boolean, depthOrOptions?: number | GetFilesOptions) {
+export async function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) => boolean, depthOrOptions?: number | GetFilesOptions) {
     const result: string[] = []
-    function _getFiles(path: string, depthOrOptions?: number | GetFilesOptions) {
+    async function _getFiles(path: string, depthOrOptions?: number | GetFilesOptions) {
         const options: GetFilesOptions = typeof depthOrOptions === "number" ? { depth: depthOrOptions } : depthOrOptions ?? {}
         const { depth, exclude } = options
         path = getAbsolutePath(path)
-        const files = readdirSync(path)
+        const files = await readdir(path)
         for (const file of files) {
             const filePath = join(path, file)
             const parsedPath = parse(filePath)
-            const stat = statSync(filePath)
-            if (judge(parsedPath, stat)) {
+            const stats = await stat(filePath)
+            if (judge(parsedPath, stats)) {
                 result.push(filePath)
             }
-            if (stat.isDirectory() && (!exclude || !exclude(parsedPath, stat)) && (depth === undefined || depth > 0)) {
-                _getFiles(filePath, {
+            if (stats.isDirectory() && (!exclude || !exclude(parsedPath, stats)) && (depth === undefined || depth > 0)) {
+                await _getFiles(filePath, {
                     depth: depth === undefined ? undefined : depth - 1,
                     exclude
                 })
             }
         }
     }
-    _getFiles(path, depthOrOptions)
+    await _getFiles(path, depthOrOptions)
     return result
 }
 
 /** 删除 ESLint 配置文件 */
-export function removeESLint() {
+export async function removeESLint() {
     try {
-        const files = getFiles(cwd(), (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile(), {
+        const files = await getFiles(cwd(), (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile(), {
             depth: 1,
             exclude: path => path.base !== "node_modules"
         })
-        files.forEach(file => {
+        for (const file of files) {
             try {
-                unlinkSync(file)
+                await rm(file, { force: true, recursive: true })
             } catch (error) {
                 consola.fail(`删除 ${file} 失败`)
             }
-        })
+        }
         consola.success("删除 ESLint 配置文件成功")
     } catch (error) {
         consola.error(error)
         consola.fail("获取 ESLint 配置文件列表失败")
     }
     try {
-        const pkg = readPackageJson()
+        const pkg = await readPackageJson()
         Object.keys(pkg.dependencies).forEach(key => {
             if (key.includes("eslint")) delete pkg.dependencies[key]
         })
         Object.keys(pkg.devDependencies).forEach(key => {
             if (key.includes("eslint")) delete pkg.devDependencies[key]
         })
-        writePackageJson(pkg)
+        await writePackageJson(pkg)
         consola.success("删除 ESLint 依赖成功")
     } catch (error) {
         consola.fail("删除 ESLint 依赖失败")
     }
 }
 
-export function vite() {
-    setTsConfig("noUnusedLocals")
-    setTsConfig("noUnusedParameters")
-    const pkg = readPackageJson()
+export async function vite() {
+    await setTsConfig("noUnusedLocals")
+    await setTsConfig("noUnusedParameters")
+    const pkg = await readPackageJson()
     pkg.scripts.dev = "vite --host"
-    writePackageJson(pkg)
+    await writePackageJson(pkg)
 }
 
 /** 添加 tailwind.config.js 配置成功 */
-export function addTailwindConfig() {
+export async function addTailwindConfig() {
     try {
-        writeFileSync(
+        await writeFile(
             getAbsolutePath("tailwind.config.js"),
             `/** @type {import('tailwindcss').Config} */
 export default {
@@ -282,7 +295,8 @@ export default {
     extend: {},
     },
     plugins: [],
-}`,
+}
+`,
             "utf-8"
         )
         consola.success("添加 tailwind.config.js 配置成功")
@@ -291,40 +305,46 @@ export default {
     }
 }
 
-/** 添加 postcss.config.js 配置成功 */
-export function addPostCSSConfig() {
+/** 添加 postcss.config.js 配置 */
+export async function addPostCSSConfig() {
     try {
-        writeFileSync(
-            getAbsolutePath("postcss.config.cjs"),
+        const packageJson = await readPackageJson()
+        const autoprefixer = Object.keys(packageJson.dependencies).includes("autoprefixer") || Object.keys(packageJson.devDependencies).includes("autoprefixer")
+        await writeFile(
+            getAbsolutePath("postcss.config.js"),
             `module.exports = {
     plugins: {
-        tailwindcss: {},
-        autoprefixer: {}
+        tailwindcss: {}${
+            autoprefixer
+                ? `,
+        autoprefixer: {}`
+                : ""
+        }
     }
 }
 `,
             "utf-8"
         )
-        consola.success("添加 postcss.config.cjs 配置成功")
+        consola.success("添加 postcss.config.js 配置成功")
     } catch (error) {
-        consola.fail("添加 postcss.config.cjs 配置失败")
+        consola.fail("添加 postcss.config.js 配置失败")
     }
 }
 
 /** 添加 tailwind 至 index.css 成功 */
-export function addTailwindToCSS() {
+export async function addTailwindToCSS() {
     try {
         const dir = getAbsolutePath("./src")
-        const files = getFiles(dir, (path, stats) => (path.base.toLowerCase() === "index.css" || path.base.toLowerCase() === "app.css") && stats.isFile(), { depth: 1 })
+        const files = await getFiles(dir, (path, stats) => (path.base.toLowerCase() === "index.css" || path.base.toLowerCase() === "app.css") && stats.isFile(), { depth: 1 })
         if (files.length === 0) throw new Error("未找到 index.css 或 app.css")
         const file = files.find(item => item.toLowerCase().endsWith("index.css")) || files.find(item => item.toLowerCase().endsWith("app.css"))!
         const { base } = parse(file)
-        const css = readFileSync(file, "utf-8")
+        const css = await readFile(file, "utf-8")
         if (css.includes("@tailwind")) {
             consola.warn(`${base} 已经包含 tailwind`)
             return
         }
-        writeFileSync(
+        await writeFile(
             file,
             `@tailwind base;    
 @tailwind components;
@@ -370,13 +390,12 @@ export const prettierConfigTextWithTailwind = `module.exports = {
 /** 添加 prettier 配置成功 */
 export async function addPrettierConfig() {
     try {
-        const packageJson = readPackageJson()
+        const packageJson = await readPackageJson()
         const tailwind = Object.keys(packageJson.dependencies).includes("tailwindcss") || Object.keys(packageJson.devDependencies).includes("tailwindcss")
-        writeFileSync(getAbsolutePath("./prettier.config.cjs"), tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
-        const pkg = readPackageJson()
-        await addDevDependencies(pkg, "prettier")
-        await addDevDependencies(pkg, "prettier-plugin-tailwindcss")
-        writePackageJson(pkg)
+        await writeFile(getAbsolutePath("./prettier.config.cjs"), tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
+        await addDevDependencies(packageJson, "prettier")
+        await addDevDependencies(packageJson, "prettier-plugin-tailwindcss")
+        await writePackageJson(packageJson)
         consola.success("添加 prettier 配置成功")
     } catch (error) {
         consola.fail("添加 prettier 配置失败")
@@ -385,24 +404,24 @@ export async function addPrettierConfig() {
 
 /** 配置 tailwind */
 export async function tailwind() {
-    const pkg = readPackageJson()
-    await addDevDependencies(pkg, "tailwindcss")
-    await addDevDependencies(pkg, "autoprefixer")
-    await addDevDependencies(pkg, "postcss")
-    await addDevDependencies(pkg, "prettier")
-    await addDevDependencies(pkg, "prettier-plugin-tailwindcss")
-    writePackageJson(pkg)
-    addTailwindConfig()
-    addPostCSSConfig()
-    addTailwindToCSS()
+    const packageJson = await readPackageJson()
+    await addDevDependencies(packageJson, "tailwindcss")
+    await addDevDependencies(packageJson, "autoprefixer")
+    await addDevDependencies(packageJson, "postcss")
+    await addDevDependencies(packageJson, "prettier")
+    await addDevDependencies(packageJson, "prettier-plugin-tailwindcss")
+    await writePackageJson(packageJson)
+    await addTailwindConfig()
+    await addPostCSSConfig()
+    await addTailwindToCSS()
     await addPrettierConfig()
 }
 
-export function removeComment(path: string) {
+export async function removeComment(path: string) {
     try {
-        const text = readFileSync(getAbsolutePath(path), "utf-8")
+        const text = await readFile(getAbsolutePath(path), "utf-8")
         const newText = text.replace(/^ *?\/\/.*?$/gm, "")
-        writeFileSync(getAbsolutePath(path), newText, "utf-8")
+        await writeFile(getAbsolutePath(path), newText, "utf-8")
         consola.success("删除注释成功")
     } catch (error) {
         consola.fail("删除注释失败")
@@ -449,38 +468,45 @@ export enum ModuleResolution {
     NodeNext = "NodeNext"
 }
 
-export function setTsConfig(key: string, value?: string | undefined) {
-    const tsconfig = readTsConfigJSON()
+export async function setTsConfig(key: string, value?: any) {
+    const tsconfig = await readTsConfigJSON()
     if (value === undefined) {
         delete tsconfig.compilerOptions[key]
     } else {
-        if (key === "target") {
-            const t = Object.values(Target).find(t => t.toLowerCase() === value.trim().toLowerCase())
-            if (!t) {
-                consola.fail("无效的 target 选项")
+        switch (key) {
+            case "target":
+                const t = Object.values(Target).find(t => t.toLowerCase() === value.trim().toLowerCase())
+                if (!t) {
+                    consola.fail("无效的 target 选项")
+                    exit()
+                }
+                tsconfig.compilerOptions.target = t
+                break
+            case "module":
+                const m = Object.values(Module).find(m => m.toLowerCase() === value.trim().toLowerCase())
+                if (!m) {
+                    consola.fail("无效的 module 选项")
+                    exit()
+                }
+                tsconfig.compilerOptions.module = m
+                break
+            case "moduleResolution":
+                const mr = Object.values(ModuleResolution).find(mr => mr.toLowerCase() === value.trim().toLowerCase())
+                if (!mr) {
+                    consola.fail("无效的 moduleResolution 选项")
+                    exit()
+                }
+                tsconfig.compilerOptions.moduleResolution = mr
+                break
+            case "noEmit":
+                tsconfig.compilerOptions.noEmit = !!value
+                break
+            default:
+                consola.fail(`暂不支持 ${key} 项`)
                 exit()
-            }
-            tsconfig.compilerOptions.target = t
-        } else if (key === "module") {
-            const m = Object.values(Module).find(m => m.toLowerCase() === value.trim().toLowerCase())
-            if (!m) {
-                consola.fail("无效的 module 选项")
-                exit()
-            }
-            tsconfig.compilerOptions.module = m
-        } else if (key === "moduleResolution") {
-            const mr = Object.values(ModuleResolution).find(mr => mr.toLowerCase() === value.trim().toLowerCase())
-            if (!mr) {
-                consola.fail("无效的 moduleResolution 选项")
-                exit()
-            }
-            tsconfig.compilerOptions.moduleResolution = mr
-        } else {
-            consola.fail(`暂不支持 ${key} 项`)
-            exit()
         }
     }
-    writeFileSync(getTsConfigJsonPath(), JSON.stringify(tsconfig, undefined, 4), "utf-8")
+    await writeFile(getTsConfigJsonPath(), JSON.stringify(tsconfig, undefined, 4), "utf-8")
     consola.success(`修改 ${key} 成功`)
 }
 
@@ -571,4 +597,75 @@ export function splitExtendsType(str: string) {
     }
     types.push(str.slice(index))
     return types.map(v => v.trim()).filter(v => v)
+}
+
+export const rsbuildConfig = `import { defineConfig } from "@rsbuild/core"
+import { pluginReact } from "@rsbuild/plugin-react"
+
+export default defineConfig({
+    html: {
+        template: "public/index.html"
+    },
+    plugins: [pluginReact()],
+    server: {
+        port: 5173
+    },
+    source: {
+        define: {}
+    }
+})
+`
+
+export async function writeRsbuildConfig() {
+    await writeFile(getAbsolutePath("rsbuild.config.ts"), rsbuildConfig, "utf-8")
+}
+
+export const indexHtml = `<!doctype html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" href="/logo.webp" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="江苏格数科技有限公司" />
+        <title>Hello, World!</title>
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
+</html>
+`
+
+export async function createIndexHtml() {
+    try {
+        await writeFile(getAbsolutePath("public/index.html"), indexHtml, "utf-8")
+        consola.success("创建 index.html 成功")
+    } catch (error) {
+        await mkdir(getAbsolutePath("public"))
+        try {
+            await writeFile(getAbsolutePath("public/index.html"), indexHtml, "utf-8")
+            consola.success("创建 index.html 成功")
+        } catch (error) {
+            consola.fail("创建 index.html 失败")
+            exit()
+        }
+    }
+}
+
+export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log"]
+
+export async function addGitignore() {
+    try {
+        const files = await getFiles(cwd(), (path, stats) => path.base === ".gitignore" && stats.isFile(), { depth: 1 })
+        const file = files.at(0)
+        if (file) {
+            const gitignore = await readFile(getAbsolutePath(".gitignore"), "utf-8")
+            const newGitignore = `${gitignore}\n${addedRules.join("\n")}`
+            await writeFile(getAbsolutePath(".gitignore"), newGitignore, "utf-8")
+        } else {
+            await writeFile(getAbsolutePath(".gitignore"), addedRules.join("\n"), "utf-8")
+        }
+    } catch (error) {
+        consola.fail("添加 .gitignore 失败")
+        exit()
+    }
 }
