@@ -514,4 +514,54 @@ program
         await install()
     })
 
+program
+    .command("git-proxy")
+    .description("设置 git 代理")
+    .action(async () => {
+        const { default: inquirer } = await import("inquirer")
+        const { global } = await inquirer.prompt({
+            type: "list",
+            name: "global",
+            message: "请选择",
+            choices: [
+                {
+                    name: "全局代理",
+                    value: true
+                },
+                {
+                    name: "当前项目",
+                    value: false
+                }
+            ]
+        })
+        const { open } = await inquirer.prompt({
+            type: "list",
+            name: "open",
+            message: "请选择",
+            choices: [
+                {
+                    name: "打开代理",
+                    value: true
+                },
+                {
+                    name: "关闭代理",
+                    value: false
+                }
+            ]
+        })
+        if (!open) {
+            await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`)
+            await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`)
+            return
+        }
+        const { proxy } = await inquirer.prompt({
+            type: "input",
+            name: "proxy",
+            message: "请输入代理地址",
+            default: "http://localhost:7890"
+        })
+        await spawnAsync(`git config${global ? " --global" : ""} http.proxy ${proxy}`)
+        await spawnAsync(`git config${global ? " --global" : ""} https.proxy ${proxy}`)
+    })
+
 program.parse()
