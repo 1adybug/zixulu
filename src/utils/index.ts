@@ -572,6 +572,7 @@ export type SpawnAsyncOptions = {
 }
 
 export function spawnAsync(command: string, options?: SpawnAsyncOptions) {
+    console.log(command)
     const { ignoreError = false, cwd } = options || {}
     return new Promise<void>((resolve, reject) => {
         const child = spawn(command, { shell: true, stdio: "inherit", cwd })
