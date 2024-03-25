@@ -550,8 +550,12 @@ program
             ]
         })
         if (!open) {
-            await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`)
-            await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`)
+            try {
+                await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`)
+            } catch (error) {}
+            try {
+                await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`)
+            } catch (error) {}
             return
         }
         const { proxy } = await inquirer.prompt({
