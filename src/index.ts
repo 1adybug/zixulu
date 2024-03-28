@@ -2,10 +2,10 @@
 
 import { Argument, Command } from "commander"
 import consola from "consola"
-import { readFile, writeFile } from "fs/promises"
+import { mkdir, readFile, writeFile } from "fs/promises"
 import { resolve } from "path"
 import { Manager, Registry } from "./constant"
-import { Module, ModuleResolution, Target, addDependencies, addDevDependencies, addGitignore, addLatestDependencies, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writePackageJson, writeRsbuildConfig } from "./utils"
+import { Module, ModuleResolution, Target, addDependencies, addDevDependencies, addGitignore, addLatestDependencies, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, download7Zip, downloadChrome, downloadDeskGo, downloadFromWinget, downloadSupermium, downloadVscode, downloadVscodeExts, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writePackageJson, writeRsbuildConfig } from "./utils"
 
 const program = new Command()
 
@@ -566,6 +566,20 @@ program
         })
         await spawnAsync(`git config${global ? " --global" : ""} http.proxy ${proxy}`)
         await spawnAsync(`git config${global ? " --global" : ""} https.proxy ${proxy}`)
+    })
+
+program
+    .command("softwares")
+    .description("下载最新版软件")
+    .action(async () => {
+        const dir = Date.now().toString()
+        await mkdir(`${dir}/vscode`, { recursive: true })
+        await downloadVscode(dir)
+        await downloadSupermium(dir)
+        await downloadChrome(dir)
+        await download7Zip(dir)
+        await downloadDeskGo(dir)
+        await downloadVscodeExts(`${dir}/vscode`)
     })
 
 program.parse()

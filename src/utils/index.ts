@@ -1,11 +1,14 @@
 import { spawn } from "child_process"
 import consola from "consola"
-import { Stats, readFileSync } from "fs"
-import { access, mkdir, readFile, readdir, rm, stat, writeFile } from "fs/promises"
+import { Stats, createWriteStream, readFileSync } from "fs"
+import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "fs/promises"
 import * as JSON5 from "json5"
 import { ParsedPath, isAbsolute, join, parse } from "path"
 import { Config } from "prettier"
 import { cwd, exit } from "process"
+import { Readable } from "stream"
+import YAML from "yaml"
+import { HttpsProxyAgent } from "https-proxy-agent"
 
 function getAbsolutePath(path: string) {
     return isAbsolute(path) ? path : join(cwd(), path)
@@ -49,10 +52,12 @@ export function getVersionFromRequiredVersion(requiredVersion: string) {
 }
 
 export function getVersionNum(version: string) {
-    const reg = /^(\d+)\.(\d+)\.(\d+)/
+    const reg = /^(\d+)(\.\d+)?(\.\d+)?/
     const result = version.match(reg)
     if (!result) throw new Error("无效的版本号")
-    return Array.from(result).slice(1).map(Number)
+    return Array.from(result)
+        .slice(1)
+        .map(str => (str ? parseInt(str.replace(/^\./, "")) : 0))
 }
 
 export async function getPackageUpgradeVersion(packageName: string, version: string, level: "major" | "minor" | "patch") {
@@ -673,5 +678,234 @@ export async function addGitignore() {
     } catch (error) {
         consola.fail("添加 .gitignore 失败")
         exit()
+    }
+}
+
+const agent = new HttpsProxyAgent("http://localhost:7890")
+
+export function getFilename(headers: Headers) {
+    const disposition = headers.get("content-disposition")
+    if (!disposition) return undefined
+    const reg = /filename=(.+?);/
+    const result = disposition.match(reg)
+    if (!result) return undefined
+    return result[1]
+}
+
+export async function download(url: string, dir: string, filename?: string, suffix?: string) {
+    const response = await fetch(url)
+    filename = getFilename(response.headers) || filename || new URL(url).pathname.split("/").at(-1)!
+    if (suffix) {
+        const { name, ext } = parse(filename)
+        filename = `${name}${suffix}${ext}`
+    }
+    const writeable = createWriteStream(join(dir, filename))
+    await new Promise((resolve, reject) =>
+        Readable.fromWeb(response.body as any)
+            .pipe(writeable)
+            .on("finish", resolve)
+            .on("error", reject)
+    )
+    return filename
+}
+
+export async function downloadVscode(dir: string) {
+    await download("https://code.visualstudio.com/sha/download?build=stable&os=win32-x64", dir, "vscode.exe")
+}
+
+export async function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+export async function downloadSupermium(dir: string) {
+    const response = await fetch("https://win32subsystem.live/supermium/")
+    const html = await response.text()
+    const reg = /href=".+?setup\.exe"/g
+    const matches = Array.from(html.match(reg) || [])
+    const reg2 = /<b>Supermium (\d+(\.\d+)*)/
+    const version = html.match(reg2)![1]
+    for (let i = 0; i < matches.length; i++) {
+        const str = matches[i]
+        const url = new URL(str.slice(6, -1), "https://win32subsystem.live").href
+        const filename = await download(url, dir)
+        await sleep(100)
+        await rename(join(dir, filename), join(dir, `Supermium_${version}_${filename.endsWith("64_setup.exe") ? "x64" : "x86"}.exe`))
+    }
+}
+
+export namespace PCQQ {
+    export interface Result {
+        resp: Resp
+    }
+
+    export interface Resp {
+        soft_list: Softlist[]
+        retCode: number
+    }
+
+    export interface Softlist {
+        soft_id: number
+        os_type: number
+        os_bit: number
+        display_name: string
+        nick_ver: string
+        ver_name: string
+        file_size: string
+        file_name: string
+        publish_date: string
+        download_url: string
+        download_https_url: string
+    }
+}
+
+export async function downloadFromPCQQ(dir: string, cmdid: number, soft_id_list: number) {
+    const data = new URLSearchParams()
+    data.set("cmdid", cmdid.toString())
+    data.set("jprxReq[req][soft_id_list][]", soft_id_list.toString())
+    const headers = new Headers()
+    headers.set("Content-Type", "application/x-www-form-urlencoded")
+    const response = await fetch(`https://luban.m.qq.com/api/public/software-manager/softwareProxy`, { method: "POST", headers, body: data.toString() })
+    const result: PCQQ.Result = await response.json()
+    await download(result.resp.soft_list[0].download_https_url, dir, result.resp.soft_list[0].file_name)
+}
+
+export namespace Winget {
+    export interface Package {
+        PackageIdentifier: string
+        PackageVersion: string
+        InstallerType: string
+        InstallModes: string[]
+        InstallerSwitches: InstallerSwitches
+        ExpectedReturnCodes: ExpectedReturnCode[]
+        UpgradeBehavior: string
+        Protocols: string[]
+        FileExtensions: string[]
+        AppsAndFeaturesEntries: AppsAndFeaturesEntry[]
+        Installers: Installer[]
+        ManifestType: string
+        ManifestVersion: string
+    }
+
+    export interface Installer {
+        Architecture: string
+        Scope: string
+        InstallerUrl: string
+        InstallerSha256: string
+        InstallerSwitches: InstallerSwitches2
+        ProductCode: string
+    }
+
+    export interface InstallerSwitches2 {
+        Custom: string
+    }
+
+    export interface AppsAndFeaturesEntry {
+        UpgradeCode: string
+        InstallerType: string
+    }
+
+    export interface ExpectedReturnCode {
+        InstallerReturnCode: number
+        ReturnResponse: string
+    }
+
+    export interface InstallerSwitches {
+        Log: string
+    }
+}
+
+export type WingetItem = {
+    filename: string
+    version: string
+}
+
+export async function downloadFromWinget(dir: string, id: string) {
+    const { default: fetch } = await import("node-fetch")
+    const reg = /^(.+?)\.(.+?)$/
+    const [, publisher, name] = id.match(reg)!
+    const response = await fetch(`https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${publisher[0].toLowerCase()}/${publisher}/${name}`, { agent })
+    const data: GithubContent[] = (await response.json()) as any
+    const reg2 = /^\d+(\.\d+?)*$/
+    const stables = data.filter(item => reg2.test(item.name))
+    stables.sort((a, b) => {
+        const avs = a.name.split(".")
+        const bvs = b.name.split(".")
+        const max = Math.max(avs.length, bvs.length)
+        for (let i = 0; i < max; i++) {
+            const av = avs[i] ? parseInt(avs[i]) : 0
+            const bv = bvs[i] ? parseInt(bvs[i]) : 0
+            if (av < bv) return 1
+            if (av > bv) return -1
+        }
+        return 0
+    })
+    const response2 = await fetch(`https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/${publisher[0].toLowerCase()}/${publisher}/${name}/${stables[0].name}/${id}.installer.yaml`, { agent })
+    const yaml = await response2.text()
+    const pkg: Winget.Package = YAML.parse(yaml)
+    const installers = pkg.Installers.filter((item, index) => (item.Architecture === "x64" || item.Architecture === "x86") && item.InstallerUrl.endsWith(".exe") && pkg.Installers.findIndex(item2 => item2.Architecture === item.Architecture) === index)
+    const result: WingetItem[] = []
+    for (const { InstallerUrl, Architecture } of installers) {
+        if (Architecture !== "x64" && Architecture !== "x86") continue
+        const filename = await download(InstallerUrl, dir, undefined, `_${Architecture}`)
+        result.push({ filename, version: pkg.PackageVersion })
+    }
+    return result
+}
+
+export interface GithubContent {
+    name: string
+    path: string
+    sha: string
+    size: number
+    url: string
+    html_url: string
+    git_url: string
+    download_url?: string | null
+    type: string
+    _links: Links
+}
+
+export interface Links {
+    self: string
+    git: string
+    html: string
+}
+
+export async function downloadChrome(dir: string) {
+    const result = await downloadFromWinget(dir, "Google.Chrome")
+    for (const { version, filename } of result) {
+        await sleep(100)
+        await rename(join(dir, filename), join(dir, `Chrome_${version}_${filename.endsWith("_x64.exe") ? "x64" : "x86"}.exe`))
+    }
+}
+
+export async function download7Zip(dir: string) {
+    const result = await downloadFromWinget(dir, "7zip.7zip")
+    for (const { version, filename } of result) {
+        await sleep(100)
+        await rename(join(dir, filename), join(dir, `7Zip_${version}_${filename.endsWith("_x64.exe") ? "x64" : "x86"}.exe`))
+    }
+}
+
+export async function downloadDeskGo(dir: string) {
+    await downloadFromPCQQ(dir, 3318, 23125)
+}
+
+export const vscodeExts: string[] = ["MS-CEINTL.vscode-language-pack-zh-hans", "russell.any-rule", "russell.any-type", "formulahendry.code-runner", "dsznajder.es7-react-js-snippets", "ms-vscode.vscode-typescript-next", "bierner.lit-html", "ritwickdey.LiveServer", "yzhang.markdown-all-in-one", "bierner.markdown-preview-github-styles", "mervin.markdown-formatter", "DavidAnson.vscode-markdownlint", "PKief.material-icon-theme", "techer.open-in-browser", "esbenp.prettier-vscode", "Prisma.prisma", "bradlc.vscode-tailwindcss", "styled-components.vscode-styled-components"]
+
+export async function downloadVscodeExt(dir: string, ext: string) {
+    const response = await fetch(`https://marketplace.visualstudio.com/items?itemName=${ext}`)
+    const html = await response.text()
+    const reg = /^(.+?)\.(.+?)$/
+    const [, author, name] = ext.match(reg)!
+    const reg2 = /"Version":"(.+?)"/
+    const version = html.match(reg2)![1]
+    const url = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${author}/vsextensions/${name}/${version}/vspackage`
+    await download(url, dir, `${ext}-${version}.vsix`)
+}
+
+export async function downloadVscodeExts(dir: string) {
+    for (const ext of vscodeExts) {
+        await downloadVscodeExt(dir, ext)
     }
 }

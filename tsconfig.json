@@ -6,6 +6,9 @@
         "baseUrl": "./",
         "target": "ESNext",
         "module": "ESNext",
-        "moduleResolution": "Bundler",
-    }
+        "moduleResolution": "Bundler"
+    },
+    "exclude": [
+        "dist"
+    ]
 }
