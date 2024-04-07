@@ -935,12 +935,11 @@ export async function downloadVscodeExt(dir: string, ext: string) {
     const [, author, name] = ext.match(reg)!
     const reg2 = /"Version":"(.+?)"/
     const version = html.match(reg2)![1]
-    const url = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${author}/vsextensions/${name}/${version}/vspackage`
     const reg3 = /<span class="ux-item-name">(.+?)<\/span>/
-    const displayName = html.match(reg3)![1].replace(/\//g, "-")
-    const filename = await download(url, dir, `${ext}-${version}.vsix`)
-    await sleep(100)
-    await rename(join(dir, filename), join(dir, `${displayName}.vsix`))
+    const displayName = html.match(reg3)![1]
+    consola.start(`正在下载 ${displayName}`)
+    const url = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${author}/vsextensions/${name}/${version}/vspackage`
+    await download(url, dir, `${ext}-${version}.vsix`)
 }
 
 export async function downloadVscodeExts(dir: string) {
@@ -979,7 +978,7 @@ async function main() {
     const dir = await readdir("./")
     const exts = dir.filter(name => name.endsWith(".vsix"))
     for (const ext of exts) {
-        await spawnAsync(\`code --install-extension \${ext}\`)
+        await spawnAsync(\`code --install-extension "\${ext}"\`)
     }
 }
 
