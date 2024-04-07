@@ -4,8 +4,8 @@ import { Argument, Command } from "commander"
 import consola from "consola"
 import { mkdir, readFile, writeFile } from "fs/promises"
 import { resolve } from "path"
-import { Manager, Registry } from "./constant"
-import { Module, ModuleResolution, Target, addDependencies, addDevDependencies, addGitignore, addLatestDependencies, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, download7Zip, downloadChrome, downloadDeskGo, downloadFromWinget, downloadSupermium, downloadVscode, downloadVscodeExts, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writePackageJson, writeRsbuildConfig } from "./utils"
+import { Manager, Registry, Software } from "./constant"
+import { Module, ModuleResolution, SoftwareDownloadMap, Target, addDependencies, addDevDependencies, addGitignore, addLatestDependencies, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig } from "./utils"
 
 const program = new Command()
 
@@ -158,6 +158,8 @@ program
                 return prev
             }, {})
         }
+        packageJson.scripts ??= {}
+        packageJson.scripts.prepublishOnly = "npx zixulu upgrade && father doctor && npm run build"
         delete packageJson.dependencies
         delete packageJson.devDependencies
         delete packageJson.peerDependencies
@@ -569,17 +571,65 @@ program
     })
 
 program
-    .command("softwares")
+    .command("shell-proxy")
+    .description("设置 powershell 代理")
+    .action(async () => {
+        const { default: inquirer } = await import("inquirer")
+        const { open } = await inquirer.prompt({
+            type: "list",
+            name: "open",
+            message: "请选择",
+            choices: [
+                {
+                    name: "打开代理",
+                    value: true
+                },
+                {
+                    name: "关闭代理",
+                    value: false
+                }
+            ]
+        })
+        if (!open) return await spawnAsync(`netsh winhttp reset proxy`)
+        const { proxy } = await inquirer.prompt({
+            type: "input",
+            name: "proxy",
+            message: "请输入代理地址",
+            default: "http://localhost:7890"
+        })
+        await spawnAsync(`netsh winhttp set proxy "${proxy}" "<local>"`)
+    })
+
+program
+    .command("download-software")
+    .alias("ds")
     .description("下载最新版软件")
     .action(async () => {
-        const dir = Date.now().toString()
-        await mkdir(`${dir}/vscode`, { recursive: true })
-        await downloadVscode(dir)
-        await downloadSupermium(dir)
-        await downloadChrome(dir)
-        await download7Zip(dir)
-        await downloadDeskGo(dir)
-        await downloadVscodeExts(`${dir}/vscode`)
+        const { default: inquirer } = await import("inquirer")
+        const dir = `softwares-${Date.now()}`
+        const { softwares } = await inquirer.prompt({
+            type: "checkbox",
+            name: "softwares",
+            message: "请选择要下载的软件",
+            choices: Object.values(Software),
+            default: Object.values(Software)
+        })
+        if (softwares.length === 0) return
+        await mkdir(dir, { recursive: true })
+        for (const software of softwares) {
+            await SoftwareDownloadMap[software as Software](dir)
+        }
+    })
+
+program
+    .command("download-vscode-extension")
+    .alias("dve")
+    .description("下载 VS Code 插件")
+    .action(async () => {
+        const dir = `vscode-${Date.now()}`
+        await mkdir(dir, { recursive: true })
+        await downloadVscodeExts(dir)
+        await writeInstallVscodeExtScript(dir)
     })
 
 program.parse()
