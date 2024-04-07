@@ -617,6 +617,7 @@ program
         if (softwares.length === 0) return
         await mkdir(dir, { recursive: true })
         for (const software of softwares) {
+            consola.start(`正在下载 ${software}`)
             await SoftwareDownloadMap[software as Software](dir)
         }
     })
