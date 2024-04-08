@@ -72,64 +72,65 @@ program
         await setTsConfig("moduleResolution", moduleResolution)
     })
 
-interface NpmPackage {
-    name: string
-    description: string
-}
+// interface NpmPackage {
+//     name: string
+//     description: string
+// }
 
-const packages: NpmPackage[] = [
-    {
-        name: "deepsea-tools",
-        description: "格数工具库"
-    },
-    {
-        name: "deepsea-components",
-        description: "格数组件库"
-    },
-    {
-        name: "react-soda",
-        description: "简单的状态管理库"
-    },
-    {
-        name: "type-request",
-        description: "基于 TypeScript 和 fetch 的类型请求库"
-    },
-    {
-        name: "use-abort-signal",
-        description: "在 useEffect 中安全地取消 fetch 请求"
-    },
-    {
-        name: "react-viewer-soda",
-        description: "基于 viewerjs 的图片预览组件"
-    },
-    {
-        name: "viewerjs-soda",
-        description: "基于 viewerjs 的图片预览库"
-    }
-]
+// const packages: NpmPackage[] = [
+//     {
+//         name: "deepsea-tools",
+//         description: "格数工具库"
+//     },
+//     {
+//         name: "deepsea-components",
+//         description: "格数组件库"
+//     },
+//     {
+//         name: "react-soda",
+//         description: "简单的状态管理库"
+//     },
+//     {
+//         name: "type-request",
+//         description: "基于 TypeScript 和 fetch 的类型请求库"
+//     },
+//     {
+//         name: "use-abort-signal",
+//         description: "在 useEffect 中安全地取消 fetch 请求"
+//     },
+//     {
+//         name: "react-viewer-soda",
+//         description: "基于 viewerjs 的图片预览组件"
+//     },
+//     {
+//         name: "viewerjs-soda",
+//         description: "基于 viewerjs 的图片预览库"
+//     }
+// ]
+
+// program
+//     .command("npm")
+//     .description("一键添加 npm 包")
+//     .action(async () => {
+//         const packageNames = (await consola.prompt("请选择需要安装的包", {
+//             type: "multiselect",
+//             options: packages.map(pkg => ({ label: pkg.name, value: pkg.name, hint: pkg.description }))
+//         })) as unknown as string[]
+//         const latest = await consola.prompt("是否安装最新版本", {
+//             type: "confirm",
+//             initial: true
+//         })
+//         const packageJson = await readPackageJson()
+//         for (const pkg of packageNames) {
+//             await (latest ? addLatestDependencies : addDependencies)(packageJson, pkg)
+//         }
+//         await writePackageJson(packageJson)
+//         install()
+//     })
 
 program
-    .command("npm")
-    .description("一键添加 npm 包")
-    .action(async () => {
-        const packageNames = (await consola.prompt("请选择需要安装的包", {
-            type: "multiselect",
-            options: packages.map(pkg => ({ label: pkg.name, value: pkg.name, hint: pkg.description }))
-        })) as unknown as string[]
-        const latest = await consola.prompt("是否安装最新版本", {
-            type: "confirm",
-            initial: true
-        })
-        const packageJson = await readPackageJson()
-        for (const pkg of packageNames) {
-            await (latest ? addLatestDependencies : addDependencies)(packageJson, pkg)
-        }
-        await writePackageJson(packageJson)
-        install()
-    })
-
-program
-    .command("father")
+    .command("father-setting")
+    .alias("fs")
     .description("修改 father 项目配置")
     .action(async () => {
         let packageJson = await readPackageJson()
@@ -195,7 +196,8 @@ export default defineConfig({
     })
 
 program
-    .command("upgrade")
+    .command("upgrade-dependency")
+    .alias("ud")
     .description("升级所有依赖")
     .action(async () => {
         const { default: inquirer } = await import("inquirer")
@@ -275,7 +277,8 @@ program
     })
 
 program
-    .command("sort")
+    .command("sort-package-json")
+    .alias("spj")
     .description("对 package.json 中的依赖进行排序")
     .action(async () => {
         const packageJson = await readPackageJson()
@@ -294,7 +297,8 @@ type Choice = {
 }
 
 program
-    .command("experimental-arrow")
+    .command("arrow-to-function")
+    .alias("a2f")
     .description("将箭头函数组件转换为函数组件")
     .action(async () => {
         consola.warn("请在使用本功能前提交或备份代码")
@@ -435,7 +439,8 @@ program
     })
 
 program
-    .command("interface")
+    .command("interface-to-type")
+    .alias("i2t")
     .description("将 interface 转换为 type")
     .action(async () => {
         consola.warn("请在使用本功能前提交或备份代码")
@@ -487,7 +492,8 @@ program
 program.command("gitignore").description("添加 .gitignore 文件").action(addGitignore)
 
 program
-    .command("rsbuild")
+    .command("rsbuild-setting")
+    .alias("rs")
     .description("rsbuild 常用设置")
     .action(async () => {
         await writeRsbuildConfig()
@@ -518,6 +524,7 @@ program
 
 program
     .command("git-proxy")
+    .alias("gp")
     .description("设置 git 代理")
     .action(async () => {
         const { default: inquirer } = await import("inquirer")
@@ -572,6 +579,7 @@ program
 
 program
     .command("shell-proxy")
+    .alias("sp")
     .description("设置 powershell 代理")
     .action(async () => {
         const { default: inquirer } = await import("inquirer")
