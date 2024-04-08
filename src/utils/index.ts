@@ -815,7 +815,7 @@ export type WingetItem = {
     architecture: string
 }
 
-type WingetDownloadInfo = {
+export type WingetDownloadInfo = {
     name: string
     id: string
     dir: string
