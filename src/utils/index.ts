@@ -578,8 +578,19 @@ export type SpawnAsyncOptions = {
     cwd?: string | URL | undefined
 }
 
+export function execAsync(command: string) {
+    consola.log(command)
+    return new Promise<string>((resolve, reject) => {
+        exec(command, (error, stdout, stderr) => {
+            if (error) return reject(error)
+            if (stderr) consola.warn(stderr)
+            resolve(stdout)
+        })
+    })
+}
+
 export function spawnAsync(command: string, options?: SpawnAsyncOptions) {
-    console.log(command)
+    consola.log(command)
     const { ignoreError = false, cwd } = options || {}
     return new Promise<void>((resolve, reject) => {
         const child = spawn(command, { shell: true, stdio: "inherit", cwd })
@@ -988,20 +999,13 @@ main()`
 
 export async function getProcessInfoFromPid(pid: number) {
     try {
-        return await new Promise<string | undefined>((resolve, reject) => {
-            exec(`tasklist | findstr ${pid}`, (error, stdout, stderr) => {
-                if (error !== null) return reject(error)
-                if (stderr !== "") return reject(stderr)
-                const reg = new RegExp(`( +)${pid}( (Services|Console) +)`)
-                return resolve(
-                    stdout
-                        .split(/[\n\r]/)
-                        .find(line => reg.test(line))
-                        ?.replace(reg, "$1$2")
-                        ?.replace(/ +/g, " ")
-                )
-            })
-        })
+        const stdout = await execAsync(`tasklist | findstr ${pid}`)
+        const reg = new RegExp(`( +)${pid}( (Services|Console) +)`)
+        return stdout
+            .split(/[\n\r]/)
+            .find(line => reg.test(line))
+            ?.replace(reg, "$1$2")
+            ?.replace(/ +/g, " ")
     } catch (error) {
         return undefined
     }
@@ -1014,30 +1018,25 @@ export type PidInfo = {
 
 export async function getPidInfoFromPort(port: number) {
     try {
-        return await new Promise<PidInfo[]>((resolve, reject) => {
-            exec(`netstat -ano | findstr :${port}`, (error, stdout, stderr) => {
-                if (error !== null) return reject(error)
-                if (stderr !== "") return reject(stderr)
-                const reg = new RegExp(` (\\[::\\]|(\\d{1,3}\\.){3}\\d{1,3}):${port} `)
-                const result = Array.from(
-                    new Set(
-                        stdout
-                            .split(/[\n\r]/)
-                            .filter(line => reg.test(line))
-                            .map(line => ({ pid: parseInt(line.match(reg)![1]), info: line }))
-                    )
-                )
-                for (let i = 0; ; ) {
-                    if (result.some(({ info }) => info[i] === undefined)) break
-                    if (result.some(({ info }) => info[i] !== " " || info[i + 1] !== " ")) {
-                        i++
-                        continue
-                    }
-                    result.forEach(item => (item.info = `${item.info.slice(0, i)}${item.info.slice(i + 1)}`))
-                }
-                resolve(result)
-            })
-        })
+        const stdout = await execAsync(`netstat -ano | findstr :${port}`)
+        const reg = new RegExp(` (\\[::\\]|(\\d{1,3}\\.){3}\\d{1,3}):${port} `)
+        const result = Array.from(
+            new Set(
+                stdout
+                    .split(/[\n\r]/)
+                    .filter(line => reg.test(line))
+                    .map(line => ({ pid: parseInt(line.match(reg)![1]), info: line }))
+            )
+        )
+        for (let i = 0; ; ) {
+            if (result.some(({ info }) => info[i] === undefined)) break
+            if (result.some(({ info }) => info[i] !== " " || info[i + 1] !== " ")) {
+                i++
+                continue
+            }
+            result.forEach(item => (item.info = `${item.info.slice(0, i)}${item.info.slice(i + 1)}`))
+        }
+        return result
     } catch (error) {
         return []
     }

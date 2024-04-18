@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
+import { exec } from "child_process"
 import { Argument, Command } from "commander"
 import consola from "consola"
 import { mkdir, readFile, writeFile } from "fs/promises"
 import { resolve } from "path"
 import { Manager, Registry, Software } from "./constant"
-import { Module, ModuleResolution, SoftwareDownloadMap, Target, addDependencies, addDevDependencies, addGitignore, addLatestDependencies, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, getFiles, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig } from "./utils"
-import pidFromPort from "pid-from-port"
-import { exec } from "child_process"
+import { Module, ModuleResolution, SoftwareDownloadMap, Target, addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig } from "./utils"
 
 const program = new Command()
 
@@ -202,7 +201,21 @@ program
     .alias("ud")
     .description("升级所有依赖")
     .action(async () => {
-        consola.warn("请在使用本功能前提交或备份代码")
+        const status = await new Promise<string>((resolve, reject) => {
+            exec("git status", (error, stdout, stderr) => {
+                if (error) return reject(error)
+                if (stderr) return reject(stderr)
+                resolve(stdout)
+            })
+        })
+
+        if (status === "fatal: not a git repository (or any of the parent directories): .git") {
+            consola.warn("请在使用本功能前备份代码")
+        } else if (!status.includes("nothing to commit, working tree clean")) {
+            consola.warn("请在使用本功能前提交代码")
+            return
+        }
+
         const { default: inquirer } = await import("inquirer")
 
         const packageJson = await readPackageJson()
@@ -252,7 +265,16 @@ program
 
         await writePackageJson(packageJson)
 
-        install()
+        const status1 = await execAsync("git status")
+
+        const reg = /modified: *package\.json/m
+
+        if (reg.test(status1)) {
+            consola.start("提交代码")
+            await execAsync("git add package.json")
+            await execAsync(`git commit -m "✨feature: upgrade dependencies"`)
+            await install()
+        }
     })
 
 program
