@@ -269,6 +269,13 @@ program
 
         const reg = /modified: *package\.json/m
 
+        try {
+            await execAsync("npx tsc --noEmit")
+        } catch (error) {
+            consola.error("TypeScript 错误，请手动解决")
+            return
+        }
+
         if (reg.test(status1)) {
             consola.start("提交代码")
             await execAsync("git add package.json")
