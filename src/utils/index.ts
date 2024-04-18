@@ -1,4 +1,4 @@
-import { spawn } from "child_process"
+import { exec, spawn } from "child_process"
 import consola from "consola"
 import { Stats, createWriteStream, readFileSync } from "fs"
 import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "fs/promises"
@@ -984,4 +984,61 @@ async function main() {
 
 main()`
     await writeFile(join(dir, "install.js"), script, "utf-8")
+}
+
+export async function getProcessInfoFromPid(pid: number) {
+    try {
+        return await new Promise<string | undefined>((resolve, reject) => {
+            exec(`tasklist | findstr ${pid}`, (error, stdout, stderr) => {
+                if (error !== null) return reject(error)
+                if (stderr !== "") return reject(stderr)
+                const reg = new RegExp(`( +)${pid}( (Services|Console) +)`)
+                return resolve(
+                    stdout
+                        .split(/[\n\r]/)
+                        .find(line => reg.test(line))
+                        ?.replace(reg, "$1$2")
+                        ?.replace(/ +/g, " ")
+                )
+            })
+        })
+    } catch (error) {
+        return undefined
+    }
+}
+
+export type PidInfo = {
+    pid: number
+    info: string
+}
+
+export async function getPidInfoFromPort(port: number) {
+    try {
+        return await new Promise<PidInfo[]>((resolve, reject) => {
+            exec(`netstat -ano | findstr :${port}`, (error, stdout, stderr) => {
+                if (error !== null) return reject(error)
+                if (stderr !== "") return reject(stderr)
+                const reg = new RegExp(` (\\[::\\]|(\\d{1,3}\\.){3}\\d{1,3}):${port} `)
+                const result = Array.from(
+                    new Set(
+                        stdout
+                            .split(/[\n\r]/)
+                            .filter(line => reg.test(line))
+                            .map(line => ({ pid: parseInt(line.match(reg)![1]), info: line }))
+                    )
+                )
+                for (let i = 0; ; ) {
+                    if (result.some(({ info }) => info[i] === undefined)) break
+                    if (result.some(({ info }) => info[i] !== " " || info[i + 1] !== " ")) {
+                        i++
+                        continue
+                    }
+                    result.forEach(item => (item.info = `${item.info.slice(0, i)}${item.info.slice(i + 1)}`))
+                }
+                resolve(result)
+            })
+        })
+    } catch (error) {
+        return []
+    }
 }

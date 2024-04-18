@@ -5,7 +5,9 @@ import consola from "consola"
 import { mkdir, readFile, writeFile } from "fs/promises"
 import { resolve } from "path"
 import { Manager, Registry, Software } from "./constant"
-import { Module, ModuleResolution, SoftwareDownloadMap, Target, addDependencies, addDevDependencies, addGitignore, addLatestDependencies, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, getFiles, getPackageUpgradeVersion, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig } from "./utils"
+import { Module, ModuleResolution, SoftwareDownloadMap, Target, addDependencies, addDevDependencies, addGitignore, addLatestDependencies, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, getFiles, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig } from "./utils"
+import pidFromPort from "pid-from-port"
+import { exec } from "child_process"
 
 const program = new Command()
 
@@ -200,6 +202,7 @@ program
     .alias("ud")
     .description("升级所有依赖")
     .action(async () => {
+        consola.warn("请在使用本功能前提交或备份代码")
         const { default: inquirer } = await import("inquirer")
 
         const packageJson = await readPackageJson()
@@ -639,6 +642,29 @@ program
         await mkdir(dir, { recursive: true })
         await downloadVscodeExts(dir)
         await writeInstallVscodeExtScript(dir)
+    })
+
+program
+    .command("port")
+    .argument("port", "端口号")
+    .action(async port => {
+        const { default: inquirer } = await import("inquirer")
+        const pidInfos = await getPidInfoFromPort(parseInt(port))
+        const choices: { name: string; value: number }[] = []
+        for (const { pid, info } of pidInfos) {
+            const name = await getProcessInfoFromPid(pid)
+            if (name) choices.push({ name: `${info} ${name}`, value: pid })
+        }
+        const { chosenPids } = await inquirer.prompt({
+            type: "checkbox",
+            name: "chosenPids",
+            message: "请选择要结束的进程",
+            choices,
+            default: choices.map(choice => choice.value)
+        })
+        for (const pid of chosenPids) {
+            exec(`taskkill /f /pid ${pid}`)
+        }
     })
 
 program.parse()
