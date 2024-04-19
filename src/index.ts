@@ -3,10 +3,11 @@
 import { exec } from "child_process"
 import { Argument, Command } from "commander"
 import consola from "consola"
-import { mkdir, readFile, writeFile } from "fs/promises"
-import { resolve } from "path"
+import { mkdir, readdir, readFile, rename, rm, writeFile } from "fs/promises"
+import { join, resolve } from "path"
 import { Manager, Registry, Software } from "./constant"
-import { Module, ModuleResolution, SoftwareDownloadMap, Target, addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig } from "./utils"
+import { Module, ModuleResolution, SoftwareDownloadMap, Target, addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig, zipDir } from "./utils"
+import { createWriteStream } from "fs"
 
 const program = new Command()
 
@@ -690,6 +691,39 @@ program
     .option("-r, --recursive", "适用于文件夹")
     .action(async (path, options) => {
         await execAsync(`git filter-branch --force --index-filter "git rm${options.recursive ? " -r" : ""} --cached --ignore-unmatch ${path}" --prune-empty --tag-name-filter cat -- --all`)
+    })
+
+program
+    .command("npm-download")
+    .alias("nd")
+    .argument("name")
+    .action(async name => {
+        const folder = `.${name}`
+        const file = `${name}.zip`
+        const dir = await readdir(".")
+        if (dir.includes(folder)) {
+            consola.warn("文件夹已存在")
+            return
+        }
+        if (dir.includes(file)) {
+            consola.warn("文件已存在")
+            return
+        }
+        await mkdir(folder, { recursive: true })
+        await execAsync(`npm init -y`, { cwd: folder })
+        await execAsync(`npm install ${name}`, { cwd: folder })
+        await mkdir(join(folder, "node_modules", name, "node_modules"))
+        const dir1 = await readdir(join(folder, "node_modules"))
+        for (const d of dir1) {
+            if (d === name) continue
+            if (d.startsWith(".")) {
+                await rm(join(folder, "node_modules", d), { recursive: true })
+                continue
+            }
+            await rename(join(folder, "node_modules", d), join(folder, "node_modules", name, "node_modules", d))
+        }
+        await zipDir(join(folder, "node_modules"), file)
+        await rm(folder, { recursive: true })
     })
 
 program.parse()

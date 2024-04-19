@@ -27,6 +27,7 @@
         "url": "git+https://github.com/1adybug/zixulu.git"
     },
     "dependencies": {
+        "archiver": "^7.0.1",
         "commander": "^12.0.0",
         "consola": "^3.2.3",
         "https-proxy-agent": "^7.0.4",
@@ -37,6 +38,7 @@
         "yaml": "^2.4.1"
     },
     "devDependencies": {
+        "@types/archiver": "^6.0.2",
         "@types/inquirer": "^9.0.7",
         "@types/node": "^20.12.7",
         "father": "^4.4.0"

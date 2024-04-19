@@ -1,3 +1,4 @@
+import archiver from "archiver"
 import { exec, spawn } from "child_process"
 import consola from "consola"
 import { Stats, createWriteStream, readFileSync } from "fs"
@@ -573,15 +574,20 @@ export function getTypeInGenerics(str: string, start = 0) {
     return str.slice(start + 1, index)
 }
 
+export type ExecAsyncOptions = {
+    cwd?: string | URL | undefined
+}
+
 export type SpawnAsyncOptions = {
     ignoreError?: boolean
     cwd?: string | URL | undefined
 }
 
-export function execAsync(command: string) {
+export function execAsync(command: string, options?: ExecAsyncOptions) {
     consola.log(command)
+    const { cwd } = options || {}
     return new Promise<string>((resolve, reject) => {
-        exec(command, (error, stdout, stderr) => {
+        exec(command, { cwd }, (error, stdout, stderr) => {
             if (error) return reject(error)
             if (stderr) consola.warn(stderr)
             resolve(stdout)
@@ -1040,4 +1046,19 @@ export async function getPidInfoFromPort(port: number) {
     } catch (error) {
         return []
     }
+}
+
+export function zipDir(sourceDir: string, outPath: string) {
+    const archive = archiver("zip", { zlib: { level: 0 } }) // 设置压缩级别
+    const stream = createWriteStream(outPath)
+
+    return new Promise<void>((resolve, reject) => {
+        archive
+            .directory(sourceDir, false) // 添加整个目录到压缩文件
+            .on("error", err => reject(err))
+            .pipe(stream)
+
+        stream.on("close", () => resolve())
+        archive.finalize()
+    })
 }
