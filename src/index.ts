@@ -201,13 +201,7 @@ program
     .alias("ud")
     .description("升级所有依赖")
     .action(async () => {
-        const status = await new Promise<string>((resolve, reject) => {
-            exec("git status", (error, stdout, stderr) => {
-                if (error) return reject(error)
-                if (stderr) return reject(stderr)
-                resolve(stdout)
-            })
-        })
+        const status = await execAsync("git status")
 
         if (status === "fatal: not a git repository (or any of the parent directories): .git") {
             consola.warn("请在使用本功能前备份代码")
@@ -269,18 +263,12 @@ program
 
         const reg = /modified: *package\.json/m
 
-        try {
-            await execAsync("npx tsc --noEmit")
-        } catch (error) {
-            consola.error("TypeScript 错误，请手动解决")
-            return
-        }
-
         if (reg.test(status1)) {
             consola.start("提交代码")
             await execAsync("git add package.json")
             await execAsync(`git commit -m "✨feature: upgrade dependencies"`)
-            await install()
+            const result = await install()
+            if (result !== "no") exec("npx tsc --noEmit")
         }
     })
 
