@@ -541,14 +541,14 @@ export function sortArrayOrObject(data: any) {
     return data
 }
 
-export async function install() {
+export async function install(): Promise<"yarn" | "pnpm" | "npm" | "no"> {
     const install = await consola.prompt("是否立即安装", {
         type: "select",
         options: ["yarn", "pnpm", "npm", "no"],
         initial: "yarn"
     })
-    if (install === "no") return
-    await spawnAsync(`${install} install`)
+    if (install !== "no") await spawnAsync(`${install} install`)
+    return install as "yarn" | "pnpm" | "npm" | "no"
 }
 
 export function getTypeInGenerics(str: string, start = 0) {
