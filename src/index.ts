@@ -684,4 +684,12 @@ program
         }
     })
 
+program
+    .command("rm-git")
+    .argument("path")
+    .option("-r, --recursive", "适用于文件夹")
+    .action(async (path, options) => {
+        await execAsync(`git filter-branch --force --index-filter "git rm${options.recursive ? " -r" : ""} --cached --ignore-unmatch ${path}" --prune-empty --tag-name-filter cat -- --all`)
+    })
+
 program.parse()
