@@ -31,7 +31,7 @@
         "commander": "^12.0.0",
         "consola": "^3.2.3",
         "https-proxy-agent": "^7.0.4",
-        "inquirer": "^9.2.19",
+        "inquirer": "^9.2.16",
         "json5": "^2.2.3",
         "node-fetch": "^3.3.2",
         "prettier": "^3.2.5",
@@ -42,5 +42,9 @@
         "@types/inquirer": "^9.0.7",
         "@types/node": "^20.12.7",
         "father": "^4.4.0"
+    },
+    "resolutions": {
+        "string-width": "^4",
+        "strip-ansi": "^6"
     }
 }

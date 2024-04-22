@@ -6,8 +6,7 @@ import consola from "consola"
 import { mkdir, readdir, readFile, rename, rm, writeFile } from "fs/promises"
 import { join, resolve } from "path"
 import { Manager, Registry, Software } from "./constant"
-import { Module, ModuleResolution, SoftwareDownloadMap, Target, addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, install, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig, zipDir } from "./utils"
-import { createWriteStream } from "fs"
+import { addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, install, Module, ModuleResolution, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, SoftwareDownloadMap, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, Target, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig, zipDir } from "./utils"
 
 const program = new Command()
 
@@ -724,6 +723,35 @@ program
         }
         await zipDir(join(folder, "node_modules"), file)
         await rm(folder, { recursive: true })
+    })
+
+program
+    .command("prisma")
+    .description("添加 prisma 配置")
+    .action(async () => {
+        const { default: inquirer } = await import("inquirer")
+        const packageJson = await readPackageJson()
+        await addDependencies(packageJson, "@prisma/client")
+        await addDevDependencies(packageJson, "prisma")
+        await addDevDependencies(packageJson, "ts-node")
+        await addDevDependencies(packageJson, "@types/node")
+        await addDevDependencies(packageJson, "typescript")
+        await writePackageJson(packageJson)
+        const dir = await readdir("./")
+        if (dir.includes("yarn.lock")) await spawnAsync("yarn")
+        else if (dir.includes("package-lock.json")) await spawnAsync("npm install")
+        else if (dir.includes("pnpm-lock.yaml")) await spawnAsync("pnpm install")
+        else {
+            const { manager } = await inquirer.prompt({
+                type: "list",
+                name: "manager",
+                message: "请选择包管理器",
+                choices: ["yarn", "npm", "pnpm"]
+            })
+            await spawnAsync(`${manager} install`)
+        }
+        if (!dir.includes("tsconfig.json")) await spawnAsync("npx tsc --init")
+        await spawnAsync("npx prisma init --datasource-provider sqlite")
     })
 
 program.parse()
