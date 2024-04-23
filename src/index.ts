@@ -754,4 +754,12 @@ program
         await spawnAsync("npx prisma init --datasource-provider sqlite")
     })
 
+program
+    .command("prisma-generate")
+    .alias("pg")
+    .description("生成 prisma client")
+    .action(async () => {
+        await spawnAsync("npx prisma db push && npx prisma generate")
+    })
+
 program.parse()
