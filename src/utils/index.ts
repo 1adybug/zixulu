@@ -681,23 +681,27 @@ export async function createIndexHtml() {
     }
 }
 
-export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log"]
+export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log", "test.js", "test.mjs", "test.ts"]
 
 export async function addGitignore() {
+    let gitignore = ""
     try {
-        const files = await getFiles(cwd(), (path, stats) => path.base === ".gitignore" && stats.isFile(), { depth: 1 })
-        const file = files.at(0)
-        if (file) {
-            const gitignore = await readFile(getAbsolutePath(".gitignore"), "utf-8")
-            const newGitignore = `${gitignore}\n${addedRules.join("\n")}`
-            await writeFile(getAbsolutePath(".gitignore"), newGitignore, "utf-8")
-        } else {
-            await writeFile(getAbsolutePath(".gitignore"), addedRules.join("\n"), "utf-8")
-        }
+        gitignore = await readFile(".gitignore", "utf-8")
     } catch (error) {
         consola.fail("添加 .gitignore 失败")
         exit()
     }
+    const rules = gitignore
+        .split("\n")
+        .map(v => v.trim())
+        .filter(v => v)
+    for (const rule of addedRules) {
+        if (rules.includes(rule)) continue
+        rules.push(rule)
+    }
+    rules.sort()
+    await writeFile(".gitignore", rules.join("\n"), "utf-8")
+    consola.success("添加 .gitignore 成功")
 }
 
 const agent = new HttpsProxyAgent("http://localhost:7890")

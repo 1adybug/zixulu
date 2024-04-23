@@ -180,19 +180,9 @@ export default defineConfig({
     sourcemap: true
 })
 `
-        const gitignore = (await readFile(".gitignore", "utf-8"))
-            .split("\n")
-            .map(line => line.trim())
-            .filter(Boolean)
-        if (!gitignore.some(line => /^\/?dist$/.test(line))) gitignore.push("dist")
-        if (!gitignore.some(line => /^\/?yarn\.lock$/.test(line))) gitignore.push("yarn.lock")
-        if (!gitignore.some(line => /^\/?pnpm-lock\.yaml$/.test(line))) gitignore.push("pnpm-lock.yaml")
-        if (!gitignore.some(line => /^\/?node_modules$/.test(line))) gitignore.push("node_modules")
-        if (!gitignore.some(line => /^\/?package-lock\.json$/.test(line))) gitignore.push("package-lock.json")
-        if (!gitignore.some(line => /^\/?yarn-error\.log$/.test(line))) gitignore.push("yarn-error.log")
+        await addGitignore()
         await writePackageJson(packageJson)
         await writeFile(".fatherrc.ts", fatherrcCode)
-        await writeFile(".gitignore", gitignore.join("\n"))
         await setTsConfig("target", Target.ESNext)
     })
 
