@@ -672,6 +672,10 @@ program
             const name = await getProcessInfoFromPid(pid)
             if (name) choices.push({ name: `${info} ${name}`, value: pid })
         }
+        if (choices.length === 0) {
+            consola.warn("没有找到对应的进程")
+            return
+        }
         const { chosenPids } = await inquirer.prompt({
             type: "checkbox",
             name: "chosenPids",
