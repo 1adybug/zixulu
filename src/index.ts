@@ -697,7 +697,7 @@ program.command("init").action(async () => {
     const { modules } = await inquirer.prompt({
         type: "checkbox",
         name: "modules",
-        message: "请选择",
+        message: "请选择要添加的模块",
         choices,
         default: choices
     })
@@ -711,7 +711,7 @@ program.command("init").action(async () => {
     await addPrettier()
     let installed = false
     if (modules.includes("prisma")) {
-        await addPrisma()
+        await addPrisma(manager)
         installed = true
     }
     if (!installed) await installDependcies(true, manager)

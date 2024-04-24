@@ -332,6 +332,36 @@ export async function addPostCSSConfig() {
     }
 }
 
+async function getEntryCssPath(path: string): Promise<string> {
+    const dir = await readdir(path)
+    if (dir.includes("app")) {
+        const stats = await stat(join(path, "app"))
+        if (stats.isDirectory()) return getEntryCssPath(join(path, "app"))
+    }
+    if (dir.includes("src")) {
+        const stats = await stat(join(path, "src"))
+        if (stats.isDirectory()) return getEntryCssPath(join(path, "src"))
+    }
+    return path
+}
+
+async function createEntryCss() {
+    const path = await getEntryCssPath("./")
+    const dir = await readdir(path)
+    let hasIndex = false
+    let hasApp = false
+    for (const item of dir) {
+        const parsedPath = parse(item)
+        if (!(parsedPath.ext === "ts" || parsedPath.ext === "tsx" || parsedPath.ext === "js" || parsedPath.ext === "jsx")) continue
+        if (parsedPath.name.toLowerCase() === "index" || parsedPath.name.toLowerCase() === "main") hasIndex = true
+        if (parsedPath.name.toLowerCase() === "app") hasApp = true
+        if (hasIndex && hasApp) break
+    }
+    const cssPath = hasIndex || !hasApp ? join(path, "index.css") : join(path, "app.css")
+    await writeFile(cssPath, "")
+    return cssPath
+}
+
 /** 添加 tailwind 至 index.css 成功 */
 export async function addTailwindToCSS() {
     try {
@@ -340,8 +370,8 @@ export async function addTailwindToCSS() {
             count: 1,
             exclude: (path, stats) => path.base === "node_modules" && stats.isDirectory()
         })
-        if (files.length === 0) await writeFile("index.css", "")
-        const file = files[0] || "index.css"
+        if (files.length === 0) files.push(await createEntryCss())
+        const file = files[0]
         const { base } = parse(file)
         const css = await readFile(file, "utf-8")
         if (css.includes("@tailwind")) {
@@ -1130,7 +1160,7 @@ export default AntdRegistry
     }
 }
 
-export async function addPrisma() {
+export async function addPrisma(manager?: PackageManager) {
     try {
         await addDependencies("@prisma/client")
         await addDevDependencies("prisma")
@@ -1138,7 +1168,7 @@ export async function addPrisma() {
         await addDevDependencies("@types/node")
         await addDevDependencies("typescript")
         const dir = await readdir("./")
-        await installDependcies(true)
+        await installDependcies(true, manager)
         if (!dir.includes("tsconfig.json")) await spawnAsync("npx tsc --init")
         await spawnAsync("npx prisma init --datasource-provider sqlite")
         consola.success("添加 Prisma 成功")
