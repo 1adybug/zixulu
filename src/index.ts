@@ -7,6 +7,7 @@ import { mkdir, readdir, readFile, rename, rm, writeFile } from "fs/promises"
 import { join, resolve } from "path"
 import { PackageManager, Registry, Software } from "./constant"
 import { addAntd, addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettier, addPrisma, addTailwind, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageManager, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, installDependcies, Module, ModuleResolution, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, SoftwareDownloadMap, sortArrayOrObject, spawnAsync, splitExtendsType, Target, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig, zipDir } from "./utils"
+import { cwd } from "process"
 
 const program = new Command()
 
@@ -689,16 +690,16 @@ program.command("create").action(async () => {
     const dir = await readdir("./")
     switch (type) {
         case "next":
-            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create next-app`)
+            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create next-app`, { cwd: cwd() })
             break
         case "rsbuild":
-            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create rsbuild`)
+            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create rsbuild`, { cwd: cwd() })
             break
         case "vite":
-            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create vite`)
+            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create vite`, { cwd: cwd() })
             break
         case "remix":
-            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create remix`)
+            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create remix`, { cwd: cwd() })
             break
     }
     const dir1 = await readdir("./")
