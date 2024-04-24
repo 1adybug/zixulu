@@ -1164,3 +1164,11 @@ export async function getPackageManager(): Promise<PackageManager> {
     })
     return manager as PackageManager
 }
+
+export async function isCommandExisted(command: string): Promise<boolean> {
+    return new Promise<boolean>(resolve => {
+        exec(`command ${command}`, err => {
+            resolve(!err)
+        })
+    })
+}
