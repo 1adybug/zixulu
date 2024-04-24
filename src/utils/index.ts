@@ -11,7 +11,7 @@ import { Config } from "prettier"
 import { cwd, exit } from "process"
 import { Readable } from "stream"
 import YAML from "yaml"
-import { Software } from "../constant"
+import { PackageManager, Software } from "../constant"
 
 function getAbsolutePath(path: string) {
     return isAbsolute(path) ? path : join(cwd(), path)
@@ -134,8 +134,9 @@ export async function readTsConfigJSON(path?: string): Promise<Record<string, an
 }
 
 /** 写入依赖 */
-export async function addDependencies(packageJson: Record<string, any>, packageName: string, version?: string) {
+export async function addDependencies(packageName: string, version?: string): Promise<void> {
     try {
+        const packageJson = await readPackageJson()
         packageJson.dependencies ??= {}
         packageJson.dependencies[packageName] ??= version?.trim() || `^${await getPackageLatestVersion(packageName)}`
         const keys = Object.keys(packageJson.dependencies)
@@ -146,34 +147,18 @@ export async function addDependencies(packageJson: Record<string, any>, packageN
         }
         packageJson.dependencies = sortedDependencies
         consola.success(`添加 ${packageName} 至依赖成功`)
+        await writePackageJson(packageJson)
     } catch (error) {
+        consola.error(error)
         consola.fail(`添加 ${packageName} 至依赖失败`)
         exit()
     }
 }
 
-/** 写入最新依赖 */
-export async function addLatestDependencies(packageJson: Record<string, any>, packageName: string) {
+/** 写入依赖 */
+export async function addDevDependencies(packageName: string, version?: string): Promise<void> {
     try {
-        packageJson.dependencies ??= {}
-        packageJson.dependencies[packageName] = `^${await getPackageLatestVersion(packageName)}`
-        const keys = Object.keys(packageJson.dependencies)
-        keys.sort()
-        const sortedDependencies: Record<string, string> = {}
-        for (const key of keys) {
-            sortedDependencies[key] = packageJson.dependencies[key]
-        }
-        packageJson.dependencies = sortedDependencies
-        consola.success(`添加 ${packageName} 至依赖成功`)
-    } catch (error) {
-        consola.fail(`添加 ${packageName} 至依赖失败`)
-        exit()
-    }
-}
-
-/** 写入开发依赖 */
-export async function addDevDependencies(packageJson: Record<string, any>, packageName: string, version?: string) {
-    try {
+        const packageJson = await readPackageJson()
         packageJson.devDependencies ??= {}
         packageJson.devDependencies[packageName] ??= version?.trim() || `^${await getPackageLatestVersion(packageName)}`
         const keys = Object.keys(packageJson.devDependencies)
@@ -184,26 +169,9 @@ export async function addDevDependencies(packageJson: Record<string, any>, packa
         }
         packageJson.devDependencies = sortedDevDependencies
         consola.success(`添加 ${packageName} 至开发依赖成功`)
+        await writePackageJson(packageJson)
     } catch (error) {
-        consola.fail(`添加 ${packageName} 至开发依赖失败`)
-        exit()
-    }
-}
-
-/** 写入最新开发依赖 */
-export async function addLatestDevDependencies(packageJson: Record<string, any>, packageName: string) {
-    try {
-        packageJson.devDependencies ??= {}
-        packageJson.devDependencies[packageName] = `^${await getPackageLatestVersion(packageName)}`
-        const keys = Object.keys(packageJson.devDependencies)
-        keys.sort()
-        const sortedDevDependencies: Record<string, string> = {}
-        for (const key of keys) {
-            sortedDevDependencies[key] = packageJson.devDependencies[key]
-        }
-        packageJson.devDependencies = sortedDevDependencies
-        consola.success(`添加 ${packageName} 至开发依赖成功`)
-    } catch (error) {
+        consola.error(error)
         consola.fail(`添加 ${packageName} 至开发依赖失败`)
         exit()
     }
@@ -401,14 +369,13 @@ export const prettierConfigTextWithTailwind = `module.exports = {
 `
 
 /** 添加 prettier 配置成功 */
-export async function addPrettierConfig() {
+export async function addPrettier() {
     try {
         const packageJson = await readPackageJson()
         const tailwind = Object.keys(packageJson.dependencies).includes("tailwindcss") || Object.keys(packageJson.devDependencies).includes("tailwindcss")
         await writeFile(getAbsolutePath("./prettier.config.cjs"), tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
-        await addDevDependencies(packageJson, "prettier")
-        await addDevDependencies(packageJson, "prettier-plugin-tailwindcss")
-        await writePackageJson(packageJson)
+        await addDevDependencies("prettier")
+        await addDevDependencies("prettier-plugin-tailwindcss")
         consola.success("添加 prettier 配置成功")
     } catch (error) {
         consola.fail("添加 prettier 配置失败")
@@ -416,18 +383,21 @@ export async function addPrettierConfig() {
 }
 
 /** 配置 tailwind */
-export async function tailwind() {
-    const packageJson = await readPackageJson()
-    await addDevDependencies(packageJson, "tailwindcss")
-    await addDevDependencies(packageJson, "autoprefixer")
-    await addDevDependencies(packageJson, "postcss")
-    await addDevDependencies(packageJson, "prettier")
-    await addDevDependencies(packageJson, "prettier-plugin-tailwindcss")
-    await writePackageJson(packageJson)
-    await addTailwindConfig()
-    await addPostCSSConfig()
-    await addTailwindToCSS()
-    await addPrettierConfig()
+export async function addTailwind() {
+    try {
+        await addDevDependencies("tailwindcss")
+        await addDevDependencies("autoprefixer")
+        await addDevDependencies("postcss")
+        await addDevDependencies("prettier")
+        await addDevDependencies("prettier-plugin-tailwindcss")
+        await addTailwindConfig()
+        await addPostCSSConfig()
+        await addTailwindToCSS()
+        await addPrettier()
+        consola.success("添加 tailwind 成功")
+    } catch (error) {
+        consola.fail("添加 tailwind 失败")
+    }
 }
 
 export async function removeComment(path: string) {
@@ -542,14 +512,19 @@ export function sortArrayOrObject(data: any) {
     return data
 }
 
-export async function install(): Promise<"yarn" | "pnpm" | "npm" | "no"> {
-    const install = await consola.prompt("是否立即安装", {
-        type: "select",
-        options: ["yarn", "pnpm", "npm", "no"],
-        initial: "yarn"
-    })
-    if (install !== "no") await spawnAsync(`${install} install`)
-    return install as "yarn" | "pnpm" | "npm" | "no"
+export async function installDependcies(silent?: boolean, manager?: PackageManager): Promise<boolean> {
+    if (!silent) {
+        const { default: inquirer } = await import("inquirer")
+        const { install } = await inquirer.prompt({
+            type: "confirm",
+            name: "install",
+            message: "安装依赖"
+        })
+        if (install === false) return false
+    }
+    manager ??= await getPackageManager()
+    await execAsync(`${manager} install`)
+    return true
 }
 
 export function getTypeInGenerics(str: string, start = 0) {
@@ -1065,4 +1040,111 @@ export function zipDir(sourceDir: string, outPath: string) {
         stream.on("close", () => resolve())
         archive.finalize()
     })
+}
+
+export async function addAntd() {
+    try {
+        
+        await addDependencies("@ant-design/cssinjs")
+        await addDependencies("@ant-design/icons")
+        await addDependencies("ahooks")
+        await addDependencies("antd")
+        const dir = await readdir("./")
+        const componentDir = dir.includes("src") ? "src/components" : "components"
+        await mkdir(componentDir, { recursive: true })
+        const packageJson = await readPackageJson()
+        if (packageJson.dependencies.next) {
+            await addDependencies("@ant-design/nextjs-registry")
+            await writeFile(
+                join(componentDir, "AntdNextRegistry.tsx"),
+                `"use client"
+import { StyleProvider } from "@ant-design/cssinjs"
+import { AntdRegistry } from "@ant-design/nextjs-registry"
+import { ConfigProvider } from "antd"
+import zhCN from "antd/locale/zh_CN"
+import { FC, ReactNode } from "react"
+
+export type AntdNextRegistryProps = {
+    children?: ReactNode
+}
+
+const AntdNextRegistry: FC<AntdNextRegistryProps> = props => {
+    const { children } = props
+
+    return (
+        <AntdRegistry>
+            <ConfigProvider locale={zhCN}>
+                <StyleProvider hashPriority="high">{children}</StyleProvider>
+            </ConfigProvider>
+        </AntdRegistry>
+    )
+}
+
+export default AntdNextRegistry
+`
+            )
+        } else {
+            await writeFile(
+                join(componentDir, "AntdRegistry.tsx"),
+                `"use client"
+import { StyleProvider } from "@ant-design/cssinjs"
+import { ConfigProvider } from "antd"
+import zhCN from "antd/locale/zh_CN"
+import { FC, ReactNode } from "react"
+
+export type AntdRegistryProps = {
+    children?: ReactNode
+}
+
+const AntdRegistry: FC<AntdRegistryProps> = props => {
+    const { children } = props
+
+    return (
+        <ConfigProvider locale={zhCN}>
+            <StyleProvider hashPriority="high">{children}</StyleProvider>
+        </ConfigProvider>
+    )
+}
+
+export default AntdRegistry
+`
+            )
+        }
+        consola.success("添加 antd 成功")
+    } catch (error) {
+        consola.fail("添加 antd 失败")
+    }
+}
+
+export async function addPrisma() {
+    try {
+        await addDependencies("@prisma/client")
+        await addDevDependencies("prisma")
+        await addDevDependencies("ts-node")
+        await addDevDependencies("@types/node")
+        await addDevDependencies("typescript")
+        const dir = await readdir("./")
+        await installDependcies(true)
+        if (!dir.includes("tsconfig.json")) await spawnAsync("npx tsc --init")
+        await spawnAsync("npx prisma init --datasource-provider sqlite")
+        consola.success("添加 Prisma 成功")
+    } catch (error) {
+        consola.fail("添加 Prisma 失败")
+    }
+}
+
+export async function getPackageManager(): Promise<PackageManager> {
+    const dir = await readdir("./")
+    if (dir.includes("yarn.lock")) return PackageManager.yarn
+    if (dir.includes("package-lock.json")) return PackageManager.npm
+    if (dir.includes("pnpm-lock.yaml")) return PackageManager.pnpm
+    if (dir.includes("bun.lockb")) return PackageManager.bun
+    const { default: inquirer } = await import("inquirer")
+    const { manager } = await inquirer.prompt({
+        type: "list",
+        name: "manager",
+        message: "请选择包管理器",
+        choices: ["yarn", "npm", "pnpm", "bun"]
+    })
+    return manager as PackageManager
 }
