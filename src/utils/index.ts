@@ -239,7 +239,7 @@ export async function removeESLint() {
         const files = await getFiles({
             match: (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile(),
             depth: 1,
-            exclude: path => path.base !== "node_modules"
+            exclude: (path, stats) => path.base === "node_modules" && stats.isDirectory()
         })
         for (const file of files) {
             try {
@@ -332,10 +332,11 @@ export async function addTailwindToCSS() {
     try {
         const files = await getFiles({
             match: (path, stats) => (path.base.toLowerCase() === "index.css" || path.base.toLowerCase() === "app.css" || path.base.toLowerCase() === "globals.css") && stats.isFile(),
-            count: 1
+            count: 1,
+            exclude: (path, stats) => path.base === "node_modules" && stats.isDirectory()
         })
-        if (files.length === 0) throw new Error("未找到 index.css 或 app.css 或 globals.css")
-        const file = files[0]
+        if (files.length === 0) await writeFile("index.css", "")
+        const file = files[0] || "index.css"
         const { base } = parse(file)
         const css = await readFile(file, "utf-8")
         if (css.includes("@tailwind")) {
