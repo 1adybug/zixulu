@@ -201,32 +201,29 @@ export interface GetFilesOptions {
 }
 
 export async function getFiles(options: GetFilesOptions) {
-    let { path = "./", match: include, count, depth, exclude } = options
+    const { path = "./", match, count, depth, exclude } = options
     if (count !== undefined && !isPositiveInteger(count)) throw new Error("count 必须是正整数")
     if (depth !== undefined && !isPositiveInteger(depth)) throw new Error("depth 必须是正整数")
     const result: string[] = []
     const e = Symbol()
-    async function _getFiles(path: string) {
-        if (depth === 0) return
-        path = getAbsolutePath(path)
+    async function _getFiles(path: string, depth: number | undefined) {
         const files = await readdir(path)
         for (const file of files) {
             const filePath = join(path, file)
             const parsedPath = parse(filePath)
             const stats = await stat(filePath)
-            if (include(parsedPath, stats)) {
+            if (match(parsedPath, stats)) {
                 const length = result.push(filePath)
                 if (count !== undefined && length >= count) throw e
             }
-            if (!stats.isDirectory()) return
-            if (exclude && exclude(parsedPath, stats)) return
-            if (depth === 1) return
-            depth !== undefined && depth--
-            await _getFiles(filePath)
+            if (!stats.isDirectory()) continue
+            if (exclude && exclude(parsedPath, stats)) continue
+            if (depth === 1) continue
+            await _getFiles(filePath, depth && depth - 1)
         }
     }
     try {
-        await _getFiles(path)
+        await _getFiles(path, depth)
     } catch (error) {
         if (error !== e) throw error
     }
@@ -236,12 +233,20 @@ export async function getFiles(options: GetFilesOptions) {
 /** 删除 ESLint 配置文件 */
 export async function removeESLint() {
     try {
+        const { default: inquirer } = await import("inquirer")
         const files = await getFiles({
-            match: (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile(),
-            depth: 1,
+            match: (path, stats) => path.base.toLowerCase().includes("eslint") && stats.isFile(),
             exclude: (path, stats) => path.base === "node_modules" && stats.isDirectory()
         })
-        for (const file of files) {
+        const { selectedFiles } = await inquirer.prompt({
+            type: "checkbox",
+            name: "selectedFiles",
+            message: "选择要删除的文件",
+            choices: files,
+            default: files
+        })
+
+        for (const file of selectedFiles) {
             try {
                 await rm(file, { force: true, recursive: true })
             } catch (error) {
