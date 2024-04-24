@@ -679,10 +679,20 @@ program.command("antd").description("添加 antd 配置").action(addAntd)
 
 program.command("init").action(async () => {
     const { default: inquirer } = await import("inquirer")
+    await addGitignore()
     const manager = await getPackageManager()
-    await installDependcies(true, manager)
     const packageJson = await readPackageJson()
     const allDependcies = Object.keys(packageJson.dependencies || {}).concat(Object.keys(packageJson.devDependencies || {}))
+    if (allDependcies.some(item => item.includes("eslint"))) {
+        const { removeEslintConfig } = await inquirer.prompt({
+            type: "confirm",
+            name: "removeEslintConfig",
+            message: "是否删除 ESLint 配置文件",
+            default: true
+        })
+        if (removeEslintConfig) await removeESLint()
+    }
+    await installDependcies(true, manager)
     const isFullStack = allDependcies.some(item => item === "next" || item.startsWith("@remix-run/"))
     const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "stable-hash", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "stable-hash", "tailwind"]
     const { modules } = await inquirer.prompt({
@@ -702,16 +712,6 @@ program.command("init").action(async () => {
     if (modules.includes("zod")) await addDependencies("zod")
     await addPrettier()
     await installDependcies(true, manager)
-    if (allDependcies.some(item => item.includes("eslint"))) {
-        const { removeEslintConfig } = await inquirer.prompt({
-            type: "confirm",
-            name: "removeEslintConfig",
-            message: "是否删除 ESLint 配置文件",
-            default: true
-        })
-        if (removeEslintConfig) await removeESLint()
-        await installDependcies(true, manager)
-    }
 })
 
 program

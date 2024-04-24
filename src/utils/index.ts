@@ -682,22 +682,14 @@ export async function createIndexHtml() {
 export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log", "test.js", "test.mjs", "test.ts"]
 
 export async function addGitignore() {
-    let gitignore = ""
-    try {
-        gitignore = await readFile(".gitignore", "utf-8")
-    } catch (error) {
-        consola.fail("添加 .gitignore 失败")
-        exit()
-    }
-    const rules = gitignore
-        .split("\n")
-        .map(v => v.trim())
-        .filter(v => v)
+    const dir = await readdir("./")
+    if (!dir.includes(".gitignore")) return await writeFile(".gitignore", addedRules.join("\n"), "utf-8")
+    const gitignore = await readFile(".gitignore", "utf-8")
+    const rules = gitignore.split("\n").map(v => v.trim())
     for (const rule of addedRules) {
         if (rules.includes(rule)) continue
         rules.push(rule)
     }
-    rules.sort()
     await writeFile(".gitignore", rules.join("\n"), "utf-8")
     consola.success("添加 .gitignore 成功")
 }
