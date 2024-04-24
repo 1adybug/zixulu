@@ -692,7 +692,6 @@ program.command("init").action(async () => {
         })
         if (removeEslintConfig) await removeESLint()
     }
-    await installDependcies(true, manager)
     const isFullStack = allDependcies.some(item => item === "next" || item.startsWith("@remix-run/"))
     const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "stable-hash", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "stable-hash", "tailwind"]
     const { modules } = await inquirer.prompt({
@@ -704,14 +703,18 @@ program.command("init").action(async () => {
     })
     if (modules.includes("antd")) await addAntd()
     if (modules.includes("tailwind")) await addTailwind()
-    if (modules.includes("prisma")) await addPrisma()
     if (modules.includes("dayjs")) await addDependencies("dayjs")
     if (modules.includes("deepsea-components")) await addDependencies("deepsea-components")
     if (modules.includes("deepsea-tools")) await addDependencies("deepsea-tools")
     if (modules.includes("stable-hash")) await addDependencies("stable-hash")
     if (modules.includes("zod")) await addDependencies("zod")
     await addPrettier()
-    await installDependcies(true, manager)
+    let installed = false
+    if (modules.includes("prisma")) {
+        await addPrisma()
+        installed = true
+    }
+    if (!installed) await installDependcies(true, manager)
 })
 
 program
