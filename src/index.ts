@@ -682,7 +682,7 @@ program.command("init").action(async () => {
     const manager = await getPackageManager()
     await installDependcies(true, manager)
     const packageJson = await readPackageJson()
-    const allDependcies = Object.keys(packageJson.dependencies || {}).concat(Object.keys(packageJson.devDpendencies || {}))
+    const allDependcies = Object.keys(packageJson.dependencies || {}).concat(Object.keys(packageJson.devDependencies || {}))
     const isFullStack = allDependcies.some(item => item === "next" || item.startsWith("@remix-run/"))
     const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "stable-hash", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "stable-hash", "tailwind"]
     const { modules } = await inquirer.prompt({
