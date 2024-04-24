@@ -6,23 +6,19 @@ import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "fs/promis
 import { HttpsProxyAgent } from "https-proxy-agent"
 import * as JSON5 from "json5"
 import { type Headers as NodeFetchHeaders } from "node-fetch"
-import { ParsedPath, isAbsolute, join, parse } from "path"
+import { ParsedPath, join, parse } from "path"
 import { Config } from "prettier"
 import { cwd, exit } from "process"
 import { Readable } from "stream"
 import YAML from "yaml"
 import { PackageManager, Software } from "../constant"
 
-function getAbsolutePath(path: string) {
-    return isAbsolute(path) ? path : join(cwd(), path)
-}
-
 export function getPackageJsonPath(path?: string) {
-    return join(getAbsolutePath(path ?? cwd()), "package.json")
+    return join(path ?? cwd(), "package.json")
 }
 
 export function getTsConfigJsonPath(path?: string) {
-    return join(getAbsolutePath(path ?? cwd()), "tsconfig.json")
+    return join(path ?? cwd(), "tsconfig.json")
 }
 
 /** 获取包的最新版本 */
@@ -285,12 +281,15 @@ export async function vite() {
 export async function addTailwindConfig() {
     try {
         await writeFile(
-            getAbsolutePath("tailwind.config.js"),
+            "tailwind.config.js",
             `/** @type {import('tailwindcss').Config} */
 export default {
     content: [
         "./index.html",
+        "./public/index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
+        "./app/**/*.{js,ts,jsx,tsx}",
+        "./components/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
     extend: {},
@@ -312,7 +311,7 @@ export async function addPostCSSConfig() {
         const packageJson = await readPackageJson()
         const autoprefixer = Object.keys(packageJson.dependencies).includes("autoprefixer") || Object.keys(packageJson.devDependencies).includes("autoprefixer")
         await writeFile(
-            getAbsolutePath("postcss.config.js"),
+            "postcss.config.cjs",
             `module.exports = {
     plugins: {
         tailwindcss: {}${
@@ -426,7 +425,7 @@ export async function addPrettier() {
     try {
         const packageJson = await readPackageJson()
         const tailwind = Object.keys(packageJson.dependencies).includes("tailwindcss") || Object.keys(packageJson.devDependencies).includes("tailwindcss")
-        await writeFile(getAbsolutePath("./prettier.config.cjs"), tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
+        await writeFile("./prettier.config.cjs", tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
         await addDevDependencies("prettier")
         await addDevDependencies("prettier-plugin-tailwindcss")
         consola.success("添加 prettier 配置成功")
@@ -455,9 +454,9 @@ export async function addTailwind() {
 
 export async function removeComment(path: string) {
     try {
-        const text = await readFile(getAbsolutePath(path), "utf-8")
+        const text = await readFile(path, "utf-8")
         const newText = text.replace(/^ *?\/\/.*?$/gm, "")
-        await writeFile(getAbsolutePath(path), newText, "utf-8")
+        await writeFile(path, newText, "utf-8")
         consola.success("删除注释成功")
     } catch (error) {
         consola.fail("删除注释失败")
@@ -675,7 +674,7 @@ export default defineConfig({
 `
 
 export async function writeRsbuildConfig() {
-    await writeFile(getAbsolutePath("rsbuild.config.ts"), rsbuildConfig, "utf-8")
+    await writeFile("rsbuild.config.ts", rsbuildConfig, "utf-8")
 }
 
 export const indexHtml = `<!doctype html>
@@ -694,19 +693,15 @@ export const indexHtml = `<!doctype html>
 `
 
 export async function createIndexHtml() {
-    try {
-        await writeFile(getAbsolutePath("public/index.html"), indexHtml, "utf-8")
-        consola.success("创建 index.html 成功")
-    } catch (error) {
-        await mkdir(getAbsolutePath("public"))
-        try {
-            await writeFile(getAbsolutePath("public/index.html"), indexHtml, "utf-8")
-            consola.success("创建 index.html 成功")
-        } catch (error) {
-            consola.fail("创建 index.html 失败")
-            exit()
-        }
+    const dir = await readdir("./")
+    let hasPublic = false
+    if (dir.includes("public")) {
+        const stats = await stat("public")
+        if (stats.isDirectory()) hasPublic = true
     }
+    if (!hasPublic) await mkdir("public", { recursive: true })
+    await writeFile("public/index.html", indexHtml, "utf-8")
+    consola.success("创建 index.html 成功")
 }
 
 export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log", "test.js", "test.mjs", "test.ts"]
