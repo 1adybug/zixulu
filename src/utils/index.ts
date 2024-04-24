@@ -188,41 +188,56 @@ export async function writePackageJson(packageJson: Record<string, any>, path?: 
     }
 }
 
+export function isPositiveInteger(value: any, allowZero = false): value is number {
+    return Number.isInteger(value) && (allowZero ? value >= 0 : value > 0)
+}
+
 export interface GetFilesOptions {
+    path?: string
+    match: (path: ParsedPath, stats: Stats) => boolean
+    count?: number
     depth?: number
     exclude?: (path: ParsedPath, stats: Stats) => boolean
 }
 
-export async function getFiles(path: string, judge: (path: ParsedPath, stats: Stats) => boolean, depthOrOptions?: number | GetFilesOptions) {
+export async function getFiles(options: GetFilesOptions) {
+    let { path = "./", match: include, count, depth, exclude } = options
+    if (count !== undefined && !isPositiveInteger(count)) throw new Error("count 必须是正整数")
+    if (depth !== undefined && !isPositiveInteger(depth)) throw new Error("depth 必须是正整数")
     const result: string[] = []
-    async function _getFiles(path: string, depthOrOptions?: number | GetFilesOptions) {
-        const options: GetFilesOptions = typeof depthOrOptions === "number" ? { depth: depthOrOptions } : depthOrOptions ?? {}
-        const { depth, exclude } = options
+    const e = Symbol()
+    async function _getFiles(path: string) {
+        if (depth === 0) return
         path = getAbsolutePath(path)
         const files = await readdir(path)
         for (const file of files) {
             const filePath = join(path, file)
             const parsedPath = parse(filePath)
             const stats = await stat(filePath)
-            if (judge(parsedPath, stats)) {
-                result.push(filePath)
+            if (include(parsedPath, stats)) {
+                const length = result.push(filePath)
+                if (count !== undefined && length >= count) throw e
             }
-            if (stats.isDirectory() && (!exclude || !exclude(parsedPath, stats)) && (depth === undefined || depth > 0)) {
-                await _getFiles(filePath, {
-                    depth: depth === undefined ? undefined : depth - 1,
-                    exclude
-                })
-            }
+            if (!stats.isDirectory()) return
+            if (exclude && exclude(parsedPath, stats)) return
+            if (depth === 1) return
+            depth !== undefined && depth--
+            await _getFiles(filePath)
         }
     }
-    await _getFiles(path, depthOrOptions)
+    try {
+        await _getFiles(path)
+    } catch (error) {
+        if (error !== e) throw error
+    }
     return result
 }
 
 /** 删除 ESLint 配置文件 */
 export async function removeESLint() {
     try {
-        const files = await getFiles(cwd(), (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile(), {
+        const files = await getFiles({
+            match: (path, stats) => /\.eslintrc\.[cm]?js/.test(path.base) && stats.isFile(),
             depth: 1,
             exclude: path => path.base !== "node_modules"
         })
@@ -315,10 +330,12 @@ export async function addPostCSSConfig() {
 /** 添加 tailwind 至 index.css 成功 */
 export async function addTailwindToCSS() {
     try {
-        const dir = getAbsolutePath("./src")
-        const files = await getFiles(dir, (path, stats) => (path.base.toLowerCase() === "index.css" || path.base.toLowerCase() === "app.css") && stats.isFile(), { depth: 1 })
-        if (files.length === 0) throw new Error("未找到 index.css 或 app.css")
-        const file = files.find(item => item.toLowerCase().endsWith("index.css")) || files.find(item => item.toLowerCase().endsWith("app.css"))!
+        const files = await getFiles({
+            match: (path, stats) => (path.base.toLowerCase() === "index.css" || path.base.toLowerCase() === "app.css" || path.base.toLowerCase() === "globals.css") && stats.isFile(),
+            count: 1
+        })
+        if (files.length === 0) throw new Error("未找到 index.css 或 app.css 或 globals.css")
+        const file = files[0]
         const { base } = parse(file)
         const css = await readFile(file, "utf-8")
         if (css.includes("@tailwind")) {
@@ -1044,7 +1061,6 @@ export function zipDir(sourceDir: string, outPath: string) {
 
 export async function addAntd() {
     try {
-        
         await addDependencies("@ant-design/cssinjs")
         await addDependencies("@ant-design/icons")
         await addDependencies("ahooks")

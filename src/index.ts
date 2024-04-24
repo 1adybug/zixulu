@@ -257,7 +257,10 @@ program
     .action(async () => {
         consola.warn("请在使用本功能前提交或备份代码")
         const { default: inquirer } = await import("inquirer")
-        const files = await getFiles("./src", (path, stats) => path.ext === ".tsx" && stats.isFile())
+        const files = await getFiles({
+            path: "./src",
+            match: (path, stats) => path.ext === ".tsx" && stats.isFile()
+        })
         const reg = /^(export )?const \w+?: FC.+?$/gm
         const { auto } = await inquirer.prompt({
             type: "confirm",
@@ -399,7 +402,8 @@ program
     .action(async () => {
         consola.warn("请在使用本功能前提交或备份代码")
 
-        const files = await getFiles(".", (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile(), {
+        const files = await getFiles({
+            match: (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile(),
             exclude: (path, stats) => stats.isDirectory() && path.base === "node_modules"
         })
 
@@ -736,16 +740,22 @@ program.command("create").action(async () => {
     if (modules.includes("zod")) await addDependencies("zod")
     await addPrettier()
     await installDependcies(true, manager)
-    const { removeEslintConfig } = await inquirer.prompt({
-        type: "confirm",
-        name: "removeEslintConfig",
-        message: "是否删除 ESLint 配置文件",
-        default: true
-    })
-    if (removeEslintConfig) await removeESLint()
-    await installDependcies(true, manager)
+    const packageJson = await readPackageJson()
+    if (Object.keys(packageJson.dependencies).some(item => item.includes("eslint")) || Object.keys(packageJson.devDependencies).some(item => item.includes("eslint"))) {
+        const { removeEslintConfig } = await inquirer.prompt({
+            type: "confirm",
+            name: "removeEslintConfig",
+            message: "是否删除 ESLint 配置文件",
+            default: true
+        })
+        if (removeEslintConfig) await removeESLint()
+        await installDependcies(true, manager)
+    }
 })
 
-program.command("tsc").description("类型检查").action(async () =>  await spawnAsync("npx tsc --noEmit"))
+program
+    .command("tsc")
+    .description("类型检查")
+    .action(async () => await spawnAsync("npx tsc --noEmit"))
 
 program.parse()
