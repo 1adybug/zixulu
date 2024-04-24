@@ -3,7 +3,9 @@
     "version": "1.23.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
-    "bin": "dist/index.js",
+    "bin": {
+        "zixulu": "dist/index.js"
+    },
     "scripts": {
         "dev": "father dev",
         "build": "father build",
