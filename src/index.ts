@@ -5,8 +5,8 @@ import { Argument, Command } from "commander"
 import consola from "consola"
 import { mkdir, readdir, readFile, rename, rm, writeFile } from "fs/promises"
 import { join, resolve } from "path"
-import { Manager, Registry, Software } from "./constant"
-import { addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettierConfig, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, install, Module, ModuleResolution, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, SoftwareDownloadMap, sortArrayOrObject, spawnAsync, splitExtendsType, tailwind, Target, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig, zipDir } from "./utils"
+import { PackageManager, Registry, Software } from "./constant"
+import { addAntd, addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettier, addPrisma, addTailwind, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageManager, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, installDependcies, Module, ModuleResolution, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, SoftwareDownloadMap, sortArrayOrObject, spawnAsync, splitExtendsType, Target, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig, zipDir } from "./utils"
 
 const program = new Command()
 
@@ -20,8 +20,8 @@ program
     .command("prettier")
     .description("添加 prettier 配置文件")
     .action(async () => {
-        await addPrettierConfig()
-        await install()
+        await addPrettier()
+        await installDependcies()
     })
 
 program.command("vite").description("删除 vite 模板中的某些配置").action(vite)
@@ -30,8 +30,8 @@ program
     .command("tailwind")
     .description("添加 tailwind 配置文件")
     .action(async () => {
-        await tailwind()
-        await install()
+        await addTailwind()
+        await installDependcies()
     })
 
 program.command("remove-comment").description("删除所有注释").addArgument(new Argument("path")).action(removeComment)
@@ -72,62 +72,6 @@ program
         })
         await setTsConfig("moduleResolution", moduleResolution)
     })
-
-// interface NpmPackage {
-//     name: string
-//     description: string
-// }
-
-// const packages: NpmPackage[] = [
-//     {
-//         name: "deepsea-tools",
-//         description: "格数工具库"
-//     },
-//     {
-//         name: "deepsea-components",
-//         description: "格数组件库"
-//     },
-//     {
-//         name: "react-soda",
-//         description: "简单的状态管理库"
-//     },
-//     {
-//         name: "type-request",
-//         description: "基于 TypeScript 和 fetch 的类型请求库"
-//     },
-//     {
-//         name: "use-abort-signal",
-//         description: "在 useEffect 中安全地取消 fetch 请求"
-//     },
-//     {
-//         name: "react-viewer-soda",
-//         description: "基于 viewerjs 的图片预览组件"
-//     },
-//     {
-//         name: "viewerjs-soda",
-//         description: "基于 viewerjs 的图片预览库"
-//     }
-// ]
-
-// program
-//     .command("npm")
-//     .description("一键添加 npm 包")
-//     .action(async () => {
-//         const packageNames = (await consola.prompt("请选择需要安装的包", {
-//             type: "multiselect",
-//             options: packages.map(pkg => ({ label: pkg.name, value: pkg.name, hint: pkg.description }))
-//         })) as unknown as string[]
-//         const latest = await consola.prompt("是否安装最新版本", {
-//             type: "confirm",
-//             initial: true
-//         })
-//         const packageJson = await readPackageJson()
-//         for (const pkg of packageNames) {
-//             await (latest ? addLatestDependencies : addDependencies)(packageJson, pkg)
-//         }
-//         await writePackageJson(packageJson)
-//         install()
-//     })
 
 program
     .command("father-setting")
@@ -257,8 +201,8 @@ program
             consola.start("提交代码")
             await execAsync("git add package.json")
             await execAsync(`git commit -m "✨feature: upgrade dependencies"`)
-            const result = await install()
-            if (result !== "no") exec("npx tsc --noEmit")
+            const result = await installDependcies()
+            if (result) exec("npx tsc --noEmit")
         }
     })
 
@@ -272,7 +216,7 @@ program
             type: "list",
             name: "manager",
             message: "请选择包管理器",
-            choices: Object.keys(Manager)
+            choices: Object.keys(PackageManager)
         })
 
         const { registry } = await inquirer.prompt({
@@ -437,9 +381,9 @@ program
 
         consola.start("格式化代码")
 
-        await addPrettierConfig()
+        await addPrettier()
 
-        await spawnAsync("yarn")
+        await installDependcies(true)
 
         await spawnAsync("npx prettier --write ./src")
 
@@ -510,26 +454,24 @@ program
         await createIndexHtml()
         await setTsConfig("noEmit", true)
         await addGitignore()
-        const packageJson = await readPackageJson()
-        await addDependencies(packageJson, "@ant-design/cssinjs")
-        await addDependencies(packageJson, "@ant-design/icons")
-        await addDependencies(packageJson, "@emotion/css")
-        await addDependencies(packageJson, "ahooks")
-        await addDependencies(packageJson, "antd")
-        await addDependencies(packageJson, "deepsea-components")
-        await addDependencies(packageJson, "deepsea-tools")
-        await addDependencies(packageJson, "react-router-dom")
-        await addDependencies(packageJson, "react-soda")
-        await addDevDependencies(packageJson, "@types/node")
-        await addDevDependencies(packageJson, "prettier")
-        await addDevDependencies(packageJson, "prettier-plugin-tailwindcss")
-        await addDevDependencies(packageJson, "tailwindcss")
-        await writePackageJson(packageJson)
+        await addDependencies("@ant-design/cssinjs")
+        await addDependencies("@ant-design/icons")
+        await addDependencies("@emotion/css")
+        await addDependencies("ahooks")
+        await addDependencies("antd")
+        await addDependencies("deepsea-components")
+        await addDependencies("deepsea-tools")
+        await addDependencies("react-router-dom")
+        await addDependencies("react-soda")
+        await addDevDependencies("@types/node")
+        await addDevDependencies("prettier")
+        await addDevDependencies("prettier-plugin-tailwindcss")
+        await addDevDependencies("tailwindcss")
         await addTailwindConfig()
         await addPostCSSConfig()
         await addTailwindToCSS()
-        await addPrettierConfig()
-        await install()
+        await addPrettier()
+        await installDependcies()
     })
 
 program
@@ -719,34 +661,7 @@ program
         await rm(folder, { recursive: true })
     })
 
-program
-    .command("prisma")
-    .description("添加 prisma 配置")
-    .action(async () => {
-        const { default: inquirer } = await import("inquirer")
-        const packageJson = await readPackageJson()
-        await addDependencies(packageJson, "@prisma/client")
-        await addDevDependencies(packageJson, "prisma")
-        await addDevDependencies(packageJson, "ts-node")
-        await addDevDependencies(packageJson, "@types/node")
-        await addDevDependencies(packageJson, "typescript")
-        await writePackageJson(packageJson)
-        const dir = await readdir("./")
-        if (dir.includes("yarn.lock")) await spawnAsync("yarn")
-        else if (dir.includes("package-lock.json")) await spawnAsync("npm install")
-        else if (dir.includes("pnpm-lock.yaml")) await spawnAsync("pnpm install")
-        else {
-            const { manager } = await inquirer.prompt({
-                type: "list",
-                name: "manager",
-                message: "请选择包管理器",
-                choices: ["yarn", "npm", "pnpm"]
-            })
-            await spawnAsync(`${manager} install`)
-        }
-        if (!dir.includes("tsconfig.json")) await spawnAsync("npx tsc --init")
-        await spawnAsync("npx prisma init --datasource-provider sqlite")
-    })
+program.command("prisma").description("添加 prisma 配置").action(addPrisma)
 
 program
     .command("prisma-generate")
@@ -756,76 +671,81 @@ program
         await spawnAsync("npx prisma db push && npx prisma generate")
     })
 
-program
-    .command("antd")
-    .description("添加 antd 配置")
-    .action(async () => {
-        const packageJson = await readPackageJson()
-        await addDependencies(packageJson, "@ant-design/cssinjs")
-        await addDependencies(packageJson, "@ant-design/icons")
-        await addDependencies(packageJson, "ahooks")
-        await addDependencies(packageJson, "antd")
-        const dir = await readdir("./")
-        const componentDir = dir.includes("src") ? "src/components" : "components"
-        await mkdir(componentDir, { recursive: true })
-        if (packageJson.dependencies.next) {
-            await addDependencies(packageJson, "@ant-design/nextjs-registry")
-            await writeFile(
-                join(componentDir, "AntdNextRegistry.tsx"),
-                `"use client"
-import { StyleProvider } from "@ant-design/cssinjs"
-import { AntdRegistry } from "@ant-design/nextjs-registry"
-import { ConfigProvider } from "antd"
-import zhCN from "antd/locale/zh_CN"
-import { FC, ReactNode } from "react"
+program.command("antd").description("添加 antd 配置").action(addAntd)
 
-export type AntdNextRegistryProps = {
-    children?: ReactNode
-}
-
-const AntdNextRegistry: FC<AntdNextRegistryProps> = props => {
-    const { children } = props
-
-    return (
-        <AntdRegistry>
-            <ConfigProvider locale={zhCN}>
-                <StyleProvider hashPriority="high">{children}</StyleProvider>
-            </ConfigProvider>
-        </AntdRegistry>
-    )
-}
-
-export default AntdNextRegistry
-`
-            )
-        } else {
-            await writeFile(
-                join(componentDir, "AntdRegistry.tsx"),
-                `"use client"
-import { StyleProvider } from "@ant-design/cssinjs"
-import { ConfigProvider } from "antd"
-import zhCN from "antd/locale/zh_CN"
-import { FC, ReactNode } from "react"
-
-export type AntdRegistryProps = {
-    children?: ReactNode
-}
-
-const AntdRegistry: FC<AntdRegistryProps> = props => {
-    const { children } = props
-
-    return (
-        <ConfigProvider locale={zhCN}>
-            <StyleProvider hashPriority="high">{children}</StyleProvider>
-        </ConfigProvider>
-    )
-}
-
-export default AntdRegistry
-`
-            )
-        }
-        await writePackageJson(packageJson)
+program.command("create").action(async () => {
+    const { default: inquirer } = await import("inquirer")
+    const { type } = await inquirer.prompt({
+        type: "list",
+        name: "type",
+        message: "",
+        choices: ["next", "rsbuild", "vite", "remix"]
     })
+    const manager = await getPackageManager()
+    const dir = await readdir("./")
+    switch (type) {
+        case "next":
+            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create next-app`)
+            break
+        case "rsbuild":
+            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create rsbuild`)
+            break
+        case "vite":
+            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create vite`)
+            break
+        case "remix":
+            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create remix`)
+            break
+    }
+    const dir1 = await readdir("./")
+    const dir2 = dir1.filter(d => !dir.includes(d))
+    let dir3: string
+    if (dir2.length === 0) {
+        consola.error("未检测到新建的文件夹")
+        return
+    }
+    if (dir2.length > 1) {
+        const { dir: dir4 } = await inquirer.prompt({
+            type: "list",
+            name: "dir",
+            message: "请选择",
+            choices: dir2
+        })
+        dir3 = dir4
+    } else {
+        dir3 = dir2[0]
+    }
+    process.chdir(dir3)
+    await installDependcies(true, manager)
+    const isFullStack = type === "next" || type === "remix"
+    const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "stable-hash", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "stable-hash", "tailwind"]
+    const { modules } = await inquirer.prompt({
+        type: "checkbox",
+        name: "modules",
+        message: "请选择",
+        choices,
+        default: choices
+    })
+    if (modules.includes("antd")) await addAntd()
+    if (modules.includes("tailwind")) await addTailwind()
+    if (modules.includes("prisma")) await addPrisma()
+    if (modules.includes("dayjs")) await addDependencies("dayjs")
+    if (modules.includes("deepsea-components")) await addDependencies("deepsea-components")
+    if (modules.includes("deepsea-tools")) await addDependencies("deepsea-tools")
+    if (modules.includes("stable-hash")) await addDependencies("stable-hash")
+    if (modules.includes("zod")) await addDependencies("zod")
+    await addPrettier()
+    await installDependcies(true, manager)
+    const { removeEslintConfig } = await inquirer.prompt({
+        type: "confirm",
+        name: "removeEslintConfig",
+        message: "是否删除 ESLint 配置文件",
+        default: true
+    })
+    if (removeEslintConfig) await removeESLint()
+    await installDependcies(true, manager)
+})
+
+program.command("tsc").description("类型检查").action(async () =>  await spawnAsync("npx tsc --noEmit"))
 
 program.parse()
