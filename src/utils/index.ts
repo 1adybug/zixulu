@@ -540,7 +540,7 @@ export async function installDependcies(silent?: boolean, manager?: PackageManag
         if (install === false) return false
     }
     manager ??= await getPackageManager()
-    await execAsync(`${manager} install`)
+    await spawnAsync(`${manager} install`)
     return true
 }
 
