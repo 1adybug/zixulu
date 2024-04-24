@@ -391,7 +391,7 @@ export const prettierConfigTextWithTailwind = `module.exports = {
 }
 `
 
-/** 添加 prettier 配置成功 */
+/** 添加 prettier */
 export async function addPrettier() {
     try {
         const packageJson = await readPackageJson()
@@ -405,7 +405,7 @@ export async function addPrettier() {
     }
 }
 
-/** 配置 tailwind */
+/** 添加 tailwind */
 export async function addTailwind() {
     try {
         await addDevDependencies("tailwindcss")
