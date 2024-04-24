@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { exec } from "child_process"
+import { exec, spawn } from "child_process"
 import { Argument, Command } from "commander"
 import consola from "consola"
 import { mkdir, readdir, readFile, rename, rm, writeFile } from "fs/promises"
@@ -679,79 +679,83 @@ program
 program.command("antd").description("添加 antd 配置").action(addAntd)
 
 program.command("create").action(async () => {
-    const { default: inquirer } = await import("inquirer")
-    const { type } = await inquirer.prompt({
-        type: "list",
-        name: "type",
-        message: "",
-        choices: ["next", "rsbuild", "vite", "remix"]
+    spawn("yarn", ["create", "vite"], {
+        stdio: "inherit",
+        shell: true
     })
-    const manager = await getPackageManager()
-    const dir = await readdir("./")
-    switch (type) {
-        case "next":
-            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create next-app`, { cwd: cwd() })
-            break
-        case "rsbuild":
-            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create rsbuild`, { cwd: cwd() })
-            break
-        case "vite":
-            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create vite`, { cwd: cwd() })
-            break
-        case "remix":
-            await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create remix`, { cwd: cwd() })
-            break
-    }
-    const dir1 = await readdir("./")
-    const dir2 = dir1.filter(d => !dir.includes(d))
-    let dir3: string
-    if (dir2.length === 0) {
-        consola.error("未检测到新建的文件夹")
-        return
-    }
-    if (dir2.length > 1) {
-        const { dir: dir4 } = await inquirer.prompt({
-            type: "list",
-            name: "dir",
-            message: "请选择",
-            choices: dir2
-        })
-        dir3 = dir4
-    } else {
-        dir3 = dir2[0]
-    }
-    process.chdir(dir3)
-    await installDependcies(true, manager)
-    const isFullStack = type === "next" || type === "remix"
-    const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "stable-hash", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "stable-hash", "tailwind"]
-    const { modules } = await inquirer.prompt({
-        type: "checkbox",
-        name: "modules",
-        message: "请选择",
-        choices,
-        default: choices
-    })
-    if (modules.includes("antd")) await addAntd()
-    if (modules.includes("tailwind")) await addTailwind()
-    if (modules.includes("prisma")) await addPrisma()
-    if (modules.includes("dayjs")) await addDependencies("dayjs")
-    if (modules.includes("deepsea-components")) await addDependencies("deepsea-components")
-    if (modules.includes("deepsea-tools")) await addDependencies("deepsea-tools")
-    if (modules.includes("stable-hash")) await addDependencies("stable-hash")
-    if (modules.includes("zod")) await addDependencies("zod")
-    await addPrettier()
-    await installDependcies(true, manager)
-    const packageJson = await readPackageJson()
-    if (Object.keys(packageJson.dependencies).some(item => item.includes("eslint")) || Object.keys(packageJson.devDependencies).some(item => item.includes("eslint"))) {
-        const { removeEslintConfig } = await inquirer.prompt({
-            type: "confirm",
-            name: "removeEslintConfig",
-            message: "是否删除 ESLint 配置文件",
-            default: true
-        })
-        if (removeEslintConfig) await removeESLint()
-        await installDependcies(true, manager)
-    }
+    // const { default: inquirer } = await import("inquirer")
+    // const { type } = await inquirer.prompt({
+    //     type: "list",
+    //     name: "type",
+    //     message: "",
+    //     choices: ["next", "rsbuild", "vite", "remix"]
+    // })
+    // const manager = await getPackageManager()
+    // const dir = await readdir("./")
+    // switch (type) {
+    //     case "next":
+    //         await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create next-app`, { cwd: cwd() })
+    //         break
+    //     case "rsbuild":
+    //         await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create rsbuild`, { cwd: cwd() })
+    //         break
+    //     case "vite":
+    //         await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create vite`, { cwd: cwd() })
+    //         break
+    //     case "remix":
+    //         await spawnAsync(`${manager === PackageManager.npm ? "npx" : manager} create remix`, { cwd: cwd() })
+    //         break
+    // }
+    // const dir1 = await readdir("./")
+    // const dir2 = dir1.filter(d => !dir.includes(d))
+    // let dir3: string
+    // if (dir2.length === 0) {
+    //     consola.error("未检测到新建的文件夹")
+    //     return
+    // }
+    // if (dir2.length > 1) {
+    //     const { dir: dir4 } = await inquirer.prompt({
+    //         type: "list",
+    //         name: "dir",
+    //         message: "请选择",
+    //         choices: dir2
+    //     })
+    //     dir3 = dir4
+    // } else {
+    //     dir3 = dir2[0]
+    // }
+    // process.chdir(dir3)
+    // await installDependcies(true, manager)
+    // const isFullStack = type === "next" || type === "remix"
+    // const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "stable-hash", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "stable-hash", "tailwind"]
+    // const { modules } = await inquirer.prompt({
+    //     type: "checkbox",
+    //     name: "modules",
+    //     message: "请选择",
+    //     choices,
+    //     default: choices
+    // })
+    // if (modules.includes("antd")) await addAntd()
+    // if (modules.includes("tailwind")) await addTailwind()
+    // if (modules.includes("prisma")) await addPrisma()
+    // if (modules.includes("dayjs")) await addDependencies("dayjs")
+    // if (modules.includes("deepsea-components")) await addDependencies("deepsea-components")
+    // if (modules.includes("deepsea-tools")) await addDependencies("deepsea-tools")
+    // if (modules.includes("stable-hash")) await addDependencies("stable-hash")
+    // if (modules.includes("zod")) await addDependencies("zod")
+    // await addPrettier()
+    // await installDependcies(true, manager)
+    // const packageJson = await readPackageJson()
+    // if (Object.keys(packageJson.dependencies).some(item => item.includes("eslint")) || Object.keys(packageJson.devDependencies).some(item => item.includes("eslint"))) {
+    //     const { removeEslintConfig } = await inquirer.prompt({
+    //         type: "confirm",
+    //         name: "removeEslintConfig",
+    //         message: "是否删除 ESLint 配置文件",
+    //         default: true
+    //     })
+    //     if (removeEslintConfig) await removeESLint()
+    //     await installDependcies(true, manager)
+    // }
 })
 
 program
