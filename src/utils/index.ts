@@ -273,7 +273,40 @@ export async function vite() {
     await setTsConfig("noUnusedLocals")
     await setTsConfig("noUnusedParameters")
     const pkg = await readPackageJson()
-    pkg.scripts.dev = "vite --host"
+    pkg.scripts.dev += " --host"
+    await writePackageJson(pkg)
+}
+
+export async function rsbuild() {
+    const { default: inquirer } = await import("inquirer")
+    const packageJson = await readPackageJson()
+    const { description, title, entryId } = await inquirer.prompt([
+        {
+            type: "input",
+            name: "description",
+            message: "项目描述",
+            default: "designed by luzixu"
+        },
+        {
+            type: "input",
+            name: "title",
+            message: "项目标题",
+            default: packageJson.name
+        },
+        {
+            type: "input",
+            name: "entryId",
+            message: "入口 id",
+            default: "root"
+        }
+    ])
+    await writeRsbuildConfig()
+    await createIndexHtml({ description, title, entryId })
+}
+
+export async function next() {
+    const pkg = await readPackageJson()
+    pkg.scripts.dev += " --hostname 0.0.0.0 --port 5173"
     await writePackageJson(pkg)
 }
 
@@ -666,9 +699,6 @@ export default defineConfig({
     plugins: [pluginReact()],
     server: {
         port: 5173
-    },
-    source: {
-        define: {}
     }
 })
 `
@@ -677,22 +707,28 @@ export async function writeRsbuildConfig() {
     await writeFile("rsbuild.config.ts", rsbuildConfig, "utf-8")
 }
 
-export const indexHtml = `<!doctype html>
-<html lang="zh">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="icon" href="/logo.webp" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="江苏格数科技有限公司" />
-        <title>Hello, World!</title>
-    </head>
-    <body>
-        <div id="root"></div>
-    </body>
-</html>
-`
+export type CreateIndexHtmlConfig = {
+    title: string
+    description: string
+    entryId: string
+}
 
-export async function createIndexHtml() {
+export async function createIndexHtml(config: CreateIndexHtmlConfig) {
+    const { title, description, entryId } = config
+    const indexHtml = `<!doctype html>
+    <html lang="zh">
+        <head>
+            <meta charset="UTF-8" />
+            <link rel="icon" href="/logo.webp" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <meta name="description" content="${description}" />
+            <title>${title}</title>
+        </head>
+        <body>
+            <div id="${entryId}"></div>
+        </body>
+    </html>
+    `
     const dir = await readdir("./")
     let hasPublic = false
     if (dir.includes("public")) {
