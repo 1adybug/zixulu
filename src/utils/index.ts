@@ -1190,7 +1190,7 @@ export async function getPackageManager(): Promise<PackageManager> {
 
 export async function isCommandExisted(command: string): Promise<boolean> {
     return new Promise<boolean>(resolve => {
-        exec(`command ${command}`, err => {
+        exec(`powershell -command command ${command}`, err => {
             resolve(!err)
         })
     })
