@@ -1,4 +1,4 @@
-import { PackageManager, Registry } from "../../src/constant"
+import { PackageManager, Registry } from "../constant"
 import { spawnAsync } from "."
 
 export async function setRegistry() {

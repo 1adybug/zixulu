@@ -1,5 +1,5 @@
 import { exit } from "process"
-import { CommitType } from "../../src/constant"
+import { CommitType } from "../constant"
 import { getCommitMessage, getPackageUpgradeVersion, getVersionFromRequiredVersion, installDependcies, readPackageJson, writePackageJson } from "."
 import { checkType } from "./checkType"
 
