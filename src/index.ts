@@ -5,8 +5,8 @@ import { Argument, Command } from "commander"
 import consola from "consola"
 import { mkdir, readdir, readFile, rename, rm, writeFile } from "fs/promises"
 import { join, resolve } from "path"
-import { PackageManager, Registry, Software } from "./constant"
-import { addAntd, addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettier, addPrisma, addTailwind, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageManager, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, installDependcies, isCommandExisted, Module, ModuleResolution, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, SoftwareDownloadMap, sortArrayOrObject, spawnAsync, splitExtendsType, Target, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig, zipDir } from "./utils"
+import { PackageManager, ProjectType, Registry, Software } from "./constant"
+import { addAntd, addDependencies, addGitignore, addPrettier, addPrisma, addTailwind, downloadVscodeExts, execAsync, getFiles, getPackageManager, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, installDependcies, isCommandExisted, Module, ModuleResolution, next, readPackageJson, readPackageJsonSync, removeComment, removeESLint, rsbuild, setTsConfig, SoftwareDownloadMap, sortArrayOrObject, spawnAsync, splitExtendsType, Target, vite, writeInstallVscodeExtScript, writePackageJson, zipDir } from "./utils"
 
 const program = new Command()
 
@@ -457,34 +457,7 @@ program
 
 program.command("gitignore").description("添加 .gitignore 文件").action(addGitignore)
 
-program
-    .command("rsbuild-setting")
-    .alias("rs")
-    .description("rsbuild 常用设置")
-    .action(async () => {
-        await writeRsbuildConfig()
-        await createIndexHtml()
-        await setTsConfig("noEmit", true)
-        await addGitignore()
-        await addDependencies("@ant-design/cssinjs")
-        await addDependencies("@ant-design/icons")
-        await addDependencies("@emotion/css")
-        await addDependencies("ahooks")
-        await addDependencies("antd")
-        await addDependencies("deepsea-components")
-        await addDependencies("deepsea-tools")
-        await addDependencies("react-router-dom")
-        await addDependencies("react-soda")
-        await addDevDependencies("@types/node")
-        await addDevDependencies("prettier")
-        await addDevDependencies("prettier-plugin-tailwindcss")
-        await addDevDependencies("tailwindcss")
-        await addTailwindConfig()
-        await addPostCSSConfig()
-        await addTailwindToCSS()
-        await addPrettier()
-        await installDependcies()
-    })
+program.command("rsbuild-setting").alias("rs").description("rsbuild 常用设置").action(rsbuild)
 
 program
     .command("git-proxy")
@@ -687,10 +660,27 @@ program.command("antd").description("添加 antd 配置").action(addAntd)
 
 program.command("init").action(async () => {
     const { default: inquirer } = await import("inquirer")
-    await addGitignore()
-    const manager = await getPackageManager()
     const packageJson = await readPackageJson()
     const allDependcies = Object.keys(packageJson.dependencies || {}).concat(Object.keys(packageJson.devDependencies || {}))
+    if (!allDependcies.includes("react") || !allDependcies.includes("react-dom")) {
+        consola.error("仅支持 React 项目")
+        return
+    }
+    let type: ProjectType
+    if (allDependcies.some(item => item === "next")) {
+        type = ProjectType.next
+    } else if (allDependcies.some(item => item === "@remix-run/react")) {
+        type = ProjectType.remix
+    } else if (allDependcies.some(item => item === "vite")) {
+        type = ProjectType.vite
+    } else if (allDependcies.some(item => item === "@rsbuild/core")) {
+        type = ProjectType.rsbuild
+    } else {
+        consola.error("仅支持 Next、Remix、Vite、Rsbuild 项目")
+        return
+    }
+    await addGitignore()
+    const manager = await getPackageManager()
     if (allDependcies.some(item => item.includes("eslint"))) {
         const { removeEslintConfig } = await inquirer.prompt({
             type: "confirm",
@@ -700,7 +690,7 @@ program.command("init").action(async () => {
         })
         if (removeEslintConfig) await removeESLint()
     }
-    const isFullStack = allDependcies.some(item => item === "next" || item.startsWith("@remix-run/"))
+    const isFullStack = type === ProjectType.next || type === ProjectType.remix
     const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "stable-hash", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "stable-hash", "tailwind"]
     const { modules } = await inquirer.prompt({
         type: "checkbox",
@@ -724,6 +714,23 @@ program.command("init").action(async () => {
     }
     if (!installed) await installDependcies(true, manager)
     await setTsConfig("noEmit", true)
+    switch (type) {
+        case ProjectType.next:
+            await next()
+            break
+
+        case ProjectType.remix:
+            await vite()
+            break
+
+        case ProjectType.vite:
+            await vite()
+            break
+
+        case ProjectType.rsbuild:
+            await rsbuild()
+            break
+    }
 })
 
 program

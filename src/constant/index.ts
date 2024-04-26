@@ -21,3 +21,10 @@ export enum Software {
     "Geek Uninstaller" = "Geek Uninstaller",
     "DeskGo" = "DeskGo"
 }
+
+export enum ProjectType {
+    next = "next",
+    remix = "remix",
+    vite = "vite",
+    rsbuild = "rsbuild"
+}
