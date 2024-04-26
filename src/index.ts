@@ -3,7 +3,33 @@
 import { Command } from "commander"
 import { resolve } from "path"
 import { CommitType } from "./constant"
-import { actionWithBackup, addAntd, addGitignore, addPrettier, addPrisma, addTailwind, arrowToFunction, downloadLatestSoftware, downloadLatestVscodeExtension, downloadNpm, getCommitMessage, initProject, interfaceToType, killProcessByPort, next, readPackageJsonSync, removeComment, removeESLint, removeFileOrFolderFromGit, rsbuild, setFatherConfig, setGitProxy, setRegistry, setShellProxy, sortPackageJson, spawnAsync, upgradeDependency, vite } from "./utils"
+import { actionWithBackup, getCommitMessage, readPackageJsonSync } from "./utils"
+import { addAntd } from "./utils/addAntd"
+import { addGitignore } from "./utils/addGitignore"
+import { addPrettier } from "./utils/addPrettier"
+import { addPrisma } from "./utils/addPrisma"
+import { addTailwind } from "./utils/addTailwind"
+import { arrowToFunction } from "./utils/arrowToFunction"
+import { checkType } from "./utils/checkType"
+import { downloadLatestSoftware } from "./utils/downloadLatestSoftware"
+import { downloadLatestVscodeExtension } from "./utils/downloadLatestVscodeExtension"
+import { downloadNpm } from "./utils/downloadNpm"
+import { generatePrisma } from "./utils/generatePrisma"
+import { initProject } from "./utils/initProject"
+import { interfaceToType } from "./utils/interfaceToType"
+import { killProcessByPort } from "./utils/killProcessByPort"
+import { next } from "./utils/next"
+import { removeComment } from "./utils/removeComment"
+import { removeESLint } from "./utils/removeESLint"
+import { removeFileOrFolderFromGit } from "./utils/removeFileOrFolderFromGit"
+import { rsbuild } from "./utils/rsbuild"
+import { setFatherConfig } from "./utils/setFatherConfig"
+import { setGitProxy } from "./utils/setGitProxy"
+import { setRegistry } from "./utils/setRegistry"
+import { setShellProxy } from "./utils/setShellProxy"
+import { sortPackageJson } from "./utils/sortPackageJson"
+import { upgradeDependency } from "./utils/upgradeDependcy"
+import { vite } from "./utils/vite"
 
 const program = new Command()
 
@@ -99,13 +125,7 @@ program
     .description("添加 prisma 配置")
     .action(actionWithBackup(addPrisma, getCommitMessage(CommitType.feature, "添加 prisma 配置")))
 
-program
-    .command("prisma-generate")
-    .alias("pg")
-    .description("生成 prisma client")
-    .action(async () => {
-        await spawnAsync("npx prisma db push && npx prisma generate")
-    })
+program.command("prisma-generate").alias("pg").description("生成 prisma client").action(generatePrisma)
 
 program
     .command("antd")
@@ -117,9 +137,6 @@ program
     .description("初始化项目")
     .action(actionWithBackup(initProject, getCommitMessage(CommitType.feature, "初始化项目")))
 
-program
-    .command("tsc")
-    .description("类型检查")
-    .action(async () => await spawnAsync("npx tsc --noEmit"))
+program.command("tsc").description("类型检查").action(checkType)
 
 program.parse()
