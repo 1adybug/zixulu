@@ -165,7 +165,7 @@ program
             choices: ["major", "minor", "patch"]
         })
 
-        let hasUpgrade = false
+        const updateLogs: string[] = []
 
         for (const type of types) {
             const upgrades: { package: string; oldVersion: string; newVersion: string; strVersion: string }[] = []
@@ -191,13 +191,13 @@ program
             })
 
             pkgs.forEach((pkg: string) => {
-                hasUpgrade = true
                 const upgrade = upgrades.find(upgrade => upgrade.package === pkg)!
                 packageJson[type][pkg] = upgrade.strVersion
+                updateLogs.push(`${pkg} ${upgrade.oldVersion} => ${upgrade.newVersion}`)
             })
         }
 
-        if (!hasUpgrade) return
+        if (updateLogs.length === 0) return
 
         await writePackageJson(packageJson)
 
@@ -208,7 +208,7 @@ program
         if (reg.test(status1)) {
             consola.start("提交代码")
             await execAsync("git add package.json")
-            await execAsync(`git commit -m "✨feature: upgrade dependencies"`)
+            await execAsync(`git commit -m "✨feature: upgrade dependencies: ${updateLogs.join(", ")}"`)
             const result = await installDependcies()
             if (result) exec("npx tsc --noEmit")
         }
