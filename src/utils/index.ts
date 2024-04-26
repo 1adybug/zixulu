@@ -11,7 +11,7 @@ import { Config } from "prettier"
 import { cwd, exit } from "process"
 import { Readable } from "stream"
 import YAML from "yaml"
-import { PackageManager, Software } from "../constant"
+import { CommitType, CommitTypeMap, PackageManager, ProjectType, Registry, Software } from "../constant"
 
 export function getPackageJsonPath(path?: string) {
     return join(path ?? cwd(), "package.json")
@@ -270,11 +270,13 @@ export async function removeESLint() {
 }
 
 export async function vite() {
+    await backupFirst()
     await setTsConfig("noUnusedLocals")
     await setTsConfig("noUnusedParameters")
     const pkg = await readPackageJson()
     pkg.scripts.dev += " --host"
     await writePackageJson(pkg)
+    await addGitCommit(`✨feature: modify some settings for vite`)
 }
 
 export async function rsbuild() {
@@ -1242,21 +1244,644 @@ export async function ifContinue() {
     if (!c) exit()
 }
 
-export async function isGitAvailable() {
-    return await isCommandExisted("git")
+export async function isRepo() {
+    try {
+        await execAsync("git status")
+        return true
+    } catch (error) {
+        return false
+    }
 }
 
-export async function checkGitStatus() {
-    if (await isGitAvailable()) {
-        const status = await execAsync("git status")
-        if (status === "fatal: not a git repository (or any of the parent directories): .git") {
-            consola.warn("请在使用本功能前备份代码")
-            await ifContinue()
-        } else if (!status.includes("nothing to commit, working tree clean")) {
-            consola.warn("请在使用本功能前提交代码")
+export async function backupFirst(forceRepo = false) {
+    if (!(await isRepo())) {
+        if (forceRepo) {
+            consola.error("git 不可用")
             exit()
         }
+        consola.warn("请先备份代码")
+        await ifContinue()
+        return
     }
-    consola.warn("请在使用本功能前备份代码")
-    await ifContinue()
+    const status = await execAsync("git status")
+    if (!status.includes("nothing to commit, working tree clean")) {
+        consola.error("请先提交代码")
+        exit()
+    }
+}
+
+export async function addGitCommit(message: string) {
+    consola.start("提交代码")
+    await execAsync("git add .")
+    await execAsync(`git commit -m "${message}"`)
+}
+
+export function actionWithBackup<T extends (...args: any[]) => Promise<string>>(action: T, message?: string): (...args: Parameters<T>) => Promise<void>
+export function actionWithBackup<T extends (...args: any[]) => Promise<void>>(action: T, message: string): (...args: Parameters<T>) => Promise<void> 
+export function actionWithBackup(action: (...args: any[]) => Promise<string | void>, message?: string) {
+    return async (...args: any[]) => {
+        await backupFirst()
+        const msg = await action(...args)
+        if (!(await isRepo())) return
+        const { default: inquirer } = await import("inquirer")
+        const { commit } = await inquirer.prompt({
+            type: "confirm",
+            name: "commit",
+            message: "是否自动提交代码",
+            default: true
+        })
+        if (!commit) return
+        let commitMessage: string
+        if (typeof message === "string") commitMessage = message
+        else if (typeof msg === "string") commitMessage = msg
+        else {
+            consola.warn("请提供提交信息")
+            exit()
+        }
+        await addGitCommit(commitMessage)
+    }
+}
+
+export async function initProject() {
+    const { default: inquirer } = await import("inquirer")
+    const packageJson = await readPackageJson()
+    const allDependcies = Object.keys(packageJson.dependencies || {}).concat(Object.keys(packageJson.devDependencies || {}))
+    if (!allDependcies.includes("react") || !allDependcies.includes("react-dom")) {
+        consola.error("仅支持 React 项目")
+        return
+    }
+    let type: ProjectType
+    if (allDependcies.some(item => item === "next")) {
+        type = ProjectType.next
+    } else if (allDependcies.some(item => item === "@remix-run/react")) {
+        type = ProjectType.remix
+    } else if (allDependcies.some(item => item === "vite")) {
+        type = ProjectType.vite
+    } else if (allDependcies.some(item => item === "@rsbuild/core")) {
+        type = ProjectType.rsbuild
+    } else {
+        consola.error("仅支持 Next、Remix、Vite、Rsbuild 项目")
+        return
+    }
+    await addGitignore()
+    const manager = await getPackageManager()
+    if (allDependcies.some(item => item.includes("eslint"))) {
+        const { removeEslintConfig } = await inquirer.prompt({
+            type: "confirm",
+            name: "removeEslintConfig",
+            message: "是否删除 ESLint 配置文件",
+            default: true
+        })
+        if (removeEslintConfig) await removeESLint()
+    }
+    const isFullStack = type === ProjectType.next || type === ProjectType.remix
+    const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "stable-hash", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "stable-hash", "tailwind"]
+    const { modules } = await inquirer.prompt({
+        type: "checkbox",
+        name: "modules",
+        message: "请选择要添加的模块",
+        choices,
+        default: choices
+    })
+    if (modules.includes("antd")) await addAntd()
+    if (modules.includes("tailwind")) await addTailwind()
+    if (modules.includes("dayjs")) await addDependencies("dayjs")
+    if (modules.includes("deepsea-components")) await addDependencies("deepsea-components")
+    if (modules.includes("deepsea-tools")) await addDependencies("deepsea-tools")
+    if (modules.includes("stable-hash")) await addDependencies("stable-hash")
+    if (modules.includes("zod")) await addDependencies("zod")
+    await addPrettier()
+    let installed = false
+    if (modules.includes("prisma")) {
+        await addPrisma(manager)
+        installed = true
+    }
+    if (!installed) await installDependcies(true, manager)
+    await setTsConfig("noEmit", true)
+    switch (type) {
+        case ProjectType.next:
+            await next()
+            break
+
+        case ProjectType.remix:
+            await vite()
+            break
+
+        case ProjectType.vite:
+            await vite()
+            break
+
+        case ProjectType.rsbuild:
+            await rsbuild()
+            break
+    }
+}
+
+export function getCommitMessage(type: CommitType, message: string) {
+    return `${CommitTypeMap[type]}${message}`
+}
+
+export async function downloadNpm(name: string) {
+    const folder = `.${name}`
+    const file = `${name}.zip`
+    const dir = await readdir(".")
+    if (dir.includes(folder)) {
+        consola.warn("文件夹已存在")
+        exit()
+    }
+    if (dir.includes(file)) {
+        consola.warn("文件已存在")
+        exit()
+    }
+    await mkdir(folder, { recursive: true })
+    await execAsync(`npm init -y`, { cwd: folder })
+    await execAsync(`npm install ${name}`, { cwd: folder })
+    await mkdir(join(folder, "node_modules", name, "node_modules"))
+    const dir1 = await readdir(join(folder, "node_modules"))
+    for (const d of dir1) {
+        if (d === name) continue
+        if (d.startsWith(".")) {
+            await rm(join(folder, "node_modules", d), { recursive: true })
+            continue
+        }
+        await rename(join(folder, "node_modules", d), join(folder, "node_modules", name, "node_modules", d))
+    }
+    await zipDir(join(folder, "node_modules"), file)
+    await rm(folder, { recursive: true })
+}
+
+export type RemoveFileOrFolderFromGitOptions = {
+    recursive?: boolean
+}
+
+export async function removeFileOrFolderFromGit(path: string, options?: RemoveFileOrFolderFromGitOptions) {
+    const { recursive = false } = options || {}
+    await backupFirst(true)
+    await execAsync(`git filter-branch --force --index-filter "git rm${recursive ? " -r" : ""} --cached --ignore-unmatch ${path}" --prune-empty --tag-name-filter cat -- --all`)
+}
+
+export async function interfaceToType() {
+    const files = await getFiles({
+        match: (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile(),
+        exclude: (path, stats) => stats.isDirectory() && path.base === "node_modules"
+    })
+
+    const { default: inquirer } = await import("inquirer")
+
+    const { ifContinue } = await inquirer.prompt({
+        type: "confirm",
+        name: "ifContinue",
+        message: "是否继续"
+    })
+
+    if (!ifContinue) return
+
+    const reg = /(export )?interface (.+?) {/gm
+    const reg1 = /\bexport\b/
+    const reg2 = /(\w+?) extends (.+)/
+    const modifiedFiles: Set<string> = new Set()
+
+    for (const file of files) {
+        const code = await readFile(file, "utf-8")
+        const newCode = code.replace(reg, match => {
+            modifiedFiles.add(file)
+            const hasExport = reg1.test(match)
+            const $2 = match.replace(reg, "$2")
+            const matches = $2.match(reg2)
+            if (matches) {
+                const name = matches[1]
+                const extendsTypes = splitExtendsType(matches[2]).join(" & ")
+
+                return `${hasExport ? "export " : ""}type ${name} = ${extendsTypes} & {`
+            }
+            return `${hasExport ? "export " : ""}type ${$2} = {`
+        })
+        await writeFile(file, newCode, "utf-8")
+    }
+
+    if (modifiedFiles.size > 0) consola.success(`以下文件中的 interface 已经转换为 type：\n\n${Array.from(modifiedFiles).join("\n")}`)
+
+    consola.start("检查项目是否存在 TypeScript 错误")
+
+    await spawnAsync("npx tsc --noEmit")
+}
+
+export async function setGitProxy() {
+    const { default: inquirer } = await import("inquirer")
+    const { global } = await inquirer.prompt({
+        type: "list",
+        name: "global",
+        message: "请选择",
+        choices: [
+            {
+                name: "全局代理",
+                value: true
+            },
+            {
+                name: "当前项目",
+                value: false
+            }
+        ]
+    })
+    const { open } = await inquirer.prompt({
+        type: "list",
+        name: "open",
+        message: "请选择",
+        choices: [
+            {
+                name: "打开代理",
+                value: true
+            },
+            {
+                name: "关闭代理",
+                value: false
+            }
+        ]
+    })
+    if (!open) {
+        try {
+            await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`)
+        } catch (error) {}
+        try {
+            await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`)
+        } catch (error) {}
+        return
+    }
+    const { proxy } = await inquirer.prompt({
+        type: "input",
+        name: "proxy",
+        message: "请输入代理地址",
+        default: "http://localhost:7890"
+    })
+    await spawnAsync(`git config${global ? " --global" : ""} http.proxy ${proxy}`)
+    await spawnAsync(`git config${global ? " --global" : ""} https.proxy ${proxy}`)
+}
+
+export async function setShellProxy() {
+    const { default: inquirer } = await import("inquirer")
+    const { open } = await inquirer.prompt({
+        type: "list",
+        name: "open",
+        message: "请选择",
+        choices: [
+            {
+                name: "打开代理",
+                value: true
+            },
+            {
+                name: "关闭代理",
+                value: false
+            }
+        ]
+    })
+    if (!open) return await spawnAsync(`netsh winhttp reset proxy`)
+    const { proxy } = await inquirer.prompt({
+        type: "input",
+        name: "proxy",
+        message: "请输入代理地址",
+        default: "http://localhost:7890"
+    })
+    await spawnAsync(`netsh winhttp set proxy "${proxy}" "<local>"`)
+}
+
+export type ArrowToFunctionChoice = {
+    value: string
+    short: string
+    name: string
+    checked: boolean
+}
+
+export async function arrowToFunction() {
+    const { default: inquirer } = await import("inquirer")
+    const files = await getFiles({
+        path: "./src",
+        match: (path, stats) => path.ext === ".tsx" && stats.isFile()
+    })
+    const reg = /^(export )?const \w+?: FC.+?$/gm
+    const { auto } = await inquirer.prompt({
+        type: "confirm",
+        name: "auto",
+        message: "是否自动选择要转换的组件"
+    })
+
+    const warnFiles: Set<string> = new Set()
+    const modifiedFiles: Set<string> = new Set()
+
+    if (auto) {
+        for (const file of files) {
+            let code = await readFile(file, "utf-8")
+            let exportDefaultReg: RegExp | undefined = undefined
+            code = code.replace(reg, match => {
+                if (match.includes("memo(") || match.includes("forwardRef(")) {
+                    warnFiles.add(file)
+                    return match
+                }
+                modifiedFiles.add(file)
+                const hasExport = match.startsWith("export ")
+                const name = match.match(/const (\w+?):/)![1]
+                const edReg = new RegExp(`^export default ${name}$`, "m")
+                let hasExportDefault = false
+                if (!exportDefaultReg && !hasExport && edReg.test(code)) {
+                    exportDefaultReg = edReg
+                    hasExportDefault = true
+                }
+                const typeIndex = match.indexOf("FC<")
+                if (typeIndex > 0) {
+                    const type = getTypeInGenerics(match, typeIndex + 2)
+                    return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}(props: ${type}) {`
+                }
+                return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}() {`
+            })
+            if (exportDefaultReg) code = code.replace(exportDefaultReg, "")
+            await writeFile(file, code, "utf-8")
+        }
+    } else {
+        for (const file of files) {
+            let code = await readFile(file, "utf-8")
+            const matches = code.match(reg)
+            if (!matches) continue
+            consola.start(file)
+            const choices = Array.from(matches).reduce((prev: ArrowToFunctionChoice[], match, index) => {
+                if (match.includes("memo(") || match.includes("forwardRef(")) {
+                    warnFiles.add(file)
+                    return prev
+                }
+                modifiedFiles.add(file)
+                const hasExport = match.startsWith("export ")
+                const funName = match.match(/const (\w+?):/)![1]
+                const typeIndex = match.indexOf("FC<")
+                if (typeIndex > 0) {
+                    const type = getTypeInGenerics(match, typeIndex + 2)
+                    const name = `◆ ${match}
+    ◆ ${hasExport ? "export " : ""}function ${funName}(props: ${type}) {`
+                    prev.push({ value: index.toString(), short: funName, name, checked: true })
+                } else {
+                    const name = `◆ ${match}
+    ◆ ${hasExport ? "export " : ""}function ${funName}() {`
+                    prev.push({ value: index.toString(), short: funName, name, checked: true })
+                }
+
+                return prev
+            }, [])
+
+            const length = choices.length.toString().length
+
+            choices.forEach((choice, index) => {
+                let first = true
+                choice.name = choice.name.replace(/◆/g, () => {
+                    if (first) {
+                        first = false
+                        return `◆ ${(index + 1).toString().padStart(length, "0")}.`
+                    }
+                    return "".padStart(length + 3, " ")
+                })
+            })
+
+            const { indexs } = await inquirer.prompt({
+                type: "checkbox",
+                name: "indexs",
+                message: `total ${choices.length} component${choices.length > 1 ? "s" : ""}`,
+                choices
+            })
+
+            let index = 0
+
+            let exportDefaultReg: RegExp | undefined = undefined
+
+            code = code.replace(reg, match => {
+                if (!indexs.includes(index.toString())) return match
+                const hasExport = match.startsWith("export ")
+                const name = match.match(/const (\w+?):/)![1]
+                const edReg = new RegExp(`^export default ${name}$`, "m")
+                let hasExportDefault = false
+                if (!exportDefaultReg && !hasExport && edReg.test(code)) {
+                    exportDefaultReg = edReg
+                    hasExportDefault = true
+                }
+                const typeIndex = match.indexOf("FC<")
+                if (typeIndex > 0) {
+                    const type = getTypeInGenerics(match, typeIndex + 2)
+                    return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}(props: ${type}) {`
+                }
+                return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}() {`
+            })
+
+            if (exportDefaultReg) code = code.replace(exportDefaultReg, "")
+
+            console.log()
+
+            await writeFile(file, code, "utf-8")
+        }
+    }
+
+    if (modifiedFiles.size > 0) consola.success(`以下文件中的箭头函数组件已经转换为函数组件：\n\n${Array.from(modifiedFiles).join("\n")}`)
+
+    if (warnFiles.size > 0) consola.warn(`以下文件中存在 memo 或 forwardRef，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`)
+
+    consola.start("格式化代码")
+
+    await addPrettier()
+
+    await installDependcies(true)
+
+    await spawnAsync("npx prettier --write ./src")
+
+    consola.start("检查项目是否存在 TypeScript 错误")
+
+    await spawnAsync("npx tsc --noEmit")
+}
+
+export async function sortPackageJson() {
+    const packageJson = await readPackageJson()
+    packageJson.dependencies = sortArrayOrObject(packageJson.dependencies)
+    packageJson.devDependencies = sortArrayOrObject(packageJson.devDependencies)
+    packageJson.peerDependencies = sortArrayOrObject(packageJson.peerDependencies)
+    packageJson.peerDevDependencies = sortArrayOrObject(packageJson.peerDevDependencies)
+    await writePackageJson(packageJson)
+}
+
+export async function setRegistry() {
+    const { default: inquirer } = await import("inquirer")
+
+    const { manager } = await inquirer.prompt({
+        type: "list",
+        name: "manager",
+        message: "请选择包管理器",
+        choices: Object.keys(PackageManager)
+    })
+
+    const { registry } = await inquirer.prompt({
+        type: "list",
+        name: "registry",
+        message: "请选择要更换的源",
+        choices: Object.keys(Registry)
+    })
+
+    const command = `${manager} config set registry ${Registry[registry as keyof typeof Registry]}`
+    await spawnAsync(command)
+}
+
+export async function upgradeDependency() {
+    const { default: inquirer } = await import("inquirer")
+
+    const packageJson = await readPackageJson()
+
+    const { types } = await inquirer.prompt({
+        type: "checkbox",
+        name: "types",
+        message: "请选择要升级的依赖类型",
+        choices: ["dependencies", "devDependencies"].filter(type => !!packageJson[type])
+    })
+
+    const { level } = await inquirer.prompt({
+        type: "list",
+        name: "level",
+        message: "请选择升级的级别",
+        choices: ["major", "minor", "patch"]
+    })
+
+    const updateLogs: string[] = []
+
+    for (const type of types) {
+        const upgrades: { package: string; oldVersion: string; newVersion: string; strVersion: string }[] = []
+        const allPkgs = Object.keys(packageJson[type])
+
+        for (let i = 0; i < allPkgs.length; i++) {
+            const pkg = allPkgs[i]
+            const rv = packageJson[type][pkg]
+            const s = rv.match(/^\D*/)![0]
+            const cv = getVersionFromRequiredVersion(rv)
+            const version = await getPackageUpgradeVersion(pkg, cv, level)
+            if (!version) continue
+            upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, strVersion: `${s}${version}` })
+        }
+
+        if (upgrades.length === 0) continue
+
+        const { pkgs } = await inquirer.prompt({
+            type: "checkbox",
+            name: "pkgs",
+            message: "请选择要升级的包",
+            choices: upgrades.map(upgrade => ({ name: `${upgrade.package} ${upgrade.oldVersion} => ${upgrade.newVersion}`, value: upgrade.package }))
+        })
+
+        pkgs.forEach((pkg: string) => {
+            const upgrade = upgrades.find(upgrade => upgrade.package === pkg)!
+            packageJson[type][pkg] = upgrade.strVersion
+            updateLogs.push(`${pkg} ${upgrade.oldVersion} => ${upgrade.newVersion}`)
+        })
+    }
+
+    if (updateLogs.length === 0) exit()
+    await writePackageJson(packageJson)
+    const result = await installDependcies()
+    if (result) await spawnAsync("npx tsc --noEmit")
+    return getCommitMessage(CommitType.feature, `upgrade dependencies: ${updateLogs.join(", ")}`)
+}
+
+export async function killProcessByPort(port: string | number) {
+    port = typeof port === "string" ? parseInt(port) : port
+    if (!Number.isInteger(port)) {
+        consola.error("无效的端口号")
+        exit()
+    }
+    const { default: inquirer } = await import("inquirer")
+    const pidInfos = await getPidInfoFromPort(port)
+    const choices: { name: string; value: number }[] = []
+    for (const { pid, info } of pidInfos) {
+        const name = await getProcessInfoFromPid(pid)
+        if (name) choices.push({ name: `${info} ${name}`, value: pid })
+    }
+    if (choices.length === 0) {
+        consola.warn("没有找到对应的进程")
+        return
+    }
+    const { chosenPids } = await inquirer.prompt({
+        type: "checkbox",
+        name: "chosenPids",
+        message: "请选择要结束的进程",
+        choices,
+        default: choices.map(choice => choice.value)
+    })
+    for (const pid of chosenPids) {
+        exec(`taskkill /f /pid ${pid}`)
+    }
+}
+
+export async function setFatherConfig() {
+    let packageJson = await readPackageJson()
+    packageJson.publishConfig ??= {}
+    packageJson.publishConfig.access = "public"
+    packageJson.publishConfig.registry = "https://registry.npmjs.org/"
+    packageJson.publishConfig = sortArrayOrObject(packageJson.publishConfig)
+    packageJson.files ??= []
+    if (!packageJson.files.includes("src")) packageJson.files.push("src")
+    packageJson.files = sortArrayOrObject(packageJson.files)
+    const dependencies = packageJson.dependencies
+    const devDependencies = packageJson.devDependencies
+    const peerDependencies = packageJson.peerDependencies
+    if (packageJson.repository?.url && !packageJson.repository.url.startsWith("git+")) packageJson.repository.url = `git+${packageJson.repository.url}.git`
+    packageJson.repository ??= {}
+    packageJson.repository.type ??= "git"
+    packageJson.repository.url ??= `git+https://github.com/1adybug/${packageJson.name}.git`
+    if (!packageJson.types) {
+        packageJson = Object.entries(packageJson).reduce((prev: Record<string, any>, [key, value]) => {
+            prev[key] = value
+            if (Object.hasOwn(packageJson, "module")) {
+                if (key === "module") prev.types = value.replace(/\.js$/, ".d.ts")
+            } else if (Object.hasOwn(packageJson, "main")) {
+                if (key === "main") prev.types = value.replace(/\.js$/, ".d.ts")
+            }
+            return prev
+        }, {})
+    }
+    packageJson.scripts ??= {}
+    packageJson.scripts.prepublishOnly = "npx zixulu upgrade && father doctor && npm run build"
+    delete packageJson.dependencies
+    delete packageJson.devDependencies
+    delete packageJson.peerDependencies
+    packageJson.dependencies = sortArrayOrObject(dependencies)
+    packageJson.devDependencies = sortArrayOrObject(devDependencies)
+    packageJson.peerDependencies = sortArrayOrObject(peerDependencies)
+    const fatherrcCode = `import { defineConfig } from "father"
+
+export default defineConfig({
+    esm: {},
+    cjs: {},
+    targets: {
+        node: 18,
+        chrome: 100
+    },
+    sourcemap: true
+})
+`
+    await addGitignore()
+    await writePackageJson(packageJson)
+    await writeFile(".fatherrc.ts", fatherrcCode)
+    await setTsConfig("target", Target.ESNext)
+}
+
+export async function downloadLatestSoftware() {
+    const { default: inquirer } = await import("inquirer")
+    const dir = `softwares-${Date.now()}`
+    const { softwares } = await inquirer.prompt({
+        type: "checkbox",
+        name: "softwares",
+        message: "请选择要下载的软件",
+        choices: Object.values(Software),
+        default: Object.values(Software)
+    })
+    if (softwares.length === 0) return
+    await mkdir(dir, { recursive: true })
+    for (const software of softwares) {
+        consola.start(`正在下载 ${software}`)
+        await SoftwareDownloadMap[software as Software](dir)
+    }
+}
+
+export async function downloadLatestVscodeExtension() {
+    const dir = `vscode-${Date.now()}`
+    await mkdir(dir, { recursive: true })
+    await downloadVscodeExts(dir)
+    await writeInstallVscodeExtScript(dir)
 }
