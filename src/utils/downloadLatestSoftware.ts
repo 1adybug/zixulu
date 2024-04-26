@@ -1,6 +1,6 @@
 import consola from "consola"
 import { mkdir } from "fs/promises"
-import { Software } from "src/constant"
+import { Software } from "../../src/constant"
 import { SoftwareDownloadMap } from "."
 
 export async function downloadLatestSoftware() {
