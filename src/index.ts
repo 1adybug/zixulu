@@ -723,6 +723,7 @@ program.command("init").action(async () => {
         installed = true
     }
     if (!installed) await installDependcies(true, manager)
+    await setTsConfig("noEmit", true)
 })
 
 program
