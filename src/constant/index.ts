@@ -28,3 +28,23 @@ export enum ProjectType {
     vite = "vite",
     rsbuild = "rsbuild"
 }
+
+export enum CommitType {
+    feature = "feature",
+    fix = "fix",
+    docs = "docs",
+    wip = "wip",
+    perfs = "perfs",
+    rollback = "rollback",
+    other = "other"
+}
+
+export const CommitTypeMap = {
+    [CommitType.feature]: "✨feature: ",
+    [CommitType.fix]: "🐞 fix: ",
+    [CommitType.docs]: "📄 docs: ",
+    [CommitType.wip]: "🖥️ wip: ",
+    [CommitType.perfs]: "🚅 perfs: ",
+    [CommitType.rollback]: "⏪ rollback: ",
+    [CommitType.other]: "🔵 other: "
+}
