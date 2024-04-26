@@ -1231,3 +1231,32 @@ export async function isCommandExisted(command: string): Promise<boolean> {
         })
     })
 }
+
+export async function ifContinue() {
+    const { default: inquirer } = await import("inquirer")
+    const { continue: c } = await inquirer.prompt({
+        type: "confirm",
+        name: "continue",
+        message: "是否继续"
+    })
+    if (!c) exit()
+}
+
+export async function isGitAvailable() {
+    return await isCommandExisted("git")
+}
+
+export async function checkGitStatus() {
+    if (await isGitAvailable()) {
+        const status = await execAsync("git status")
+        if (status === "fatal: not a git repository (or any of the parent directories): .git") {
+            consola.warn("请在使用本功能前备份代码")
+            await ifContinue()
+        } else if (!status.includes("nothing to commit, working tree clean")) {
+            consola.warn("请在使用本功能前提交代码")
+            exit()
+        }
+    }
+    consola.warn("请在使用本功能前备份代码")
+    await ifContinue()
+}
