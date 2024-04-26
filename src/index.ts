@@ -6,7 +6,7 @@ import consola from "consola"
 import { mkdir, readdir, readFile, rename, rm, writeFile } from "fs/promises"
 import { join, resolve } from "path"
 import { PackageManager, Registry, Software } from "./constant"
-import { addAntd, addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettier, addPrisma, addTailwind, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageManager, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, installDependcies, Module, ModuleResolution, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, SoftwareDownloadMap, sortArrayOrObject, spawnAsync, splitExtendsType, Target, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig, zipDir } from "./utils"
+import { addAntd, addDependencies, addDevDependencies, addGitignore, addPostCSSConfig, addPrettier, addPrisma, addTailwind, addTailwindConfig, addTailwindToCSS, createIndexHtml, downloadVscodeExts, execAsync, getFiles, getPackageManager, getPackageUpgradeVersion, getPidInfoFromPort, getProcessInfoFromPid, getTypeInGenerics, getVersionFromRequiredVersion, installDependcies, isCommandExisted, Module, ModuleResolution, readPackageJson, readPackageJsonSync, removeComment, removeESLint, setTsConfig, SoftwareDownloadMap, sortArrayOrObject, spawnAsync, splitExtendsType, Target, vite, writeInstallVscodeExtScript, writePackageJson, writeRsbuildConfig, zipDir } from "./utils"
 
 const program = new Command()
 
@@ -135,13 +135,16 @@ program
     .alias("ud")
     .description("升级所有依赖")
     .action(async () => {
-        const status = await execAsync("git status")
-
-        if (status === "fatal: not a git repository (or any of the parent directories): .git") {
+        if (await isCommandExisted("git")) {
+            const status = await execAsync("git status")
+            if (status === "fatal: not a git repository (or any of the parent directories): .git") {
+                consola.warn("请在使用本功能前备份代码")
+            } else if (!status.includes("nothing to commit, working tree clean")) {
+                consola.warn("请在使用本功能前提交代码")
+                return
+            }
+        } else {
             consola.warn("请在使用本功能前备份代码")
-        } else if (!status.includes("nothing to commit, working tree clean")) {
-            consola.warn("请在使用本功能前提交代码")
-            return
         }
 
         const { default: inquirer } = await import("inquirer")
@@ -161,6 +164,8 @@ program
             message: "请选择升级的级别",
             choices: ["major", "minor", "patch"]
         })
+
+        let hasUpgrade = false
 
         for (const type of types) {
             const upgrades: { package: string; oldVersion: string; newVersion: string; strVersion: string }[] = []
@@ -186,10 +191,13 @@ program
             })
 
             pkgs.forEach((pkg: string) => {
+                hasUpgrade = true
                 const upgrade = upgrades.find(upgrade => upgrade.package === pkg)!
                 packageJson[type][pkg] = upgrade.strVersion
             })
         }
+
+        if (!hasUpgrade) return
 
         await writePackageJson(packageJson)
 
