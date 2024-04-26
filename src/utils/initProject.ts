@@ -1,5 +1,5 @@
 import consola from "consola"
-import { ProjectType } from "src/constant"
+import { ProjectType } from "../../src/constant"
 import { addDependencies, getPackageManager, installDependcies, readPackageJson, setTsConfig } from "."
 import { addAntd } from "./addAntd"
 import { addGitignore } from "./addGitignore"
