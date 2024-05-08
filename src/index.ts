@@ -116,7 +116,7 @@ program.command("download-vscode-extension").alias("dve").description("下载 VS
 
 program.command("kill-port").description("根据端口号杀死进程").argument("port", "端口号").action(killProcessByPort)
 
-program.command("rm-git").argument("path", "要移除的文件或文件夹").option("-r, --recursive", "是否是文件夹").action(removeFileOrFolderFromGit)
+program.command("rm-git").argument("path", "要移除的文件或文件夹").action(removeFileOrFolderFromGit)
 
 program.command("npm-download").alias("nd").description("下载 npm 包").argument("name", "包名").action(downloadNpm)
 
