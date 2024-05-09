@@ -30,6 +30,7 @@ import { setShellProxy } from "./utils/setShellProxy"
 import { sortPackageJson } from "./utils/sortPackageJson"
 import { upgradeDependency } from "./utils/upgradeDependcy"
 import { vite } from "./utils/vite"
+import { betaVersion } from "./utils/betaVersion"
 
 const program = new Command()
 
@@ -138,5 +139,7 @@ program
     .action(actionWithBackup(initProject, getCommitMessage(CommitType.feature, "初始化项目")))
 
 program.command("tsc").description("类型检查").action(checkType)
+
+program.command("beta-version").alias("bv").description("设置版本号").action(betaVersion)
 
 program.parse()
