@@ -10,6 +10,7 @@ import { addPrettier } from "./utils/addPrettier"
 import { addPrisma } from "./utils/addPrisma"
 import { addTailwind } from "./utils/addTailwind"
 import { arrowToFunction } from "./utils/arrowToFunction"
+import { betaVersion } from "./utils/betaVersion"
 import { checkType } from "./utils/checkType"
 import { downloadLatestSoftware } from "./utils/downloadLatestSoftware"
 import { downloadLatestVscodeExtension } from "./utils/downloadLatestVscodeExtension"
@@ -19,6 +20,7 @@ import { initProject } from "./utils/initProject"
 import { interfaceToType } from "./utils/interfaceToType"
 import { killProcessByPort } from "./utils/killProcessByPort"
 import { next } from "./utils/next"
+import { reinstall } from "./utils/reinstall"
 import { removeComment } from "./utils/removeComment"
 import { removeESLint } from "./utils/removeESLint"
 import { removeFileOrFolderFromGit } from "./utils/removeFileOrFolderFromGit"
@@ -30,7 +32,6 @@ import { setShellProxy } from "./utils/setShellProxy"
 import { sortPackageJson } from "./utils/sortPackageJson"
 import { upgradeDependency } from "./utils/upgradeDependcy"
 import { vite } from "./utils/vite"
-import { betaVersion } from "./utils/betaVersion"
 
 const program = new Command()
 
@@ -141,5 +142,7 @@ program
 program.command("tsc").description("类型检查").action(checkType)
 
 program.command("beta-version").alias("bv").description("设置版本号").action(betaVersion)
+
+program.command("reinstall").alias("re").description("重新安装依赖").argument("name", "包名").action(reinstall)
 
 program.parse()
