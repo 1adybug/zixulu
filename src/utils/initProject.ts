@@ -45,7 +45,7 @@ export async function initProject() {
         if (removeEslintConfig) await removeESLint()
     }
     const isFullStack = type === ProjectType.next || type === ProjectType.remix
-    const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "stable-hash", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "stable-hash", "tailwind"]
+    const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "tailwind"]
     const { modules } = await inquirer.prompt({
         type: "checkbox",
         name: "modules",
