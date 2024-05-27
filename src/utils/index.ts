@@ -2,7 +2,7 @@ import archiver from "archiver"
 import { exec, spawn } from "child_process"
 import consola from "consola"
 import { Stats, createWriteStream, readFileSync } from "fs"
-import { mkdir, readFile, readdir, rename, stat, writeFile } from "fs/promises"
+import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "fs/promises"
 import { HttpsProxyAgent } from "https-proxy-agent"
 import * as JSON5 from "json5"
 import { type Headers as NodeFetchHeaders } from "node-fetch"
@@ -257,26 +257,26 @@ export default {
 /** 添加 postcss.config.js 配置 */
 export async function addPostCSSConfig() {
     try {
-        const packageJson = await readPackageJson()
-        const autoprefixer = Object.keys(packageJson.dependencies).includes("autoprefixer") || Object.keys(packageJson.devDependencies).includes("autoprefixer")
+        await rm("postcss.config.js", { recursive: true })
+        await rm("postcss.config.mjs", { recursive: true })
+        await rm("postcss.config.cjs", { recursive: true })
         await writeFile(
-            "postcss.config.cjs",
-            `module.exports = {
+            "postcss.config.mjs",
+            `/** @type {import("postcss-load-config").Config} */
+const config = {
     plugins: {
-        tailwindcss: {}${
-            autoprefixer
-                ? `,
-        autoprefixer: {}`
-                : ""
-        }
+        tailwindcss: {},
+        autoprefixer: {},
     }
 }
+
+export default config            
 `,
             "utf-8"
         )
-        consola.success("添加 postcss.config.js 配置成功")
+        consola.success("添加 postcss.config.mjs 配置成功")
     } catch (error) {
-        consola.fail("添加 postcss.config.js 配置失败")
+        consola.fail("添加 postcss.config.mjs 配置失败")
     }
 }
 
