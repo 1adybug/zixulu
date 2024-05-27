@@ -257,9 +257,9 @@ export default {
 /** 添加 postcss.config.js 配置 */
 export async function addPostCSSConfig() {
     try {
-        await rm("postcss.config.js", { recursive: true })
-        await rm("postcss.config.mjs", { recursive: true })
-        await rm("postcss.config.cjs", { recursive: true })
+        await rm("postcss.config.js", { force: true })
+        await rm("postcss.config.mjs", { force: true })
+        await rm("postcss.config.cjs", { force: true })
         await writeFile(
             "postcss.config.mjs",
             `/** @type {import("postcss-load-config").Config} */
