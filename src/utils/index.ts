@@ -230,9 +230,9 @@ export async function getFiles(options: GetFilesOptions) {
 export async function addTailwindConfig() {
     try {
         await writeFile(
-            "tailwind.config.js",
-            `/** @type {import('tailwindcss').Config} */
-export default {
+            "tailwind.config.ts",
+            `import type { Config } from "tailwindcss"
+const config: Config = {
     content: [
         "./index.html",
         "./public/index.html",
@@ -245,12 +245,14 @@ export default {
     },
     plugins: [],
 }
+
+export default config
 `,
             "utf-8"
         )
-        consola.success("添加 tailwind.config.js 配置成功")
+        consola.success("添加 tailwind.config.ts 配置成功")
     } catch (error) {
-        consola.fail("添加 tailwind.config.js 配置失败")
+        consola.fail("添加 tailwind.config.ts 配置失败")
     }
 }
 
