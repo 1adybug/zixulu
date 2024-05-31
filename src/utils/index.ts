@@ -268,7 +268,7 @@ export async function addPostCSSConfig() {
 const config = {
     plugins: {
         tailwindcss: {},
-        autoprefixer: {},
+        autoprefixer: {}
     }
 }
 

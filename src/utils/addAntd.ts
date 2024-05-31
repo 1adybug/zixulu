@@ -18,6 +18,7 @@ export async function addAntd() {
         await writeFile(
             join(componentDir, "AntdNextRegistry.tsx"),
             `"use client"
+
 import { StyleProvider } from "@ant-design/cssinjs"
 import { AntdRegistry } from "@ant-design/nextjs-registry"
 import { ConfigProvider } from "antd"
@@ -46,8 +47,7 @@ export default AntdNextRegistry
     } else {
         await writeFile(
             join(componentDir, "AntdRegistry.tsx"),
-            `"use client"
-import { StyleProvider } from "@ant-design/cssinjs"
+            `import { StyleProvider } from "@ant-design/cssinjs"
 import { ConfigProvider } from "antd"
 import zhCN from "antd/locale/zh_CN"
 import { FC, ReactNode } from "react"
