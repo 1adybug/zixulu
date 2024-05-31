@@ -45,7 +45,7 @@ export async function initProject() {
         if (removeEslintConfig) await removeESLint()
     }
     const isFullStack = type === ProjectType.next || type === ProjectType.remix
-    const choices = isFullStack ? ["antd", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod"] : ["antd", "dayjs", "deepsea-components", "deepsea-tools", "tailwind"]
+    const choices = isFullStack ? ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod", "@emotion/css"] : ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "@emotion/css", "react-router-dom"]
     const { modules } = await inquirer.prompt({
         type: "checkbox",
         name: "modules",
@@ -54,12 +54,15 @@ export async function initProject() {
         default: choices
     })
     if (modules.includes("antd")) await addAntd()
+    if (modules.includes("ahooks")) await addDependencies("ahooks")
     if (modules.includes("tailwind")) await addTailwind()
     if (modules.includes("dayjs")) await addDependencies("dayjs")
     if (modules.includes("deepsea-components")) await addDependencies("deepsea-components")
     if (modules.includes("deepsea-tools")) await addDependencies("deepsea-tools")
     if (modules.includes("stable-hash")) await addDependencies("stable-hash")
     if (modules.includes("zod")) await addDependencies("zod")
+    if (modules.includes("@emotion/css")) await addDependencies("@emotion/css")
+    if (modules.includes("react-router-dom")) await addDependencies("react-router-dom")
     await addPrettier()
     let installed = false
     if (modules.includes("prisma")) {
