@@ -7,7 +7,6 @@ export async function addAntd() {
     consola.start("开始添加 antd 配置")
     await addDependencies("@ant-design/cssinjs")
     await addDependencies("@ant-design/icons")
-    await addDependencies("ahooks")
     await addDependencies("antd")
     const dir = await readdir("./")
     const componentDir = dir.includes("src") ? "src/components" : "components"
