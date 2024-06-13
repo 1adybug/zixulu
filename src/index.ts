@@ -13,7 +13,7 @@ import { arrowToFunction } from "./utils/arrowToFunction"
 import { betaVersion } from "./utils/betaVersion"
 import { checkType } from "./utils/checkType"
 import { downloadLatestSoftware } from "./utils/downloadLatestSoftware"
-import { downloadLatestVscodeExtension } from "./utils/downloadLatestVscodeExtension"
+import { syncVscode } from "./utils/syncVscode"
 import { downloadNpm } from "./utils/downloadNpm"
 import { generatePrisma } from "./utils/generatePrisma"
 import { initProject } from "./utils/initProject"
@@ -114,7 +114,7 @@ program.command("shell-proxy").alias("sp").description("设置 Shell 代理").ac
 
 program.command("download-software").alias("ds").description("下载最新版软件").action(downloadLatestSoftware)
 
-program.command("download-vscode-extension").alias("dve").description("下载 VS Code 插件").action(downloadLatestVscodeExtension)
+program.command("vscode").alias("vsc").description("同步 VS Code 配置").action(syncVscode)
 
 program.command("kill-port").description("根据端口号杀死进程").argument("port", "端口号").action(killProcessByPort)
 
