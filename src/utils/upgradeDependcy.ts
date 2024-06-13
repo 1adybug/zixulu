@@ -15,6 +15,8 @@ export async function upgradeDependency() {
         choices: ["dependencies", "devDependencies"].filter(type => !!packageJson[type])
     })
 
+    if (types.length === 0) exit()
+
     const { level } = await inquirer.prompt({
         type: "list",
         name: "level",
@@ -29,13 +31,17 @@ export async function upgradeDependency() {
         const allPkgs = Object.keys(packageJson[type])
 
         for (let i = 0; i < allPkgs.length; i++) {
-            const pkg = allPkgs[i]
-            const rv = packageJson[type][pkg]
-            const s = rv.match(/^\D*/)![0]
-            const cv = getVersionFromRequiredVersion(rv)
-            const version = await getPackageUpgradeVersion(pkg, cv, level)
-            if (!version) continue
-            upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, strVersion: `${s}${version}` })
+            try {
+                const pkg = allPkgs[i]
+                const rv = packageJson[type][pkg]
+                const s = rv.match(/^\D*/)![0]
+                const cv = getVersionFromRequiredVersion(rv)
+                const version = await getPackageUpgradeVersion(pkg, cv, level)
+                if (!version) continue
+                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, strVersion: `${s}${version}` })
+            } catch (error) {
+                continue
+            }
         }
 
         if (upgrades.length === 0) continue
