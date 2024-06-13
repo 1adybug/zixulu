@@ -1,11 +1,12 @@
 import archiver from "archiver"
 import { exec, spawn } from "child_process"
 import consola from "consola"
-import { Stats, createWriteStream, readFileSync } from "fs"
+import { Stats, createWriteStream, existsSync, readFileSync } from "fs"
 import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "fs/promises"
 import { HttpsProxyAgent } from "https-proxy-agent"
 import * as JSON5 from "json5"
 import { type Headers as NodeFetchHeaders } from "node-fetch"
+import { homedir } from "os"
 import { ParsedPath, join, parse } from "path"
 import { Config } from "prettier"
 import { cwd, exit } from "process"
@@ -862,7 +863,7 @@ export async function downloadGeekUninstaller(dir: string) {
 
 export const vscodeExts: string[] = ["MS-CEINTL.vscode-language-pack-zh-hans", "russell.any-rule", "russell.any-type", "formulahendry.code-runner", "dsznajder.es7-react-js-snippets", "ms-vscode.vscode-typescript-next", "bierner.lit-html", "ritwickdey.LiveServer", "yzhang.markdown-all-in-one", "bierner.markdown-preview-github-styles", "mervin.markdown-formatter", "DavidAnson.vscode-markdownlint", "PKief.material-icon-theme", "techer.open-in-browser", "esbenp.prettier-vscode", "Prisma.prisma", "bradlc.vscode-tailwindcss", "styled-components.vscode-styled-components", "rioukkevin.vscode-git-commit"]
 
-export async function downloadVscodeExt(dir: string, ext: string) {
+export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
     const response = await fetch(`https://marketplace.visualstudio.com/items?itemName=${ext}`)
     const html = await response.text()
     const reg = /^(.+?)\.(.+?)$/
@@ -871,15 +872,44 @@ export async function downloadVscodeExt(dir: string, ext: string) {
     const version = html.match(reg2)![1]
     const reg3 = /<span class="ux-item-name">(.+?)<\/span>/
     const displayName = html.match(reg3)![1]
-    consola.start(`正在下载 ${displayName}`)
     const url = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${author}/vsextensions/${name}/${version}/vspackage`
-    await download(url, dir, `${ext}-${version}.vsix`)
+    return { id: ext, name: displayName, version, url }
+    // await download(url, dir, `${ext}-${version}.vsix`)
+}
+
+export interface VscodeExt {
+    id: string
+    name: string
+    version: string
+    url: string
 }
 
 export async function downloadVscodeExts(dir: string) {
     await mkdir(dir, { recursive: true })
-    for (const ext of vscodeExts) {
-        await downloadVscodeExt(dir, ext)
+    const { default: inquirer } = await import("inquirer")
+    consola.start("正在获取 VS Code 扩展列表")
+    const extList = await execAsync("code --list-extensions")
+    const exts = await Promise.all(
+        extList
+            .split(/[\n\r]/)
+            .filter(Boolean)
+            .map(ext => getVscodeExtInfo(ext))
+    )
+    const setting = await getSetting()
+    const vscodeExts = setting?.vscodeExts
+    const exts2 = await inquirer.prompt({
+        type: "checkbox",
+        name: "exts",
+        message: "选择需要下载的扩展",
+        choices: exts.map(ext => ({ name: ext.name, value: ext.id })),
+        default: vscodeExts || exts.map(ext => ext.id)
+    })
+    setting.vscodeExts = exts2.exts
+    await setSetting(setting)
+    for (const ext of exts) {
+        if (!exts2.exts.includes(ext.id)) continue
+        consola.start(`正在下载 ${ext.name}`)
+        await download(ext.url, dir, `${ext.id}-${ext.version}.vsix`)
     }
 }
 
@@ -1084,4 +1114,20 @@ export function actionWithBackup(action: (...args: any[]) => Promise<string | vo
 
 export function getCommitMessage(type: CommitType, message: string) {
     return `${CommitTypeMap[type]}${message}`
+}
+
+export async function getSetting() {
+    const userDir = homedir()
+    const settingPath = join(userDir, ".zixulu.json")
+    if (existsSync(settingPath)) {
+        const setting = JSON.parse(await readFile(settingPath, "utf-8"))
+        return setting
+    }
+    return {}
+}
+
+export async function setSetting(setting: Record<string, any>) {
+    const userDir = homedir()
+    const settingPath = join(userDir, ".zixulu.json")
+    await writeFile(settingPath, JSON.stringify(setting, undefined, 4), "utf-8")
 }
