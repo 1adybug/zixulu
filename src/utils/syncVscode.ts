@@ -2,7 +2,7 @@ import consola from "consola"
 import { copyFile, mkdir, readdir } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
-import { downloadVscodeExts, writeSyncVscodeScript } from "."
+import { downloadVscode, downloadVscodeExts, writeSyncVscodeScript } from "."
 
 export async function syncVscode() {
     const { default: inquirer } = await import("inquirer")
@@ -23,12 +23,12 @@ export async function syncVscode() {
     await downloadVscodeExts(join(dir, "extensions"))
     consola.success("下载最新 VSCode 插件完成")
     await writeSyncVscodeScript(dir)
-    const { downloadVscode } = await inquirer.prompt({
+    const { vscode } = await inquirer.prompt({
         type: "confirm",
-        name: "downloadVscode",
+        name: "vscode",
         message: "是否下载最新版 VSCode"
     })
-    if (downloadVscode) {
+    if (vscode) {
         consola.start("开始下载最新 VSCode")
         await downloadVscode(dir)
         consola.success("下载最新 VSCode 完成")
