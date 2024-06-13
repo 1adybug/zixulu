@@ -896,20 +896,20 @@ export async function downloadVscodeExts(dir: string) {
             .map(ext => getVscodeExtInfo(ext))
     )
     const setting = await getSetting()
-    const vscodeExts = setting?.vscodeExts
+    const vscodeExts = setting?.vscodeExts as string[] | undefined
     const exts2 = await inquirer.prompt({
         type: "checkbox",
         name: "exts",
         message: "选择需要下载的扩展",
         choices: exts.map(ext => ({ name: ext.name, value: ext.id })),
-        default: vscodeExts || exts.map(ext => ext.id)
+        default: vscodeExts?.filter(ext => exts.some(item => item.id === ext)) || exts.map(ext => ext.id)
     })
     setting.vscodeExts = exts2.exts
     await setSetting(setting)
     for (const ext of exts) {
         if (!exts2.exts.includes(ext.id)) continue
         consola.start(`正在下载 ${ext.name}`)
-        await download(ext.url, dir, `${ext.id}-${ext.version}.vsix`)
+        await retry(() => download(ext.url, dir, `${ext.id}-${ext.version}.vsix`), 2)
     }
 }
 
@@ -924,7 +924,7 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
     [Software.Supermium]: downloadSupermium
 }
 
-export async function writeInstallVscodeExtScript(dir: string) {
+export async function writeSyncVscodeScript(dir: string) {
     const script = `// @ts-check
 const { readdir, copyFile, rm } = require("fs/promises")
 const { spawn } = require("child_process")
@@ -942,22 +942,24 @@ function spawnAsync(command) {
 }
 
 async function main() {
-    const dir = await readdir("./")
-    const exts = dir.filter(name => name.endsWith(".vsix"))
+    const dir = await readdir("./extensions")
     for (const ext of exts) {
-        await spawnAsync(\`code --install-extension "\${ext}"\`)
+        await spawnAsync(\`code --install-extension "./extensions/\${ext}"\`)
     }
     const userDir = homedir()
-    const snippet = join(userDir, "AppData/Roaming/Code/User/snippets/global.code-snippets")
     const setting = join(userDir, "AppData/Roaming/Code/User/settings.json")
-    await rm(snippet, { force: true })
     await rm(setting, { force: true })
-    await copyFile("./global.code-snippets", snippet)
     await copyFile("./settings.json", setting)
+    const snippetTarget = join(userDir, "AppData/Roaming/Code/User/snippets")
+    const dir2 = await readdir("./snippets")
+    for (const file of dir2) {
+        await rm(join(snippetTarget, file), { force: true })
+        await copyFile(join("./snippets", file), join(snippetTarget, file))
+    }
 }
 
 main()`
-    await writeFile(join(dir, "install.js"), script, "utf-8")
+    await writeFile(join(dir, "syncVscode.js"), script, "utf-8")
 }
 
 export async function getProcessInfoFromPid(pid: number) {
@@ -1130,4 +1132,13 @@ export async function setSetting(setting: Record<string, any>) {
     const userDir = homedir()
     const settingPath = join(userDir, ".zixulu.json")
     await writeFile(settingPath, JSON.stringify(setting, undefined, 4), "utf-8")
+}
+
+export async function retry<T>(callback: () => Promise<T>, times = 1) {
+    try {
+        return await callback()
+    } catch (error) {
+        if (times === 0) throw error
+        return await retry(callback, times - 1)
+    }
 }

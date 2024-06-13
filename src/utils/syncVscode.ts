@@ -1,23 +1,28 @@
 import consola from "consola"
-import { copyFile, mkdir } from "fs/promises"
+import { copyFile, mkdir, readdir } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
-import { downloadVscodeExts, writeInstallVscodeExtScript } from "."
+import { downloadVscodeExts, writeSyncVscodeScript } from "."
 
-export async function downloadLatestVscodeExtension() {
+export async function syncVscode() {
     const { default: inquirer } = await import("inquirer")
     const userDir = homedir()
-    const snippet = join(userDir, "AppData/Roaming/Code/User/snippets/global.code-snippets")
+    const snippetSource = join(userDir, "AppData/Roaming/Code/User/snippets")
     const setting = join(userDir, "AppData/Roaming/Code/User/settings.json")
     const dir = `vscode-${Date.now()}`
     await mkdir(dir, { recursive: true })
+    const snippetTarget = join(dir, "snippets")
+    await mkdir(snippetTarget, { recursive: true })
     consola.start("开始下载最新 VSCode 配置")
-    await copyFile(snippet, join(dir, "global.code-snippets"))
     await copyFile(setting, join(dir, "settings.json"))
+    const files = await readdir(snippetSource)
+    for (const file of files) {
+        await copyFile(join(snippetSource, file), join(snippetTarget, file))
+    }
     consola.success("下载最新 VSCode 配置完成")
-    await downloadVscodeExts(dir)
+    await downloadVscodeExts(join(dir, "extensions"))
     consola.success("下载最新 VSCode 插件完成")
-    await writeInstallVscodeExtScript(dir)
+    await writeSyncVscodeScript(dir)
     const { downloadVscode } = await inquirer.prompt({
         type: "confirm",
         name: "downloadVscode",
