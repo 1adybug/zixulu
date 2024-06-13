@@ -926,10 +926,10 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
 
 export async function writeSyncVscodeScript(dir: string) {
     const script = `// @ts-check
-const { readdir, copyFile, rm } = require("fs/promises")
-const { spawn } = require("child_process")
-const { homedir } = require("os")
-const { join } = require("path")
+import { spawn } from "child_process"
+import { readdir, copyFile, rm } from "fs/promises"
+import { homedir } from "os"
+import { join } from "path"
 
 function spawnAsync(command) {
     return new Promise((resolve, reject) => {
@@ -943,7 +943,7 @@ function spawnAsync(command) {
 
 async function main() {
     const dir = await readdir("./extensions")
-    for (const ext of exts) {
+    for (const ext of dir) {
         await spawnAsync(\`code --install-extension "./extensions/\${ext}"\`)
     }
     const userDir = homedir()
@@ -959,7 +959,7 @@ async function main() {
 }
 
 main()`
-    await writeFile(join(dir, "syncVscode.js"), script, "utf-8")
+    await writeFile(join(dir, "syncVscode.mjs"), script, "utf-8")
 }
 
 export async function getProcessInfoFromPid(pid: number) {
