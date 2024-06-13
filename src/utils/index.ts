@@ -931,6 +931,9 @@ import { readdir, copyFile, rm } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
 
+/** 
+ * @param {string} command
+ */
 function spawnAsync(command) {
     return new Promise((resolve, reject) => {
         const child = spawn(command, { shell: true, stdio: "inherit" })
