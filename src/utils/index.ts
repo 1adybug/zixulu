@@ -895,15 +895,18 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
 }
 
 export async function writeInstallVscodeExtScript(dir: string) {
-    const script = `const { readdir } = require("fs/promises")
+    const script = `// @ts-check
+const { readdir, copyFile, rm } = require("fs/promises")
 const { spawn } = require("child_process")
+const { homedir } = require("os")
+const { join } = require("path")
 
 function spawnAsync(command) {
     return new Promise((resolve, reject) => {
         const child = spawn(command, { shell: true, stdio: "inherit" })
         child.on("exit", code => {
             if (code !== 0) return reject(new Error(\`Command failed with code \${code}\`))
-            resolve()
+            resolve(0)
         })
     })
 }
@@ -914,6 +917,13 @@ async function main() {
     for (const ext of exts) {
         await spawnAsync(\`code --install-extension "\${ext}"\`)
     }
+    const userDir = homedir()
+    const snippet = join(userDir, "AppData/Roaming/Code/User/snippets/global.code-snippets")
+    const setting = join(userDir, "AppData/Roaming/Code/User/settings.json")
+    await rm(snippet, { force: true })
+    await rm(setting, { force: true })
+    await copyFile("./global.code-snippets", snippet)
+    await copyFile("./settings.json", setting)
 }
 
 main()`
