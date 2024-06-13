@@ -2,7 +2,7 @@ import consola from "consola"
 import { copyFile, mkdir } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
-import { downloadVscodeExts, writeInstallVscodeExtScript } from "."
+import { downloadVscode, downloadVscodeExts, writeInstallVscodeExtScript } from "."
 
 export async function downloadLatestVscodeExtension() {
     consola.start("开始下载最新的 vscode 插件")
@@ -13,6 +13,7 @@ export async function downloadLatestVscodeExtension() {
     await mkdir(dir, { recursive: true })
     await copyFile(snippet, join(dir, "global.code-snippets"))
     await copyFile(setting, join(dir, "settings.json"))
+    await downloadVscode(dir)
     await downloadVscodeExts(dir)
     await writeInstallVscodeExtScript(dir)
     consola.success("下载最新的 vscode 插件完成")
