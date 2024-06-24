@@ -473,56 +473,7 @@ export function splitExtendsType(str: string) {
     return types.map(v => v.trim()).filter(v => v)
 }
 
-export const rsbuildConfig = `import { defineConfig } from "@rsbuild/core"
-import { pluginReact } from "@rsbuild/plugin-react"
 
-export default defineConfig({
-    html: {
-        template: "public/index.html"
-    },
-    plugins: [pluginReact()],
-    server: {
-        port: 5173
-    }
-})
-`
-
-export async function writeRsbuildConfig() {
-    await writeFile("rsbuild.config.ts", rsbuildConfig, "utf-8")
-}
-
-export type CreateIndexHtmlConfig = {
-    title: string
-    description: string
-    entryId: string
-}
-
-export async function createIndexHtml(config: CreateIndexHtmlConfig) {
-    const { title, description, entryId } = config
-    const indexHtml = `<!doctype html>
-<html lang="zh">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="icon" href="/logo.webp" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="${description}" />
-        <title>${title}</title>
-    </head>
-    <body>
-        <div id="${entryId}"></div>
-    </body>
-</html>
-`
-    const dir = await readdir("./")
-    let hasPublic = false
-    if (dir.includes("public")) {
-        const stats = await stat("public")
-        if (stats.isDirectory()) hasPublic = true
-    }
-    if (!hasPublic) await mkdir("public", { recursive: true })
-    await writeFile("public/index.html", indexHtml, "utf-8")
-    consola.success("创建 index.html 成功")
-}
 
 export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log", "test.js", "test.mjs", "test.ts"]
 
