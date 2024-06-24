@@ -18,8 +18,6 @@ export function getPackageJsonPath(path?: string) {
     return join(path ?? cwd(), "package.json")
 }
 
-
-
 /** 获取包的最新版本 */
 export async function getPackageLatestVersion(packageName: string) {
     try {
@@ -116,13 +114,18 @@ export async function readPackageJson(path?: string): Promise<Record<string, any
     }
 }
 
-
 /** 写入依赖 */
-export async function addDependencies(packageName: string, version?: string): Promise<void> {
+export async function addDependencies(packageName: string, version?: string): Promise<void>
+export async function addDependencies(packageName: string[]): Promise<void>
+export async function addDependencies(packageName: string | string[], version?: string): Promise<void> {
     try {
         const packageJson = await readPackageJson()
         packageJson.dependencies ??= {}
-        packageJson.dependencies[packageName] ??= version?.trim() || `^${await getPackageLatestVersion(packageName)}`
+        const packages = Array.isArray(packageName) ? packageName : [packageName]
+        for (const name of packages) {
+            packageJson.dependencies[name] ??= version?.trim() || `^${await getPackageLatestVersion(name)}`
+            consola.success(`添加 ${name} 至依赖成功`)
+        }
         const keys = Object.keys(packageJson.dependencies)
         keys.sort()
         const sortedDependencies: Record<string, string> = {}
@@ -130,21 +133,25 @@ export async function addDependencies(packageName: string, version?: string): Pr
             sortedDependencies[key] = packageJson.dependencies[key]
         }
         packageJson.dependencies = sortedDependencies
-        consola.success(`添加 ${packageName} 至依赖成功`)
         await writePackageJson(packageJson)
     } catch (error) {
         consola.error(error)
-        consola.fail(`添加 ${packageName} 至依赖失败`)
         exit()
     }
 }
 
-/** 写入依赖 */
-export async function addDevDependencies(packageName: string, version?: string): Promise<void> {
+/** 写入开发依赖 */
+export async function addDevDependencies(packageName: string, version?: string): Promise<void>
+export async function addDevDependencies(packageName: string[]): Promise<void>
+export async function addDevDependencies(packageName: string | string[], version?: string): Promise<void> {
     try {
         const packageJson = await readPackageJson()
         packageJson.devDependencies ??= {}
-        packageJson.devDependencies[packageName] ??= version?.trim() || `^${await getPackageLatestVersion(packageName)}`
+        const packages = Array.isArray(packageName) ? packageName : [packageName]
+        for (const name of packages) {
+            packageJson.devDependencies[name] ??= version?.trim() || `^${await getPackageLatestVersion(name)}`
+            consola.success(`添加 ${name} 至开发依赖成功`)
+        }
         const keys = Object.keys(packageJson.devDependencies)
         keys.sort()
         const sortedDevDependencies: Record<string, string> = {}
@@ -152,11 +159,9 @@ export async function addDevDependencies(packageName: string, version?: string):
             sortedDevDependencies[key] = packageJson.devDependencies[key]
         }
         packageJson.devDependencies = sortedDevDependencies
-        consola.success(`添加 ${packageName} 至开发依赖成功`)
         await writePackageJson(packageJson)
     } catch (error) {
         consola.error(error)
-        consola.fail(`添加 ${packageName} 至开发依赖失败`)
         exit()
     }
 }
@@ -359,9 +364,6 @@ export const prettierConfigTextWithTailwind = `module.exports = {
 }
 `
 
-
-
-
 export function sortArrayOrObject(data: any) {
     if (typeof data !== "object" || data === null) return data
     if (Array.isArray(data)) {
@@ -472,8 +474,6 @@ export function splitExtendsType(str: string) {
     types.push(str.slice(index))
     return types.map(v => v.trim()).filter(v => v)
 }
-
-
 
 export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log", "test.js", "test.mjs", "test.ts"]
 
