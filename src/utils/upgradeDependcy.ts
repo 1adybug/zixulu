@@ -1,6 +1,6 @@
 import { exit } from "process"
-import { CommitType } from "../constant"
 import { getCommitMessage, getPackageUpgradeVersion, getVersionFromRequiredVersion, installDependcies, readPackageJson, writePackageJson } from "."
+import { CommitType } from "../constant"
 import { checkType } from "./checkType"
 
 export async function upgradeDependency() {
@@ -21,7 +21,8 @@ export async function upgradeDependency() {
         type: "list",
         name: "level",
         message: "请选择升级的级别",
-        choices: ["major", "minor", "patch"]
+        choices: ["major", "minor", "patch"],
+        default: "minor"
     })
 
     const updateLogs: string[] = []
