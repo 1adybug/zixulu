@@ -4,7 +4,6 @@ import consola from "consola"
 import { Stats, createWriteStream, existsSync, readFileSync } from "fs"
 import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "fs/promises"
 import { HttpsProxyAgent } from "https-proxy-agent"
-import * as JSON5 from "json5"
 import { type Headers as NodeFetchHeaders } from "node-fetch"
 import { homedir } from "os"
 import { ParsedPath, join, parse } from "path"
@@ -115,15 +114,12 @@ export async function readPackageJson(path?: string): Promise<Record<string, any
 }
 
 /** 写入依赖 */
-export async function addDependencies(packageName: string, version?: string): Promise<void>
-export async function addDependencies(packageName: string[]): Promise<void>
-export async function addDependencies(packageName: string | string[], version?: string): Promise<void> {
+export async function addDependencies(...packages: string[]): Promise<void> {
     try {
         const packageJson = await readPackageJson()
         packageJson.dependencies ??= {}
-        const packages = Array.isArray(packageName) ? packageName : [packageName]
         for (const name of packages) {
-            packageJson.dependencies[name] ??= version?.trim() || `^${await getPackageLatestVersion(name)}`
+            packageJson.dependencies[name] ??= `^${await getPackageLatestVersion(name)}`
             consola.success(`添加 ${name} 至依赖成功`)
         }
         const keys = Object.keys(packageJson.dependencies)
@@ -141,15 +137,12 @@ export async function addDependencies(packageName: string | string[], version?: 
 }
 
 /** 写入开发依赖 */
-export async function addDevDependencies(packageName: string, version?: string): Promise<void>
-export async function addDevDependencies(packageName: string[]): Promise<void>
-export async function addDevDependencies(packageName: string | string[], version?: string): Promise<void> {
+export async function addDevDependencies(...packages: string[]): Promise<void> {
     try {
         const packageJson = await readPackageJson()
         packageJson.devDependencies ??= {}
-        const packages = Array.isArray(packageName) ? packageName : [packageName]
         for (const name of packages) {
-            packageJson.devDependencies[name] ??= version?.trim() || `^${await getPackageLatestVersion(name)}`
+            packageJson.devDependencies[name] ??= `^${await getPackageLatestVersion(name)}`
             consola.success(`添加 ${name} 至开发依赖成功`)
         }
         const keys = Object.keys(packageJson.devDependencies)
