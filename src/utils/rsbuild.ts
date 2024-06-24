@@ -1,6 +1,8 @@
 import consola from "consola"
-import { createIndexHtml, readPackageJson, writeRsbuildConfig } from "."
+import { addDevDependencies, readPackageJson } from "."
+import { createIndexHtml } from "./createIndexHtml"
 import { readTsConfig } from "./readTsConfig"
+import { writeRsbuildConfig } from "./writeRsbuildConfig"
 import { writeTsConfig } from "./writeTsConfig"
 
 export async function rsbuild() {
@@ -16,7 +18,7 @@ export async function rsbuild() {
             type: "input",
             name: "description",
             message: "项目描述",
-            default: "designed by luzixu"
+            default: "designed by someone"
         },
         {
             type: "input",
@@ -31,6 +33,7 @@ export async function rsbuild() {
             default: "root"
         }
     ])
+    addDevDependencies("get-port-please")
     await writeRsbuildConfig()
     await createIndexHtml({ description, title, entryId })
     consola.success("设置 rsbuild 配置成功")
