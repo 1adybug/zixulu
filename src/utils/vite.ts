@@ -1,5 +1,6 @@
 import consola from "consola"
-import { readPackageJson, setTsConfig, writePackageJson } from "."
+import { readPackageJson, writePackageJson } from "."
+import { setTsConfig } from "./setTsConfig"
 
 export async function vite() {
     consola.start("开始设置 vite 配置")
