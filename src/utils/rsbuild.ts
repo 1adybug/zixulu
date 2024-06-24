@@ -4,6 +4,8 @@ import { createIndexHtml } from "./createIndexHtml"
 import { readTsConfig } from "./readTsConfig"
 import { writeRsbuildConfig } from "./writeRsbuildConfig"
 import { writeTsConfig } from "./writeTsConfig"
+import { rename, rm, writeFile } from "fs/promises"
+import { checkTailwind } from "./checkTailwind"
 
 export async function rsbuild() {
     consola.start("开始设置 rsbuild 配置")
@@ -33,8 +35,46 @@ export async function rsbuild() {
             default: "root"
         }
     ])
-    addDevDependencies("get-port-please", "@rsbuild/plugin-svgr")
     await writeRsbuildConfig()
     await createIndexHtml({ description, title, entryId })
+    await rm(`src/App.css`, { force: true })
+
+    await writeFile(
+        `src/index.css`,
+        (await checkTailwind())
+            ? `@tailwind base;    
+@tailwind components;
+@tailwind utilities;
+`
+            : ``,
+        "utf-8"
+    )
+
+    await writeFile(
+        `src/App.tsx`,
+        `import { FC } from "react"
+
+const App: FC = () => {
+    return <div>Hello, World!</div>
+}
+
+export default App`,
+        "utf-8"
+    )
+
+    await writeFile(
+        `src/index.tsx`,
+        `import React from "react"
+import ReactDOM from "react-dom/client"
+import App from "./App"
+import "./index.css"
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
+)`,
+        "utf-8"
+    )
     consola.success("设置 rsbuild 配置成功")
 }
