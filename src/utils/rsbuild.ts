@@ -33,7 +33,7 @@ export async function rsbuild() {
             default: "root"
         }
     ])
-    addDevDependencies(["get-port-please", "@rsbuild/plugin-svgr"])
+    addDevDependencies("get-port-please", "@rsbuild/plugin-svgr")
     await writeRsbuildConfig()
     await createIndexHtml({ description, title, entryId })
     consola.success("设置 rsbuild 配置成功")

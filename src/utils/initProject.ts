@@ -67,13 +67,6 @@ export async function initProject() {
     if (modules.includes("@emotion/css")) await addDependencies("@emotion/css")
     if (modules.includes("react-router-dom")) await addDependencies("react-router-dom")
     await addPrettier()
-    let installed = false
-    if (modules.includes("prisma")) {
-        await addPrisma(manager)
-        installed = true
-    }
-    if (!installed) await installDependcies(true, manager)
-    await setTsConfig("noEmit", true)
     switch (type) {
         case ProjectType.next:
             await next()
@@ -91,5 +84,12 @@ export async function initProject() {
             await rsbuild()
             break
     }
+    let installed = false
+    if (modules.includes("prisma")) {
+        await addPrisma(manager)
+        installed = true
+    }
+    if (!installed) await installDependcies(true, manager)
+    await setTsConfig("noEmit", true)
     consola.success("项目初始化完成")
 }
