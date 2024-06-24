@@ -5,9 +5,7 @@ import { addDependencies, readPackageJson } from "."
 
 export async function addAntd() {
     consola.start("开始添加 antd 配置")
-    await addDependencies("@ant-design/cssinjs")
-    await addDependencies("@ant-design/icons")
-    await addDependencies("antd")
+    await addDependencies(["@ant-design/cssinjs", "@ant-design/icons", "antd"])
     const dir = await readdir("./")
     const componentDir = dir.includes("src") ? "src/components" : "components"
     await mkdir(componentDir, { recursive: true })
