@@ -1068,7 +1068,11 @@ export async function isRepo() {
     }
 }
 
-export async function backupFirst(forceRepo = false) {
+/**
+ * @param [forceRepo=false] 是否强制认为是 git 目录
+ * @returns 如果是 git 目录且检测到未提交的更改，选择继续，则返回 true，否则返回 undefined
+ */
+export async function backupFirst(forceRepo = false): Promise<true | void> {
     if (!(await isRepo())) {
         if (forceRepo) {
             consola.error("git 不可用")
@@ -1080,8 +1084,15 @@ export async function backupFirst(forceRepo = false) {
     }
     const status = await execAsync("git status")
     if (!status.includes("nothing to commit, working tree clean")) {
-        consola.error("请先提交代码")
-        exit()
+        const { default: inquirer } = await import("inquirer")
+        const { skip } = await inquirer.prompt({
+            type: "confirm",
+            name: "skip",
+            message: "检测到未提交的更改，是否继续",
+            default: true
+        })
+        if (!skip) exit()
+        return true
     }
 }
 
@@ -1095,9 +1106,9 @@ export function actionWithBackup<T extends (...args: any[]) => Promise<string>>(
 export function actionWithBackup<T extends (...args: any[]) => Promise<void>>(action: T, message: string): (...args: Parameters<T>) => Promise<void>
 export function actionWithBackup(action: (...args: any[]) => Promise<string | void>, message?: string) {
     return async (...args: any[]) => {
-        await backupFirst()
+        const skip = await backupFirst()
         const msg = await action(...args)
-        if (!(await isRepo())) return
+        if (!(await isRepo()) || skip) return
         const { default: inquirer } = await import("inquirer")
         const { commit } = await inquirer.prompt({
             type: "confirm",
