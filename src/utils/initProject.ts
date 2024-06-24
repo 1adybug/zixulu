@@ -1,19 +1,22 @@
 import consola from "consola"
+import { addDependencies, getPackageManager, installDependcies, readPackageJson } from "."
 import { ProjectType } from "../constant"
-import { addDependencies, getPackageManager, installDependcies, readPackageJson, setTsConfig } from "."
 import { addAntd } from "./addAntd"
 import { addGitignore } from "./addGitignore"
 import { addPrettier } from "./addPrettier"
 import { addPrisma } from "./addPrisma"
 import { addTailwind } from "./addTailwind"
+import { createBrowserlistrc } from "./createBrowserlistrc"
 import { next } from "./next"
 import { removeESLint } from "./removeESLint"
 import { rsbuild } from "./rsbuild"
+import { setTsConfig } from "./setTsConfig"
 import { vite } from "./vite"
 
 export async function initProject() {
     consola.start("开始初始化项目")
     const { default: inquirer } = await import("inquirer")
+    await createBrowserlistrc()
     const packageJson = await readPackageJson()
     const allDependcies = Object.keys(packageJson.dependencies || {}).concat(Object.keys(packageJson.devDependencies || {}))
     if (!allDependcies.includes("react") || !allDependcies.includes("react-dom")) {

@@ -1,7 +1,8 @@
 import { writeFile } from "fs/promises"
-import { readPackageJson, setTsConfig, sortArrayOrObject, Target, writePackageJson } from "."
+import { readPackageJson, sortArrayOrObject, writePackageJson } from "."
 import { addGitignore } from "./addGitignore"
 import consola from "consola"
+import { setTsConfig, Target } from "./setTsConfig"
 
 export async function setFatherConfig() {
     consola.start("开始设置 father 配置")
