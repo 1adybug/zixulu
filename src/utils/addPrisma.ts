@@ -6,10 +6,7 @@ import { addDependencies, addDevDependencies, installDependcies, spawnAsync } fr
 export async function addPrisma(manager?: PackageManager) {
     consola.start("开始添加 Prisma 配置")
     await addDependencies("@prisma/client")
-    await addDevDependencies("prisma")
-    await addDevDependencies("ts-node")
-    await addDevDependencies("@types/node")
-    await addDevDependencies("typescript")
+    await addDevDependencies("prisma", "ts-node", "@types/node", "typescript")
     const dir = await readdir("./")
     await installDependcies(true, manager)
     if (!dir.includes("tsconfig.json")) await spawnAsync("npx tsc --init")
