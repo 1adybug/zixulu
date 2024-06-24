@@ -2,6 +2,7 @@ import { writeFile } from "fs/promises"
 
 export const rsbuildConfig = `import { defineConfig } from "@rsbuild/core"
 import { pluginReact } from "@rsbuild/plugin-react"
+import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { checkPort } from "get-port-please"
 
 async function getPort(start = 5173): Promise<number> {
@@ -16,7 +17,14 @@ export default defineConfig(async ({ env, command, envMode }) => {
         html: {
             template: "public/index.html"
         },
-        plugins: [pluginReact()],
+        plugins: [
+            pluginReact(),
+            pluginSvgr({
+                svgrOptions: {
+                    exportType: "default"
+                }
+            })
+        ],
         server: {
             port
         }
