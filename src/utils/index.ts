@@ -500,19 +500,19 @@ export type CreateIndexHtmlConfig = {
 export async function createIndexHtml(config: CreateIndexHtmlConfig) {
     const { title, description, entryId } = config
     const indexHtml = `<!doctype html>
-    <html lang="zh">
-        <head>
-            <meta charset="UTF-8" />
-            <link rel="icon" href="/logo.webp" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <meta name="description" content="${description}" />
-            <title>${title}</title>
-        </head>
-        <body>
-            <div id="${entryId}"></div>
-        </body>
-    </html>
-    `
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" href="/logo.webp" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="${description}" />
+        <title>${title}</title>
+    </head>
+    <body>
+        <div id="${entryId}"></div>
+    </body>
+</html>
+`
     const dir = await readdir("./")
     let hasPublic = false
     if (dir.includes("public")) {
