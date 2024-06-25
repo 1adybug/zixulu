@@ -8,11 +8,14 @@ export async function upgradeDependency() {
 
     const packageJson = await readPackageJson()
 
+    if (!packageJson.dependencies && !packageJson.devDependencies) return
+
     const { types } = await inquirer.prompt({
         type: "checkbox",
         name: "types",
         message: "请选择要升级的依赖类型",
-        choices: ["dependencies", "devDependencies"].filter(type => !!packageJson[type])
+        choices: ["dependencies", "devDependencies"].filter(type => !!packageJson[type]),
+        default: ["dependencies", "devDependencies"]
     })
 
     if (types.length === 0) exit()
