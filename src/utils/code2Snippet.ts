@@ -26,7 +26,7 @@ export async function code2Snippet(path: string) {
             const reg = new RegExp(placeholder, "g")
             line = line.replace(reg, `\${${index + 1}:${placeholder}}`)
         })
-        line = line.slice(trim).trimEnd().replace(/\\/g, `\\\\`).replace(/"/g, `\\"`)
+        line = line.slice(trim).trimEnd().replace(/\\/g, `\\\\`).replace(/"/g, `\\"`).replace(/\$/g, `\\\\\$`)
         return `            "${line}"`
     }
     const body = lines.map(line2Snippet).join(",\n")
