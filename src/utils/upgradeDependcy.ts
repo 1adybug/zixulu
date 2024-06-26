@@ -8,7 +8,7 @@ export async function upgradeDependency() {
 
     const packageJson = await readPackageJson()
 
-    if (!packageJson.dependencies && !packageJson.devDependencies) return
+    if (!packageJson.dependencies && !packageJson.devDependencies) exit()
 
     const { types } = await inquirer.prompt({
         type: "checkbox",
