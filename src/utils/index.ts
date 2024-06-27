@@ -902,14 +902,14 @@ export async function isCommandExisted(command: string): Promise<boolean> {
     })
 }
 
-export async function ifContinue() {
+export async function ifContinue(message = "是否继续"): Promise<boolean> {
     const { default: inquirer } = await import("inquirer")
-    const { continue: c } = await inquirer.prompt({
+    const { continue: cont } = await inquirer.prompt({
         type: "confirm",
         name: "continue",
-        message: "是否继续"
+        message
     })
-    if (!c) exit()
+    return cont
 }
 
 export async function isRepo() {
@@ -932,18 +932,15 @@ export async function backupFirst(forceRepo = false): Promise<true | void> {
             exit()
         }
         consola.warn("强烈建议使用前备份代码")
-        await ifContinue()
+        const cont = await ifContinue()
+        if (!cont) exit()
         return
     }
     if (await hasChangeNoCommit()) {
         const { default: inquirer } = await import("inquirer")
-        const { skip } = await inquirer.prompt({
-            type: "confirm",
-            name: "skip",
-            message: "检测到未提交的更改，是否继续（强烈建议使用前先提交代码）",
-            default: false
-        })
-        if (!skip) exit()
+        consola.warn("强烈建议使用前提交代码")
+        const cont = await ifContinue()
+        if (!cont) exit()
         return true
     }
 }
