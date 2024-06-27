@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
+import { addFolderPathAlias, replacePathAlias } from "@utils/addPathAlias"
 import { Command } from "commander"
 import { resolve } from "path"
-import { CommitType } from "./constant"
+import { CommitType } from "@constant/index"
 import { actionWithBackup, getCommitMessage, readPackageJsonSync } from "./utils"
 import { addAntd } from "./utils/addAntd"
 import { addGitignore } from "./utils/addGitignore"
@@ -147,5 +148,9 @@ program.command("beta-version").alias("bv").description("设置版本号").actio
 program.command("reinstall").alias("re").description("重新安装依赖").argument("name", "包名").action(reinstall)
 
 program.command("snippet").alias("sn").description("生成 vscode snippet").argument("path", "文件路径").action(code2Snippet)
+
+program.command("add-alias").alias("aa").description("添加路径别名").action(addFolderPathAlias)
+
+program.command("replace-alias").alias("ra").description("替换路径别名").action(replacePathAlias)
 
 program.parse()
