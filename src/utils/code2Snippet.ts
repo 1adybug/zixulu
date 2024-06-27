@@ -4,7 +4,7 @@ import { parse } from "path"
 export async function code2Snippet(path: string) {
     const { default: clipboard } = await import("clipboardy")
     const { default: inquirer } = await import("inquirer")
-    const { base } = parse(path)
+    const { name } = parse(path)
     const code = await readFile(path, "utf-8")
     const placeholders: string[] = []
     while (true) {
@@ -22,18 +22,18 @@ export async function code2Snippet(path: string) {
     const reg2 = /^ */
     const trim = Math.min(...lines.map(line => (reg.test(line) ? Infinity : reg2.exec(line)![0].length)))
     function line2Snippet(line: string) {
+        line = line.slice(trim).trimEnd().replace(/\\/g, `\\\\`).replace(/"/g, `\\"`).replace(/\$/g, `\\\\\$`)
         placeholders.forEach((placeholder, index) => {
             const reg = new RegExp(placeholder, "g")
             line = line.replace(reg, `\${${index + 1}:${placeholder}}`)
         })
-        line = line.slice(trim).trimEnd().replace(/\\/g, `\\\\`).replace(/"/g, `\\"`).replace(/\$/g, `\\\\\$`)
         return `            "${line}"`
     }
     const body = lines.map(line2Snippet).join(",\n")
     const snippet = `,
-    "${base}": {
+    "${name}": {
         "scope": "javascript,javascriptreact,typescript,typescriptreact",
-        "prefix": "${base.toLowerCase().replace(/\W/, "")}",
+        "prefix": "${name.toLowerCase().replace(/\W/, "")}",
         "body": [
 ${body}
         ]
