@@ -12,6 +12,7 @@ import { Config } from "prettier"
 import { cwd, exit } from "process"
 import { Readable } from "stream"
 import YAML from "yaml"
+import { hasChangeNoCommit } from "./hasChangeNoCommit"
 
 export function getPackageJsonPath(path?: string) {
     return join(path ?? cwd(), "package.json")
@@ -934,8 +935,7 @@ export async function backupFirst(forceRepo = false): Promise<true | void> {
         await ifContinue()
         return
     }
-    const status = await execAsync("git status")
-    if (!status.includes("nothing to commit, working tree clean")) {
+    if (await hasChangeNoCommit()) {
         const { default: inquirer } = await import("inquirer")
         const { skip } = await inquirer.prompt({
             type: "confirm",
@@ -960,7 +960,7 @@ export function actionWithBackup(action: (...args: any[]) => Promise<string | vo
     return async (...args: any[]) => {
         const skip = await backupFirst()
         const msg = await action(...args)
-        if (!(await isRepo()) || skip) return
+        if (!(await isRepo()) || skip || !(await hasChangeNoCommit())) return
         const { default: inquirer } = await import("inquirer")
         const { commit } = await inquirer.prompt({
             type: "confirm",
