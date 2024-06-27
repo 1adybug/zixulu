@@ -149,7 +149,7 @@ program.command("reinstall").alias("re").description("重新安装依赖").argum
 
 program.command("snippet").alias("sn").description("生成 vscode snippet").argument("path", "文件路径").action(code2Snippet)
 
-program.command("add-alias").alias("aa").description("添加路径别名").action(addFolderPathAlias)
+program.command("add-alias").alias("aa").description("添加路径别名").action(actionWithBackup(addFolderPathAlias))
 
 program.command("replace-alias").alias("ra").description("替换路径别名").action(actionWithBackup(replacePathAlias))
 
