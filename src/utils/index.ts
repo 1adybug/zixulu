@@ -1,3 +1,4 @@
+import { CommitType, CommitTypeMap, PackageManager, Software } from "@constant/index"
 import archiver from "archiver"
 import { exec, spawn } from "child_process"
 import consola from "consola"
@@ -11,7 +12,6 @@ import { Config } from "prettier"
 import { cwd, exit } from "process"
 import { Readable } from "stream"
 import YAML from "yaml"
-import { CommitType, CommitTypeMap, PackageManager, Software } from "../constant"
 
 export function getPackageJsonPath(path?: string) {
     return join(path ?? cwd(), "package.json")
@@ -930,7 +930,7 @@ export async function backupFirst(forceRepo = false): Promise<true | void> {
             consola.error("git 不可用")
             exit()
         }
-        consola.warn("请先备份代码")
+        consola.warn("强烈建议使用前备份代码")
         await ifContinue()
         return
     }
@@ -940,8 +940,8 @@ export async function backupFirst(forceRepo = false): Promise<true | void> {
         const { skip } = await inquirer.prompt({
             type: "confirm",
             name: "skip",
-            message: "检测到未提交的更改，是否继续",
-            default: true
+            message: "检测到未提交的更改，是否继续（强烈建议使用前先提交代码）",
+            default: false
         })
         if (!skip) exit()
         return true
