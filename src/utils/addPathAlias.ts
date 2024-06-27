@@ -1,6 +1,7 @@
+import { CommitType } from "@src/constant"
 import { readFile, writeFile } from "fs/promises"
 import { join, parse } from "path"
-import { getFiles } from "."
+import { getCommitMessage, getFiles } from "."
 import { getRelativePath } from "./getRelativePath"
 import { getTsFile } from "./getTsFile"
 import { readTsConfig } from "./readTsConfig"
@@ -56,7 +57,7 @@ export async function replacePathAlias() {
     })
     const files = await getFiles({
         match(path, stats) {
-            return (path.ext === ".ts" || path.ext === ".tsx") && stats.isFile() && path.base === "index.ts"
+            return (path.ext === ".ts" || path.ext === ".tsx") && stats.isFile()
         },
         exclude(path, stats) {
             return stats.isDirectory() && (path.base === "node_modules" || path.base === ".git" || path.base === ".vscode" || path.base === "dist" || path.base === "build")
@@ -70,7 +71,15 @@ export async function replacePathAlias() {
             if (!arg2.startsWith("./") && !arg2.startsWith("../")) return match
 
             /** 获取最终的 ts 文件地址 */
-            let { path: pathToReplace, depth } = getTsFile(getRelativePath(join(file, "../", arg2)))
+            let pathToReplace: string
+            let depth: 0 | 1
+            try {
+                const tsFile = getTsFile(getRelativePath(join(file, "../", arg2)))
+                pathToReplace = tsFile.path
+                depth = tsFile.depth
+            } catch (error) {
+                return match
+            }
 
             pathToReplace = getRelativePath(pathToReplace)
 
@@ -102,6 +111,7 @@ export async function replacePathAlias() {
         })
         await writeFile(file, code, "utf-8")
     }
+    return getCommitMessage(CommitType.feature, "replace path alias")
 }
 
 export async function addFolderPathAlias() {
