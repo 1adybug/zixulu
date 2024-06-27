@@ -1,6 +1,6 @@
+import { CommitType } from "@constant/index"
 import { exit } from "process"
 import { getCommitMessage, getPackageUpgradeVersion, getVersionFromRequiredVersion, installDependcies, readPackageJson, writePackageJson } from "."
-import { CommitType } from "../constant"
 import { checkType } from "./checkType"
 
 export async function upgradeDependency() {

@@ -1,6 +1,6 @@
+import { ProjectType } from "@constant/index"
 import consola from "consola"
 import { addDependencies, getPackageManager, installDependcies, readPackageJson } from "."
-import { ProjectType } from "../constant"
 import { addAntd } from "./addAntd"
 import { addGitignore } from "./addGitignore"
 import { addPrettier } from "./addPrettier"

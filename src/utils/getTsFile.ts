@@ -44,5 +44,5 @@ export function getTsFile(path: string): TsFile {
             ext: ".tsx",
             path: path5
         }
-    throw new Error("找不到 ts 或 tsx 文件")
+    throw new Error(`找不到 ${path} 对应的 ts 或 tsx 文件`)
 }
