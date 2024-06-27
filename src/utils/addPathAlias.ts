@@ -138,4 +138,5 @@ export async function addFolderPathAlias() {
         default: names.filter(item => item !== "node_modules" && item !== ".git" && item !== ".vscode" && item !== "dist" && item !== "build")
     })
     await addPathAlias(result.map((item: string) => ({ name: item, path: getRelativePath(join(folder, item)) })))
+    return getCommitMessage(CommitType.feature, `add path alias: ${result.join(", ")}`)
 }
