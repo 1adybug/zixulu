@@ -34,6 +34,7 @@ import { upgradeDependency } from "@utils/upgradeDependcy"
 import { vite } from "@utils/vite"
 import { Command } from "commander"
 import { resolve } from "path"
+import { pnpm } from "./utils/pnpm"
 
 const program = new Command()
 
@@ -152,5 +153,7 @@ program.command("snippet").alias("sn").description("生成 vscode snippet").argu
 program.command("add-alias").alias("aa").description("添加路径别名").action(actionWithBackup(addFolderPathAlias))
 
 program.command("replace-alias").alias("ra").description("替换路径别名").action(actionWithBackup(replacePathAlias))
+
+program.command("pnpm").description("设置 pnpm 配置").action(pnpm)
 
 program.parse()
