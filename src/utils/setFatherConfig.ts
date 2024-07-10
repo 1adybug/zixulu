@@ -1,8 +1,21 @@
-import { writeFile } from "fs/promises"
+import consola from "consola"
+import { rm, writeFile } from "fs/promises"
 import { readPackageJson, sortArrayOrObject, writePackageJson } from "."
 import { addGitignore } from "./addGitignore"
-import consola from "consola"
-import { setTsConfig, Target } from "./setTsConfig"
+import { Module, ModuleResolution, setTsConfig, Target } from "./setTsConfig"
+
+const fatherrcCode = `import { defineConfig } from "father"
+
+export default defineConfig({
+    esm: {},
+    cjs: {},
+    targets: {
+        node: 18,
+        chrome: 100
+    },
+    sourcemap: true
+})
+`
 
 export async function setFatherConfig() {
     consola.start("开始设置 father 配置")
@@ -32,29 +45,20 @@ export async function setFatherConfig() {
             return prev
         }, {})
     }
-    packageJson.scripts ??= {}
-    packageJson.scripts.prepublishOnly = "npx zixulu upgrade && father doctor && npm run build"
     delete packageJson.dependencies
     delete packageJson.devDependencies
     delete packageJson.peerDependencies
     packageJson.dependencies = sortArrayOrObject(dependencies)
     packageJson.devDependencies = sortArrayOrObject(devDependencies)
     packageJson.peerDependencies = sortArrayOrObject(peerDependencies)
-    const fatherrcCode = `import { defineConfig } from "father"
-
-export default defineConfig({
-    esm: {},
-    cjs: {},
-    targets: {
-        node: 18,
-        chrome: 100
-    },
-    sourcemap: true
-})
-`
     await addGitignore()
     await writePackageJson(packageJson)
     await writeFile(".fatherrc.ts", fatherrcCode)
     await setTsConfig("target", Target.ESNext)
+    await setTsConfig("module", Module.ESNext)
+    await setTsConfig("moduleResolution", ModuleResolution.Bundler)
+    await rm("src/client", { recursive: true, force: true })
+    await rm("src/server", { recursive: true, force: true })
+    await writeFile("src/index.ts", "")
     consola.success("设置 father 配置成功")
 }
