@@ -469,7 +469,7 @@ export function splitExtendsType(str: string) {
     return types.map(v => v.trim()).filter(v => v)
 }
 
-export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log", "test.js", "test.mjs", "test.ts"]
+export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log", "test.js", "test.mjs", "test.ts", "test"]
 
 const agent = new HttpsProxyAgent("http://localhost:7890")
 
