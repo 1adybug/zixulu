@@ -35,6 +35,7 @@ import { vite } from "@utils/vite"
 import { Command } from "commander"
 import { resolve } from "path"
 import { pnpm } from "./utils/pnpm"
+import { rollup } from "./utils/rollup"
 
 const program = new Command()
 
@@ -155,5 +156,7 @@ program.command("add-alias").alias("aa").description("添加路径别名").actio
 program.command("replace-alias").alias("ra").description("替换路径别名").action(actionWithBackup(replacePathAlias))
 
 program.command("pnpm").description("设置 pnpm 配置").action(pnpm)
+
+program.command("rollup").description("rollup 打包").action(rollup)
 
 program.parse()
