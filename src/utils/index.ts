@@ -616,6 +616,7 @@ export async function downloadFromWinget({ name, id, dir, architecture = "x64" }
     const path = id.replace(/\./g, "/")
     const response = await fetch(`https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${firstLetter}/${path}`, { agent })
     const data: GithubContent[] = (await response.json()) as any
+    if (!Array.isArray(data)) throw new Error((data as any).message)
     const reg2 = /^\d+(\.\d+?)*$/
     const stables = data.filter(item => reg2.test(item.name))
     stables.sort((a, b) => {
