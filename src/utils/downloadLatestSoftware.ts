@@ -1,12 +1,13 @@
 import { Software } from "@constant/index"
 import consola from "consola"
+import dayjs from "dayjs"
 import { mkdir } from "fs/promises"
 import { download7Zip, downloadChrome, downloadDeskGo, downloadGeekUninstaller, downloadGit, downloadNodeJS, downloadSupermium, downloadVscode } from "."
 import { downloadAnydesk } from "./downloadAnydesk"
 import { downloadFirefox } from "./downloadFirefox"
 import { downloadHoneyview } from "./downloadHoneyview"
-import { downloadPowerToys } from "./downloadPowerToys"
 import { downloadPotPlayer } from "./downloadPotPlayer"
+import { downloadPowerToys } from "./downloadPowerToys"
 
 export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void>> = {
     [Software.Chrome]: downloadChrome,
@@ -27,7 +28,7 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
 export async function downloadLatestSoftware() {
     consola.start("开始下载软件")
     const { default: inquirer } = await import("inquirer")
-    const dir = `softwares-${Date.now()}`
+    const dir = `softwares-${dayjs().format("YYYYMMDDHHmmss")}`
     const { softwares } = await inquirer.prompt({
         type: "checkbox",
         name: "softwares",
