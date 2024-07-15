@@ -494,7 +494,7 @@ export async function download(url: string, dir: string, filename?: string) {
 
 export async function downloadVscode(dir: string) {
     await downloadFromWinget({
-        name: "Code",
+        name: "VSCode",
         id: "Microsoft.VisualStudioCode",
         dir
     })
