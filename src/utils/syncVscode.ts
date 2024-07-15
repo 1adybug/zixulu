@@ -1,4 +1,5 @@
 import consola from "consola"
+import dayjs from "dayjs"
 import { copyFile, mkdir, readdir } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
@@ -9,7 +10,7 @@ export async function syncVscode() {
     const userDir = homedir()
     const snippetSource = join(userDir, "AppData/Roaming/Code/User/snippets")
     const setting = join(userDir, "AppData/Roaming/Code/User/settings.json")
-    const dir = `vscode-${Date.now()}`
+    const dir = `vscode-${dayjs().format("YYYYMMDDHHmmss")}`
     await mkdir(dir, { recursive: true })
     const snippetTarget = join(dir, "snippets")
     await mkdir(snippetTarget, { recursive: true })
