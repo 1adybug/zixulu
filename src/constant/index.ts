@@ -19,7 +19,12 @@ export enum Software {
     "Git" = "Git",
     "NodeJS" = "NodeJS",
     "Geek Uninstaller" = "Geek Uninstaller",
-    "DeskGo" = "DeskGo"
+    "DeskGo" = "DeskGo",
+    "PowerToys" = "PowerToys",
+    "Honeyview" = "Honeyview",
+    "AnyDesk" = "AnyDesk",
+    "Firefox" = "Firefox",
+    "PotPlayer" = "PotPlayer"
 }
 
 export enum ProjectType {
