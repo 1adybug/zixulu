@@ -512,7 +512,7 @@ export async function downloadSupermium(dir: string) {
         const url = new URL(str.slice(6, -1), "https://win32subsystem.live").href
         const filename = await download(url, dir)
         await sleep(100)
-        await rename(join(dir, filename), join(dir, `Supermium_${version}_${filename.endsWith("64_setup.exe") ? "x64" : "x86"}.exe`))
+        await rename(join(dir, filename), join(dir, `Supermium-${version}-${filename.endsWith("64_setup.exe") ? "x64" : "x86"}.exe`))
     }
 }
 
@@ -635,6 +635,7 @@ export async function downloadFromWinget({ name, id, dir, architecture = "x64" }
     const response2 = await fetch(`https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/${firstLetter}/${path}/${stables[0].name}/${id}.installer.yaml`, { agent })
     const yaml = await response2.text()
     const pkg: Winget.Package = YAML.parse(yaml)
+    if (pkg.Installers.some(item => item.Scope === "machine")) pkg.Installers = pkg.Installers.filter(item => item.Scope === "machine")
     const installers = pkg.Installers.filter((item, index) => {
         if (item.Architecture !== "x64" && item.Architecture !== "x86") return false
         if (architecture !== "all" && item.Architecture !== architecture) return false
@@ -651,7 +652,7 @@ export async function downloadFromWinget({ name, id, dir, architecture = "x64" }
     }
     for (const { version, filename, architecture, ext } of result) {
         await sleep(100)
-        await rename(join(dir, filename), join(dir, `${name}_${version}_${architecture}.${ext}`))
+        await rename(join(dir, filename), join(dir, `${name}-${version}-${architecture}.${ext}`))
     }
 }
 
@@ -716,7 +717,7 @@ export async function downloadDeskGo(dir: string) {
         join(dir, file),
         join(
             dir,
-            file.replace(/^DeskGo_(.+)_full\.exe$/, (match, arg) => `DeskGo_${arg.replace(/\_/g, ".")}_x64.exe`)
+            file.replace(/^DeskGo_(.+)_full\.exe$/, (match, arg) => `DeskGo-${arg.replace(/\_/g, ".")}-x64.exe`)
         )
     )
 }
@@ -731,7 +732,7 @@ export async function downloadGeekUninstaller(dir: string) {
     const response = await fetch("https://geekuninstaller.com/download")
     const text = await response.text()
     const version = text.match(/<b>(.+?)<\/b>/)![1]
-    await rename(join(dir, "geek.exe"), join(dir, `GeekUninstaller_${version}_x64.exe`))
+    await rename(join(dir, "geek.exe"), join(dir, `GeekUninstaller-${version}-x64.exe`))
 }
 
 export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
