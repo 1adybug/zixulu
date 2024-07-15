@@ -710,6 +710,15 @@ export async function downloadGit(dir: string) {
 
 export async function downloadDeskGo(dir: string) {
     await downloadFromPCQQ(dir, 3318, 23125)
+    const dir2 = await readdir(dir)
+    const file = dir2.find(item => item.startsWith("DeskGo"))!
+    await rename(
+        join(dir, file),
+        join(
+            dir,
+            file.replace(/^DeskGo_(.+)_full\.exe$/, (match, arg) => `DeskGo_${arg.replace(/\_/g, ".")}_x64.exe`)
+        )
+    )
 }
 
 export async function downloadGeekUninstaller(dir: string) {
