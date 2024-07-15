@@ -1,4 +1,4 @@
-import { CommitType, CommitTypeMap, PackageManager, Software } from "@constant/index"
+import { CommitType, CommitTypeMap, PackageManager } from "@constant/index"
 import archiver from "archiver"
 import { exec, spawn } from "child_process"
 import consola from "consola"
@@ -10,6 +10,7 @@ import { homedir } from "os"
 import { ParsedPath, join, parse } from "path"
 import { Config } from "prettier"
 import { cwd, exit } from "process"
+import { unzip } from "soda-nodejs"
 import { Readable } from "stream"
 import YAML from "yaml"
 import { hasChangeNoCommit } from "./hasChangeNoCommit"
@@ -713,9 +714,16 @@ export async function downloadDeskGo(dir: string) {
 
 export async function downloadGeekUninstaller(dir: string) {
     await download(`https://geekuninstaller.com/geek.zip`, dir)
+    await unzip({
+        input: join(dir, "geek.zip"),
+        output: dir
+    })
+    await rm(join(dir, "geek.zip"), { force: true })
+    const response = await fetch("https://geekuninstaller.com/download")
+    const text = await response.text()
+    const version = text.match(/<b>(.+?)<\/b>/)![1]
+    await rename(join(dir, "geek.exe"), join(dir, `GeekUninstaller_${version}_x64.exe`))
 }
-
-export const vscodeExts: string[] = ["MS-CEINTL.vscode-language-pack-zh-hans", "russell.any-rule", "russell.any-type", "formulahendry.code-runner", "dsznajder.es7-react-js-snippets", "ms-vscode.vscode-typescript-next", "bierner.lit-html", "ritwickdey.LiveServer", "yzhang.markdown-all-in-one", "bierner.markdown-preview-github-styles", "mervin.markdown-formatter", "DavidAnson.vscode-markdownlint", "PKief.material-icon-theme", "techer.open-in-browser", "esbenp.prettier-vscode", "Prisma.prisma", "bradlc.vscode-tailwindcss", "styled-components.vscode-styled-components", "rioukkevin.vscode-git-commit"]
 
 export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
     const response = await fetch(`https://marketplace.visualstudio.com/items?itemName=${ext}`)
@@ -766,7 +774,6 @@ export async function downloadVscodeExts(dir: string) {
         await retry(() => download(ext.url, dir, `${ext.id}-${ext.version}.vsix`), 2)
     }
 }
-
 
 export async function writeSyncVscodeScript(dir: string) {
     const script = `// @ts-check

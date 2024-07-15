@@ -39,13 +39,15 @@
         "json5": "^2.2.3",
         "node-fetch": "^3.3.2",
         "prettier": "^3.2.5",
+        "soda-nodejs": "^0.2.0",
         "yaml": "^2.4.1"
     },
     "devDependencies": {
         "@types/archiver": "^6.0.2",
         "@types/inquirer": "^9.0.7",
         "@types/node": "^20.12.7",
-        "father": "^4.4.0"
+        "father": "^4.4.0",
+        "typescript": "^5.5.3"
     },
     "resolutions": {
         "string-width": "^4",
