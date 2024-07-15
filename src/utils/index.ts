@@ -493,7 +493,11 @@ export async function download(url: string, dir: string, filename?: string) {
 }
 
 export async function downloadVscode(dir: string) {
-    await download("https://code.visualstudio.com/sha/download?build=stable&os=win32-x64", dir, "vscode.exe")
+    await downloadFromWinget({
+        name: "Code",
+        id: "Microsoft.VisualStudioCode",
+        dir
+    })
 }
 
 export async function sleep(ms: number) {
