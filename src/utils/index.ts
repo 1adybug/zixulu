@@ -678,7 +678,7 @@ export async function downloadChrome(dir: string) {
         name: "Chrome",
         id: "Google.Chrome",
         dir,
-        architecture: "all"
+        architecture: "x64"
     })
 }
 
@@ -695,7 +695,7 @@ export async function download7Zip(dir: string) {
         name: "7Zip",
         id: "7zip.7zip",
         dir,
-        architecture: "all"
+        architecture: "x64"
     })
 }
 
@@ -767,16 +767,6 @@ export async function downloadVscodeExts(dir: string) {
     }
 }
 
-export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void>> = {
-    [Software.Chrome]: downloadChrome,
-    [Software.NodeJS]: downloadNodeJS,
-    [Software["7zip"]]: download7Zip,
-    [Software.Git]: downloadGit,
-    [Software.DeskGo]: downloadDeskGo,
-    [Software["Geek Uninstaller"]]: downloadGeekUninstaller,
-    [Software["VS Code"]]: downloadVscode,
-    [Software.Supermium]: downloadSupermium
-}
 
 export async function writeSyncVscodeScript(dir: string) {
     const script = `// @ts-check

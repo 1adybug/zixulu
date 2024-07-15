@@ -1,7 +1,28 @@
 import { Software } from "@constant/index"
 import consola from "consola"
 import { mkdir } from "fs/promises"
-import { SoftwareDownloadMap } from "."
+import { download7Zip, downloadChrome, downloadDeskGo, downloadGeekUninstaller, downloadGit, downloadNodeJS, downloadSupermium, downloadVscode } from "."
+import { downloadAnydesk } from "./downloadAnydesk"
+import { downloadFirefox } from "./downloadFirefox"
+import { downloadHoneyview } from "./downloadHoneyview"
+import { downloadPowerToys } from "./downloadPowerToys"
+import { downloadPotPlayer } from "./downloadPotPlayer"
+
+export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void>> = {
+    [Software.Chrome]: downloadChrome,
+    [Software.NodeJS]: downloadNodeJS,
+    [Software["7zip"]]: download7Zip,
+    [Software.Git]: downloadGit,
+    [Software.DeskGo]: downloadDeskGo,
+    [Software["Geek Uninstaller"]]: downloadGeekUninstaller,
+    [Software["VS Code"]]: downloadVscode,
+    [Software.Supermium]: downloadSupermium,
+    [Software.PowerToys]: downloadPowerToys,
+    [Software.Honeyview]: downloadHoneyview,
+    [Software.AnyDesk]: downloadAnydesk,
+    [Software.Firefox]: downloadFirefox,
+    [Software.PotPlayer]: downloadPotPlayer
+}
 
 export async function downloadLatestSoftware() {
     consola.start("开始下载软件")
