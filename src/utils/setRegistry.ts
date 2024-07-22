@@ -1,5 +1,5 @@
 import { PackageManager, Registry } from "@constant/index"
-import { spawnAsync } from "."
+import { spawnAsync } from "soda-nodejs"
 
 export async function setRegistry() {
     const { default: inquirer } = await import("inquirer")
@@ -19,5 +19,5 @@ export async function setRegistry() {
     })
 
     const command = `${manager} config set registry ${Registry[registry as keyof typeof Registry]}`
-    await spawnAsync(command)
+    await spawnAsync(command, { shell: true, stdio: "inherit" })
 }

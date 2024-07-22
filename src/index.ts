@@ -19,10 +19,12 @@ import { initProject } from "@utils/initProject"
 import { interfaceToType } from "@utils/interfaceToType"
 import { killProcessByPort } from "@utils/killProcessByPort"
 import { next } from "@utils/next"
+import { pnpm } from "@utils/pnpm"
 import { reinstall } from "@utils/reinstall"
 import { removeComment } from "@utils/removeComment"
 import { removeESLint } from "@utils/removeESLint"
 import { removeFileOrFolderFromGit } from "@utils/removeFileOrFolderFromGit"
+import { rollup } from "@utils/rollup"
 import { rsbuild } from "@utils/rsbuild"
 import { setFatherConfig } from "@utils/setFatherConfig"
 import { setGitProxy } from "@utils/setGitProxy"
@@ -30,12 +32,11 @@ import { setRegistry } from "@utils/setRegistry"
 import { setShellProxy } from "@utils/setShellProxy"
 import { sortPackageJson } from "@utils/sortPackageJson"
 import { syncVscode } from "@utils/syncVscode"
-import { upgradeDependency } from "@utils/upgradeDependcy"
+import { upgradeDependency } from "@utils/upgradeDependency"
 import { vite } from "@utils/vite"
 import { Command } from "commander"
 import { resolve } from "path"
-import { pnpm } from "./utils/pnpm"
-import { rollup } from "./utils/rollup"
+import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 
 const program = new Command()
 
@@ -86,6 +87,8 @@ program
     .action(actionWithBackup(setFatherConfig, getCommitMessage(CommitType.feature, "初始化 father 项目配置")))
 
 program.command("upgrade-dependency").alias("ud").description("升级项目依赖").action(actionWithBackup(upgradeDependency))
+
+program.command("upgrade-workspace-dependency").alias("uwd").description("升级工作区项目依赖").argument("[dir]", "项目目录", "packages").action(upgradeWorkspaceDependceny)
 
 program.command("registry").description("设置 npm registry").action(setRegistry)
 

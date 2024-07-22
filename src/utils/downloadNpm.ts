@@ -2,7 +2,8 @@ import consola from "consola"
 import { mkdir, readdir, rename, rm } from "fs/promises"
 import { join } from "path"
 import { exit } from "process"
-import { execAsync, zipDir } from "."
+import { zipDir } from "."
+import { execAsync } from "soda-nodejs"
 
 export async function downloadNpm(name: string) {
     consola.start(`开始下载 ${name}`)

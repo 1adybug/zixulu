@@ -1,4 +1,4 @@
-import { spawnAsync } from "."
+import { spawnAsync } from "soda-nodejs"
 
 export async function setGitProxy() {
     const { default: inquirer } = await import("inquirer")
@@ -34,10 +34,10 @@ export async function setGitProxy() {
     })
     if (!open) {
         try {
-            await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`)
+            await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`, {shell: true, stdio: "inherit"})
         } catch (error) {}
         try {
-            await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`)
+            await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`, {shell: true, stdio: "inherit"})
         } catch (error) {}
         return
     }
@@ -47,6 +47,6 @@ export async function setGitProxy() {
         message: "请输入代理地址",
         default: "http://localhost:7890"
     })
-    await spawnAsync(`git config${global ? " --global" : ""} http.proxy ${proxy}`)
-    await spawnAsync(`git config${global ? " --global" : ""} https.proxy ${proxy}`)
+    await spawnAsync(`git config${global ? " --global" : ""} http.proxy ${proxy}`, {shell: true, stdio: "inherit"})
+    await spawnAsync(`git config${global ? " --global" : ""} https.proxy ${proxy}`, {shell: true, stdio: "inherit"})
 }
