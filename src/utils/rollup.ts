@@ -1,6 +1,7 @@
 import { existsSync } from "fs"
 import { writeFile } from "fs/promises"
-import { addDevDependencies, installDependceny, readPackageJson, writePackageJson } from "."
+import { addDevDependencies, readPackageJson, writePackageJson } from "."
+import { installDependceny } from "./installDependceny"
 import { Module, ModuleResolution, setTsConfig, Target } from "./setTsConfig"
 
 const rollupConfig = `import commonjs from "@rollup/plugin-commonjs"
