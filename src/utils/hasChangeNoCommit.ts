@@ -1,4 +1,4 @@
-import { execAsync } from "."
+import { execAsync } from "soda-nodejs"
 
 export async function hasChangeNoCommit(cwd?: string) {
     const status = await execAsync("git status", { cwd })

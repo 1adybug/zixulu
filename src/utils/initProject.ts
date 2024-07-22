@@ -1,6 +1,6 @@
 import { ProjectType } from "@constant/index"
 import consola from "consola"
-import { addDependencies, getPackageManager, installDependcies, readPackageJson } from "."
+import { addDependencies, getPackageManager, installDependceny, readPackageJson } from "."
 import { addAntd } from "./addAntd"
 import { addGitignore } from "./addGitignore"
 import { addPrettier } from "./addPrettier"
@@ -89,7 +89,7 @@ export async function initProject() {
         await addPrisma(manager)
         installed = true
     }
-    if (!installed) await installDependcies(true, manager)
+    if (!installed) await installDependceny(true, manager)
     await setTsConfig("noEmit", true)
     consola.success("项目初始化完成")
 }

@@ -1,6 +1,7 @@
 import consola from "consola"
 import { stat } from "fs/promises"
-import { backupFirst, execAsync } from "."
+import { execAsync } from "soda-nodejs"
+import { backupFirst } from "."
 
 export async function removeFileOrFolderFromGit(path: string) {
     const stats = await stat(path)

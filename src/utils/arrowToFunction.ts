@@ -1,8 +1,6 @@
 import consola from "consola"
 import { readFile, writeFile } from "fs/promises"
-import { getFiles, getTypeInGenerics, installDependcies, spawnAsync } from "."
-import { addPrettier } from "./addPrettier"
-import { checkType } from "./checkType"
+import { getFiles, getTypeInGenerics } from "."
 
 export type ArrowToFunctionChoice = {
     value: string
@@ -138,18 +136,4 @@ export async function arrowToFunction() {
     if (modifiedFiles.size > 0) consola.success(`以下文件中的箭头函数组件已经转换为函数组件：\n\n${Array.from(modifiedFiles).join("\n")}`)
 
     if (warnFiles.size > 0) consola.warn(`以下文件中存在 memo 或 forwardRef，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`)
-
-    consola.start("格式化代码")
-
-    await addPrettier()
-
-    await installDependcies(true)
-
-    await spawnAsync("npx prettier --write ./src")
-
-    consola.start("检查项目是否存在 TypeScript 错误")
-
-    await checkType()
-
-    consola.success("转换完成")
 }

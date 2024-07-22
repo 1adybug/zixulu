@@ -39,7 +39,8 @@
         "json5": "^2.2.3",
         "node-fetch": "^3.3.2",
         "prettier": "^3.2.5",
-        "soda-nodejs": "^0.2.0",
+        "soda-nodejs": "^0.3.0",
+        "which": "^4.0.0",
         "yaml": "^2.4.1"
     },
     "devDependencies": {

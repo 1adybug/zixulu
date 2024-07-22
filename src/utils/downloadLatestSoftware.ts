@@ -2,7 +2,7 @@ import { Software } from "@constant/index"
 import consola from "consola"
 import dayjs from "dayjs"
 import { mkdir } from "fs/promises"
-import { download7Zip, downloadChrome, downloadDeskGo, downloadGeekUninstaller, downloadGit, downloadNodeJS, downloadSupermium, downloadVscode } from "."
+import { download7Zip, downloadChrome, downloadDeskGo, downloadGeekUninstaller, downloadGit, downloadNodeJS, downloadVscode } from "."
 import { downloadAnydesk } from "./downloadAnydesk"
 import { downloadFirefox } from "./downloadFirefox"
 import { downloadHoneyview } from "./downloadHoneyview"
@@ -17,7 +17,6 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
     [Software.DeskGo]: downloadDeskGo,
     [Software["Geek Uninstaller"]]: downloadGeekUninstaller,
     [Software["VS Code"]]: downloadVscode,
-    [Software.Supermium]: downloadSupermium,
     [Software.PowerToys]: downloadPowerToys,
     [Software.Honeyview]: downloadHoneyview,
     [Software.AnyDesk]: downloadAnydesk,

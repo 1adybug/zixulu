@@ -1,7 +1,8 @@
 import consola from "consola"
-import { actionWithBackup, backupFirst, execAsync, isRepo, readPackageJson, spawnAsync, writePackageJson } from "."
 import dayjs from "dayjs"
 import { exit } from "process"
+import { execAsync, spawnAsync } from "soda-nodejs"
+import { backupFirst, isRepo, readPackageJson, writePackageJson } from "."
 
 export async function getBetaVersion() {
     const packageJson = await readPackageJson()
@@ -62,5 +63,5 @@ export async function betaVersion() {
         name: "publish",
         message: "是否现在发布"
     })
-    if (publish) await spawnAsync("npm publish --tag beta")
+    if (publish) await spawnAsync("npm publish --tag beta", { shell: true, stdio: "inherit" })
 }

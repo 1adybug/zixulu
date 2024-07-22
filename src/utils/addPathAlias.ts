@@ -120,7 +120,7 @@ export async function addFolderPathAlias() {
         type: "input",
         name: "folder",
         message: "请输入文件夹路径",
-        default: "./"
+        default: "."
     })
     const dir = await getFiles({
         match(path, stats) {

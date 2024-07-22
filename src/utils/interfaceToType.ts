@@ -1,6 +1,6 @@
 import consola from "consola"
 import { readFile, writeFile } from "fs/promises"
-import { getFiles, spawnAsync, splitExtendsType } from "."
+import { getFiles,  splitExtendsType } from "."
 import { checkType } from "./checkType"
 
 export async function interfaceToType() {

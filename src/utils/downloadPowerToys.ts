@@ -5,6 +5,6 @@ export async function downloadPowerToys(dir: string) {
         name: "PowerToys",
         id: "Microsoft.PowerToys",
         dir,
-        architecture: "x64"
+        filter: item => item.Architecture === "x64" && item.Scope === "machine"
     })
 }

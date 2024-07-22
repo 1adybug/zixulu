@@ -1,8 +1,7 @@
 export enum PackageManager {
     npm = "npm",
     yarn = "yarn",
-    pnpm = "pnpm",
-    bun = "bun"
+    pnpm = "pnpm"
 }
 
 export enum Registry {
@@ -14,7 +13,6 @@ export enum Registry {
 export enum Software {
     "VS Code" = "VS Code",
     "Chrome" = "Chrome",
-    "Supermium" = "Supermium",
     "7zip" = "7zip",
     "Git" = "Git",
     "NodeJS" = "NodeJS",
@@ -52,4 +50,9 @@ export const CommitTypeMap = {
     [CommitType.perfs]: "🚅 perfs: ",
     [CommitType.rollback]: "⏪ rollback: ",
     [CommitType.other]: "🔵 other: "
+}
+
+export const SpawnOptions = {
+    shell: true,
+    stdio: "inherit"
 }
