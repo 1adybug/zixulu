@@ -86,7 +86,11 @@ program
     .description("初始化 father 项目配置")
     .action(actionWithBackup(setFatherConfig, getCommitMessage(CommitType.feature, "初始化 father 项目配置")))
 
-program.command("upgrade-dependency").alias("ud").description("升级项目依赖").action(actionWithBackup(upgradeDependency))
+program
+    .command("upgrade-dependency")
+    .alias("ud")
+    .description("升级项目依赖")
+    .action(actionWithBackup(() => upgradeDependency()))
 
 program.command("upgrade-workspace-dependency").alias("uwd").description("升级工作区项目依赖").argument("[dir]", "项目目录", "packages").action(upgradeWorkspaceDependceny)
 
