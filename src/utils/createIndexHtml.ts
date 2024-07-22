@@ -23,7 +23,7 @@ export async function createIndexHtml(config: CreateIndexHtmlConfig) {
     </body>
 </html>
 `
-    const dir = await readdir("./")
+    const dir = await readdir(".")
     let hasPublic = false
     if (dir.includes("public")) {
         const stats = await stat("public")

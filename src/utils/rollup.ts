@@ -1,6 +1,6 @@
 import { existsSync } from "fs"
 import { writeFile } from "fs/promises"
-import { addDevDependencies, installDependcies, readPackageJson, writePackageJson } from "."
+import { addDevDependencies, installDependceny, readPackageJson, writePackageJson } from "."
 import { Module, ModuleResolution, setTsConfig, Target } from "./setTsConfig"
 
 const rollupConfig = `import commonjs from "@rollup/plugin-commonjs"
@@ -46,5 +46,5 @@ export async function rollup() {
     } else {
         await writeFile("tsconfig.json", tsconfig, "utf-8")
     }
-    await installDependcies()
+    await installDependceny()
 }

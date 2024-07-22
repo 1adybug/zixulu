@@ -4,7 +4,7 @@ import { addedRules } from "."
 
 export async function addGitignore() {
     consola.start("开始添加 .gitignore")
-    const dir = await readdir("./")
+    const dir = await readdir(".")
     if (!dir.includes(".gitignore")) return await writeFile(".gitignore", addedRules.join("\n"), "utf-8")
     const gitignore = await readFile(".gitignore", "utf-8")
     const rules = gitignore.split("\n").map(v => v.trim())
