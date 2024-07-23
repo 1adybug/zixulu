@@ -24,7 +24,7 @@ export async function addDependency(config: AddDependenciesConfig): Promise<void
         for (const name of packages) {
             const version = await retry({
                 action: () => getPackageLatestVersion(name),
-                count: 3,
+                count: 4,
                 callback: (error, current) => consola.error(`获取 ${name} 版本失败，第 ${current} 次重试`)
             })
             packageJson[type][name] ??= `^${version}`
