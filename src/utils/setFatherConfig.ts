@@ -1,8 +1,10 @@
 import consola from "consola"
 import { rm, writeFile } from "fs/promises"
-import { readPackageJson, sortArrayOrObject, writePackageJson } from "."
+import { sortArrayOrObject } from "./sortArrayOrObject"
 import { addGitignore } from "./addGitignore"
+import { readPackageJson } from "./readPackageJson"
 import { Module, ModuleResolution, setTsConfig, Target } from "./setTsConfig"
+import { writePackageJson } from "./writePackageJson"
 
 const fatherrcCode = `import { defineConfig } from "father"
 
@@ -52,7 +54,7 @@ export async function setFatherConfig() {
     packageJson.devDependencies = sortArrayOrObject(devDependencies)
     packageJson.peerDependencies = sortArrayOrObject(peerDependencies)
     await addGitignore()
-    await writePackageJson(packageJson)
+    await writePackageJson({ data: packageJson })
     await writeFile(".fatherrc.ts", fatherrcCode)
     await setTsConfig("target", Target.ESNext)
     await setTsConfig("module", Module.ESNext)

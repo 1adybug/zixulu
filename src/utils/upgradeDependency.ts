@@ -1,7 +1,11 @@
 import { CommitType } from "@constant/index"
-import { getCommitMessage, getPackageUpgradeVersion, getVersionFromRequiredVersion, readPackageJson, writePackageJson } from "."
+import { getCommitMessage } from "./getCommitMessage"
+import { getPackageUpgradeVersion } from "./getPackageUpgradeVersion"
 import { getUpgradeDependencyConfig, UpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
+import { getVersionFromRequiredVersion } from "./getVersionFromRequiredVersion"
 import { installDependceny } from "./installDependceny"
+import { readPackageJson } from "./readPackageJson"
+import { writePackageJson } from "./writePackageJson"
 
 export type UpgradeInfo = {
     package: string
@@ -31,10 +35,14 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
                 const rv = packageJson[type][pkg]
                 const s = rv.match(/^\D*/)![0]
                 const cv = getVersionFromRequiredVersion(rv)
-                const version = await getPackageUpgradeVersion(pkg, cv, level)
+
+                const version = await getPackageUpgradeVersion({
+                    packageName: pkg,
+                    version: cv,
+                    level
+                })
 
                 if (!version) continue
-
                 upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, strVersion: `${s}${version}` })
             } catch (error) {
                 continue
@@ -62,7 +70,7 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
 
     if (updateLogs.length === 0) return ""
 
-    await writePackageJson(packageJson, dir)
+    await writePackageJson({ data: packageJson, dir })
     await installDependceny()
 
     return getCommitMessage(CommitType.feature, `upgrade dependencies: ${updateLogs.join(", ")}`)

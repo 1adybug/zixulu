@@ -1,19 +1,20 @@
 import { ProjectType } from "@constant/index"
 import consola from "consola"
-import { addDependencies, readPackageJson } from "."
 import { addAntd } from "./addAntd"
+import { addDependency } from "./addDependency"
 import { addGitignore } from "./addGitignore"
 import { addPrettier } from "./addPrettier"
 import { addPrisma } from "./addPrisma"
-import { addTailwind } from "./addTailwind"
+import { tailwind } from "./tailwind"
 import { createBrowserlistrc } from "./createBrowserlistrc"
+import { getPackageManager } from "./getPackageManager"
+import { installDependceny } from "./installDependceny"
 import { next } from "./next"
+import { readPackageJson } from "./readPackageJson"
 import { removeESLint } from "./removeESLint"
 import { rsbuild } from "./rsbuild"
 import { setTsConfig } from "./setTsConfig"
 import { vite } from "./vite"
-import { getPackageManager } from "./getPackageManager"
-import { installDependceny } from "./installDependceny"
 
 export async function initProject() {
     consola.start("开始初始化项目")
@@ -51,6 +52,7 @@ export async function initProject() {
     }
     const isFullStack = type === ProjectType.next || type === ProjectType.remix
     const choices = isFullStack ? ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod", "@emotion/css"] : ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "@emotion/css", "react-router-dom"]
+
     const { modules } = await inquirer.prompt({
         type: "checkbox",
         name: "modules",
@@ -58,17 +60,25 @@ export async function initProject() {
         choices,
         default: choices
     })
+
+    const added: string[] = []
     if (modules.includes("antd")) await addAntd()
-    if (modules.includes("ahooks")) await addDependencies("ahooks")
-    if (modules.includes("tailwind")) await addTailwind()
-    if (modules.includes("dayjs")) await addDependencies("dayjs")
-    if (modules.includes("deepsea-components")) await addDependencies("deepsea-components")
-    if (modules.includes("deepsea-tools")) await addDependencies("deepsea-tools")
-    if (modules.includes("stable-hash")) await addDependencies("stable-hash")
-    if (modules.includes("zod")) await addDependencies("zod")
-    if (modules.includes("@emotion/css")) await addDependencies("@emotion/css")
-    if (modules.includes("react-router-dom")) await addDependencies("react-router-dom")
-    await addPrettier()
+    if (modules.includes("tailwind")) await tailwind()
+    else await addPrettier()
+    if (modules.includes("ahooks")) added.push("ahooks")
+    if (modules.includes("dayjs")) added.push("dayjs")
+    if (modules.includes("deepsea-components")) added.push("deepsea-components")
+    if (modules.includes("deepsea-tools")) added.push("deepsea-tools")
+    if (modules.includes("stable-hash")) added.push("stable-hash")
+    if (modules.includes("zod")) added.push("zod")
+    if (modules.includes("@emotion/css")) added.push("@emotion/css")
+    if (modules.includes("react-router-dom")) added.push("react-router-dom")
+
+    await addDependency({
+        package: added,
+        type: "dependencies"
+    })
+
     switch (type) {
         case ProjectType.next:
             await next()
@@ -86,6 +96,7 @@ export async function initProject() {
             await rsbuild()
             break
     }
+
     let installed = false
     if (modules.includes("prisma")) {
         await addPrisma(manager)

@@ -6,7 +6,7 @@ import { addGitignore } from "@utils/addGitignore"
 import { addFolderPathAlias, replacePathAlias } from "@utils/addPathAlias"
 import { addPrettier } from "@utils/addPrettier"
 import { addPrisma } from "@utils/addPrisma"
-import { addTailwind } from "@utils/addTailwind"
+import { tailwind } from "@utils/tailwind"
 import { arrowToFunction } from "@utils/arrowToFunction"
 import { betaVersion } from "@utils/betaVersion"
 import { checkType } from "@utils/checkType"
@@ -14,7 +14,6 @@ import { code2Snippet } from "@utils/code2Snippet"
 import { downloadLatestSoftware } from "@utils/downloadLatestSoftware"
 import { downloadNpm } from "@utils/downloadNpm"
 import { generatePrisma } from "@utils/generatePrisma"
-import { actionWithBackup, getCommitMessage, readPackageJsonSync } from "@utils/index"
 import { initProject } from "@utils/initProject"
 import { interfaceToType } from "@utils/interfaceToType"
 import { killProcessByPort } from "@utils/killProcessByPort"
@@ -36,7 +35,10 @@ import { upgradeDependency } from "@utils/upgradeDependency"
 import { vite } from "@utils/vite"
 import { Command } from "commander"
 import { resolve } from "path"
+import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
+import { actionWithBackup } from "./utils/actionWithBackup"
+import { getCommitMessage } from "./utils/getCommitMessage"
 
 const program = new Command()
 
@@ -72,7 +74,7 @@ program
 program
     .command("tailwind")
     .description("添加 tailwind 配置")
-    .action(actionWithBackup(addTailwind, getCommitMessage(CommitType.feature, "添加 tailwind 配置")))
+    .action(actionWithBackup(tailwind, getCommitMessage(CommitType.feature, "添加 tailwind 配置")))
 
 program
     .command("remove-comment")

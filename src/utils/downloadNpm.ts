@@ -2,8 +2,7 @@ import consola from "consola"
 import { mkdir, readdir, rename, rm } from "fs/promises"
 import { join } from "path"
 import { exit } from "process"
-import { zipDir } from "."
-import { execAsync } from "soda-nodejs"
+import { execAsync, zip } from "soda-nodejs"
 
 export async function downloadNpm(name: string) {
     consola.start(`开始下载 ${name}`)
@@ -12,11 +11,11 @@ export async function downloadNpm(name: string) {
     const dir = await readdir(".")
     if (dir.includes(folder)) {
         consola.warn("文件夹已存在")
-        exit()
+        throw new Error("文件夹已存在")
     }
     if (dir.includes(file)) {
         consola.warn("文件已存在")
-        exit()
+        throw new Error("文件已存在")
     }
     await mkdir(folder, { recursive: true })
     await execAsync(`npm init -y`, { cwd: folder })
@@ -31,7 +30,10 @@ export async function downloadNpm(name: string) {
         }
         await rename(join(folder, "node_modules", d), join(folder, "node_modules", name, "node_modules", d))
     }
-    await zipDir(join(folder, "node_modules"), file)
+    await zip({
+        input: join(folder, "node_modules"),
+        output: file
+    })
     await rm(folder, { recursive: true })
     consola.success(`下载 ${name} 完成`)
 }

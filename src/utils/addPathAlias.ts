@@ -1,7 +1,8 @@
 import { CommitType } from "@src/constant"
 import { readFile, writeFile } from "fs/promises"
 import { join, parse } from "path"
-import { getCommitMessage, getFiles } from "."
+import { getCommitMessage } from "./getCommitMessage"
+import { getFiles } from "./getFiles"
 import { getRelativePath } from "./getRelativePath"
 import { getTsFile } from "./getTsFile"
 import { readTsConfig } from "./readTsConfig"
@@ -127,7 +128,7 @@ export async function addFolderPathAlias() {
             return stats.isDirectory()
         },
         depth: 1,
-        path: folder
+        dir: folder
     })
     const names = dir.map(item => parse(item).name)
     const { result } = await inquirer.prompt({
