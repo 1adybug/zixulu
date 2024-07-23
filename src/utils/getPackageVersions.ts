@@ -13,7 +13,9 @@ export async function getPackageVersions(packageName: string) {
         const registry = await getRegistry()
         const url = new URL(`/${packageName}`, registry)
         const { default: fetch } = await import("node-fetch")
-        const response = await fetch(url, { agent })
+        const response = await fetch(url, {
+            agent: global.__USE_PROXY__ ? agent : undefined
+        })
         const data = (await response.json()) as any
         return Object.keys(data.versions) as string[]
     } catch (error) {
