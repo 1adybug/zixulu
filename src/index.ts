@@ -6,7 +6,6 @@ import { addGitignore } from "@utils/addGitignore"
 import { addFolderPathAlias, replacePathAlias } from "@utils/addPathAlias"
 import { addPrettier } from "@utils/addPrettier"
 import { addPrisma } from "@utils/addPrisma"
-import { tailwind } from "@utils/tailwind"
 import { arrowToFunction } from "@utils/arrowToFunction"
 import { betaVersion } from "@utils/betaVersion"
 import { checkType } from "@utils/checkType"
@@ -31,14 +30,21 @@ import { setRegistry } from "@utils/setRegistry"
 import { setShellProxy } from "@utils/setShellProxy"
 import { sortPackageJson } from "@utils/sortPackageJson"
 import { syncVscode } from "@utils/syncVscode"
+import { tailwind } from "@utils/tailwind"
 import { upgradeDependency } from "@utils/upgradeDependency"
 import { vite } from "@utils/vite"
 import { Command } from "commander"
 import { resolve } from "path"
-import { readPackageJsonSync } from "./utils/readPackageJsonSync"
-import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { actionWithBackup } from "./utils/actionWithBackup"
+import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
+import { readPackageJsonSync } from "./utils/readPackageJsonSync"
+import { upgradeRsbuild } from "./utils/upgradeRsbuild"
+import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
+
+declare global {
+    var __USE_PROXY__: boolean
+}
 
 const program = new Command()
 
@@ -92,9 +98,22 @@ program
     .command("upgrade-dependency")
     .alias("ud")
     .description("升级项目依赖")
-    .action(actionWithBackup(() => upgradeDependency()))
+    .option("-p, --proxy", "是否使用代理")
+    .action(async ({ proxy }) => {
+        global.__USE_PROXY__ = !!proxy
+        await actionWithBackup(() => upgradeDependency())()
+    })
 
-program.command("upgrade-workspace-dependency").alias("uwd").description("升级工作区项目依赖").argument("[dir]", "项目目录", "packages").action(upgradeWorkspaceDependceny)
+program
+    .command("upgrade-workspace-dependency")
+    .alias("uwd")
+    .description("升级工作区项目依赖")
+    .option("-p, --proxy", "是否使用代理")
+    .argument("[dir]", "项目目录", "packages")
+    .action(async (dir, { proxy }) => {
+        global.__USE_PROXY__ = !!proxy
+        await upgradeWorkspaceDependceny(dir)
+    })
 
 program.command("registry").description("设置 npm registry").action(setRegistry)
 
@@ -167,5 +186,17 @@ program.command("replace-alias").alias("ra").description("替换路径别名").a
 program.command("pnpm").description("设置 pnpm 配置").action(pnpm)
 
 program.command("rollup").description("rollup 打包").action(rollup)
+
+program.command("browserlistrc").alias("blr").description("添加 browserlistrc 配置").action(createBrowserlistrc)
+
+program
+    .command("upgrade-rsbuild")
+    .alias("ur")
+    .description("升级 rsbuild")
+    .option("-p, --proxy", "是否使用代理")
+    .action(async ({ proxy }) => {
+        global.__USE_PROXY__ = !!proxy
+        await actionWithBackup(() => upgradeRsbuild())()
+    })
 
 program.parse()

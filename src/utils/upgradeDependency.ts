@@ -23,7 +23,7 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
 
     if (types.length === 0) return ""
 
-    const updateLogs: string[] = []
+    const upgradeLogs: string[] = []
 
     for (const type of types) {
         const upgrades: UpgradeInfo[] = []
@@ -64,14 +64,14 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
         pkgs.forEach((pkg: string) => {
             const upgrade = upgrades.find(upgrade => upgrade.package === pkg)!
             packageJson[type][pkg] = upgrade.strVersion
-            updateLogs.push(`${pkg} ${upgrade.oldVersion} => ${upgrade.newVersion}`)
+            upgradeLogs.push(`${pkg} ${upgrade.oldVersion} => ${upgrade.newVersion}`)
         })
     }
 
-    if (updateLogs.length === 0) return ""
+    if (upgradeLogs.length === 0) return ""
 
     await writePackageJson({ data: packageJson, dir })
     await installDependceny()
 
-    return getCommitMessage(CommitType.feature, `upgrade dependencies: ${updateLogs.join(", ")}`)
+    return getCommitMessage(CommitType.feature, `upgrade dependencies: ${upgradeLogs.join(", ")}`)
 }
