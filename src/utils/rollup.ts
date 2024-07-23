@@ -1,8 +1,10 @@
 import { existsSync } from "fs"
 import { writeFile } from "fs/promises"
-import { addDevDependencies, readPackageJson, writePackageJson } from "."
+import { addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"
+import { readPackageJson } from "./readPackageJson"
 import { Module, ModuleResolution, setTsConfig, Target } from "./setTsConfig"
+import { writePackageJson } from "./writePackageJson"
 
 const rollupConfig = `import commonjs from "@rollup/plugin-commonjs"
 import json from "@rollup/plugin-json"
@@ -34,12 +36,17 @@ const tsconfig = `{
 `
 
 export async function rollup() {
-    await addDevDependencies("@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "rollup", "typescript")
+    await addDependency({
+        package: ["@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "rollup", "typescript"],
+        type: "devDependencies"
+    })
+
     const packageJson = await readPackageJson()
     if (packageJson.scripts.build) packageJson.scripts["build:rollup"] = "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript"
     else packageJson.scripts.build = "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript"
-    await writePackageJson(packageJson)
+    await writePackageJson({ data: packageJson })
     await writeFile("rollup.config.ts", rollupConfig, "utf-8")
+
     if (existsSync("tsconfig.json")) {
         await setTsConfig("target", Target.ESNext)
         await setTsConfig("module", Module.ESNext)
@@ -47,5 +54,6 @@ export async function rollup() {
     } else {
         await writeFile("tsconfig.json", tsconfig, "utf-8")
     }
+
     await installDependceny()
 }

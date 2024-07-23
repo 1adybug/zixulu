@@ -1,17 +1,18 @@
 import consola from "consola"
 import { mkdir, readdir, writeFile } from "fs/promises"
 import { join } from "path"
-import { addDependencies, readPackageJson } from "."
+import { addDependency } from "./addDependency"
+import { readPackageJson } from "./readPackageJson"
 
 export async function addAntd() {
     consola.start("开始添加 antd 配置")
-    await addDependencies("@ant-design/cssinjs", "@ant-design/icons", "antd")
+    await addDependency({ package: ["@ant-design/cssinjs", "@ant-design/icons", "antd"] })
     const dir = await readdir(".")
     const componentDir = dir.includes("src") ? "src/components" : "components"
     await mkdir(componentDir, { recursive: true })
     const packageJson = await readPackageJson()
     if (packageJson.dependencies.next) {
-        await addDependencies("@ant-design/nextjs-registry")
+        await addDependency({ package: "@ant-design/nextjs-registry" })
         await writeFile(
             join(componentDir, "AntdNextRegistry.tsx"),
             `"use client"

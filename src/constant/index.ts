@@ -1,3 +1,5 @@
+import { HttpsProxyAgent } from "https-proxy-agent"
+
 export enum PackageManager {
     npm = "npm",
     yarn = "yarn",
@@ -56,3 +58,7 @@ export const SpawnOptions = {
     shell: true,
     stdio: "inherit"
 }
+
+export const agent = new HttpsProxyAgent("http://localhost:7890")
+
+export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log", "test.js", "test.mjs", "test.ts", "test"]

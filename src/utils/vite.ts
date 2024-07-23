@@ -1,6 +1,7 @@
 import consola from "consola"
-import { readPackageJson, writePackageJson } from "."
 import { setTsConfig } from "./setTsConfig"
+import { readPackageJson } from "./readPackageJson"
+import { writePackageJson } from "./writePackageJson"
 
 export async function vite() {
     consola.start("开始设置 vite 配置")
@@ -8,6 +9,6 @@ export async function vite() {
     await setTsConfig("noUnusedParameters")
     const pkg = await readPackageJson()
     pkg.scripts.dev += " --host"
-    await writePackageJson(pkg)
+    await writePackageJson({ data: pkg })
     consola.success("设置 vite 配置成功")
 }

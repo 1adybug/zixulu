@@ -1,6 +1,6 @@
+import { addedRules } from "@constant/index"
 import consola from "consola"
 import { readdir, readFile, writeFile } from "fs/promises"
-import { addedRules } from "."
 
 export async function addGitignore() {
     consola.start("开始添加 .gitignore")

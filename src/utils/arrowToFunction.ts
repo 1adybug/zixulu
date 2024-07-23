@@ -1,6 +1,7 @@
 import consola from "consola"
 import { readFile, writeFile } from "fs/promises"
-import { getFiles, getTypeInGenerics } from "."
+import { getFiles } from "./getFiles"
+import { getTypeInGenerics } from "./getTypeInGenerics"
 
 export type ArrowToFunctionChoice = {
     value: string
@@ -9,11 +10,14 @@ export type ArrowToFunctionChoice = {
     checked: boolean
 }
 
+/**
+ * 将箭头函数组件转换为函数组件
+ */
 export async function arrowToFunction() {
     consola.start("开始将转换箭头函数组件为函数组件")
     const { default: inquirer } = await import("inquirer")
     const files = await getFiles({
-        path: "./src",
+        dir: "src",
         match: (path, stats) => path.ext === ".tsx" && stats.isFile()
     })
     const reg = /^(export )?const \w+?: FC.+?$/gm

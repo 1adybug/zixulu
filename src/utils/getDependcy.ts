@@ -1,4 +1,4 @@
-import { readPackageJson } from "."
+import { readPackageJson } from "./readPackageJson"
 
 export async function getDependcy(name: string) {
     const packageJson = await readPackageJson()

@@ -10,8 +10,7 @@ export async function readTsConfig(path?: string): Promise<Record<string, any>> 
         const result = JSON5.parse(await readFile(getTsConfigJsonPath(path), "utf-8"))
         return result
     } catch (error) {
-        consola.error(error)
         consola.fail("读取 tsconfig.json 失败")
-        exit()
+        throw error
     }
 }
