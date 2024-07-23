@@ -1,8 +1,12 @@
 import consola from "consola"
 import { readFile, writeFile } from "fs/promises"
-import { getFiles,  splitExtendsType } from "."
 import { checkType } from "./checkType"
+import { getFiles } from "./getFiles"
+import { splitExtendsType } from "./splitExtendsType"
 
+/** 
+ * 将项目中的 interface 转换为 type
+ */
 export async function interfaceToType() {
     consola.start("开始将项目中的 interface 转换为 type")
 
@@ -13,13 +17,13 @@ export async function interfaceToType() {
 
     const { default: inquirer } = await import("inquirer")
 
-    const { ifContinue } = await inquirer.prompt({
+    const { cont } = await inquirer.prompt({
         type: "confirm",
-        name: "ifContinue",
+        name: "cont",
         message: "是否继续"
     })
 
-    if (!ifContinue) return
+    if (!cont) return
 
     const reg = /(export )?interface (.+?) {/gm
     const reg1 = /\bexport\b/

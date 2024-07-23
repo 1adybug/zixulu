@@ -7,7 +7,7 @@ export async function killProcessByPort(port: string | number) {
     port = typeof port === "string" ? parseInt(port) : port
     if (!Number.isInteger(port)) {
         consola.error("无效的端口号")
-        exit()
+        throw new Error("无效的端口号")
     }
     const { default: inquirer } = await import("inquirer")
     const pidInfos = await getPidInfoFromPort(port)

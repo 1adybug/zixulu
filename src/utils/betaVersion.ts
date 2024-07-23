@@ -2,7 +2,10 @@ import consola from "consola"
 import dayjs from "dayjs"
 import { exit } from "process"
 import { execAsync, spawnAsync } from "soda-nodejs"
-import { backupFirst, isRepo, readPackageJson, writePackageJson } from "."
+import { backupFirst } from "./backupFirst"
+import { isRepository } from "./isRepository"
+import { readPackageJson } from "./readPackageJson"
+import { writePackageJson } from "./writePackageJson"
 
 export async function getBetaVersion() {
     const packageJson = await readPackageJson()
@@ -11,7 +14,7 @@ export async function getBetaVersion() {
     const match = version.match(reg)
     if (!match) {
         consola.error("版本号不符合规范")
-        exit()
+        throw new Error("版本号不符合规范")
     }
     const [, major, minor, patch, , beta] = match
     if (beta) {
@@ -51,8 +54,8 @@ export async function betaVersion() {
     const version = await getBetaVersion()
     const packageJson = await readPackageJson()
     packageJson.version = version
-    await writePackageJson(packageJson)
-    if (await isRepo()) {
+    await writePackageJson({ data: packageJson })
+    if (await isRepository()) {
         await execAsync("git add .")
         await execAsync(`git commit -m "${version}"`)
         await execAsync(`git tag ${version}`)

@@ -1,8 +1,9 @@
 import consola from "consola"
 import { rm, writeFile } from "fs/promises"
-import { addDevDependencies, readPackageJson } from "."
+import { addDependency } from "./addDependency"
 import { checkTailwind } from "./checkTailwind"
 import { createIndexHtml } from "./createIndexHtml"
+import { readPackageJson } from "./readPackageJson"
 import { readTsConfig } from "./readTsConfig"
 import { writeRsbuildConfig } from "./writeRsbuildConfig"
 import { writeTsConfig } from "./writeTsConfig"
@@ -10,7 +11,10 @@ import { writeTsConfig } from "./writeTsConfig"
 export async function rsbuild() {
     consola.start("开始设置 rsbuild 配置")
     const { default: inquirer } = await import("inquirer")
-    await addDevDependencies("@rsbuild/plugin-svgr", "get-port-please")
+    await addDependency({
+        package: ["@rsbuild/plugin-svgr", "get-port-please"],
+        type: "devDependencies"
+    })
     const packageJson = await readPackageJson()
     const tsConfig = await readTsConfig()
     tsConfig.compilerOptions.lib = tsConfig.compilerOptions.lib.map((item: string) => (item === tsConfig.compilerOptions.target ? "ESNext" : item))
