@@ -321,7 +321,7 @@ export async function downloadVscodeExts(dir: string) {
     for (const ext of exts) {
         if (!exts2.exts.includes(ext.id)) continue
         consola.start(`正在下载 ${ext.name}`)
-        await retry(() => download(ext.url, dir, `${ext.id}-${ext.version}.vsix`), 2)
+        await retry(() => download(ext.url, dir, `${ext.id}-${ext.version}.vsix`), 4)
     }
 }
 

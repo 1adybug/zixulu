@@ -17,7 +17,7 @@ export async function getPackageUpgradeVersion({ packageName, version, level }: 
     const current = getVersionNum(version)
     const versions = await retry({
         action: () => getPackageVersions(packageName),
-        count: 3,
+        count: 4,
         callback: (error, current) => consola.error(`获取 ${packageName} 版本失败，第 ${current} 次重试`)
     })
     const reg = /^\d+\.\d+\.\d+$/
