@@ -1,6 +1,6 @@
 import { writeFile } from "fs/promises"
 
-export const rsbuildConfig = `import { defineConfig } from "@rsbuild/core"
+export const rsbuildConfig = `import { defineConfig, RsbuildConfig } from "@rsbuild/core"
 import { pluginReact } from "@rsbuild/plugin-react"
 import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { checkPort } from "get-port-please"
@@ -27,8 +27,11 @@ export default defineConfig(async ({ env, command, envMode }) => {
         ],
         server: {
             port
+        },
+        output: {
+            polyfill: "usage"
         }
-    }
+    } satisfies RsbuildConfig
 })
 `
 
