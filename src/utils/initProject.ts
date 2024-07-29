@@ -26,6 +26,10 @@ export async function initProject() {
         consola.error("仅支持 React 项目")
         return
     }
+    addDependency({
+        package: ["@types/node"],
+        type: "devDependencies"
+    })
     let type: ProjectType
     if (allDependcies.some(item => item === "next")) {
         type = ProjectType.next
@@ -51,7 +55,7 @@ export async function initProject() {
         if (removeEslintConfig) await removeESLint()
     }
     const isFullStack = type === ProjectType.next || type === ProjectType.remix
-    const choices = isFullStack ? ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod", "@emotion/css"] : ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "@emotion/css", "react-router-dom"]
+    const choices = isFullStack ? ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod", "@emotion/css", "stable-hash"] : ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "@emotion/css", "react-router-dom", "stable-hash"]
 
     const { modules } = await inquirer.prompt({
         type: "checkbox",
@@ -73,6 +77,7 @@ export async function initProject() {
     if (modules.includes("zod")) added.push("zod")
     if (modules.includes("@emotion/css")) added.push("@emotion/css")
     if (modules.includes("react-router-dom")) added.push("react-router-dom")
+    if (modules.includes("stable-hash")) added.push("stable-hash")
 
     await addDependency({
         package: added,
