@@ -175,7 +175,7 @@ program.command("tsc").description("类型检查").action(checkType)
 
 program.command("beta-version").alias("bv").description("设置版本号").action(betaVersion)
 
-program.command("reinstall").alias("re").description("重新安装依赖").argument("name", "包名").action(reinstall)
+program.command("reinstall").alias("ri").description("重新安装依赖").action(reinstall)
 
 program.command("snippet").alias("sn").description("生成 vscode snippet").argument("path", "文件路径").action(code2Snippet)
 
