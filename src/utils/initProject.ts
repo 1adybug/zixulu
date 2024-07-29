@@ -26,7 +26,7 @@ export async function initProject() {
         consola.error("仅支持 React 项目")
         return
     }
-    addDependency({
+    await addDependency({
         package: ["@types/node"],
         type: "devDependencies"
     })
