@@ -1,9 +1,10 @@
 import { CommitType } from "@src/constant"
+import consola from "consola"
 import { getCommitMessage } from "./getCommitMessage"
 import { getPackageLatestVersion } from "./getPackageLatestVersion"
+import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
-import { installDependceny } from "./installDependceny"
 
 export async function upgradeRsbuild() {
     const packageJson = await readPackageJson()
@@ -20,5 +21,7 @@ export async function upgradeRsbuild() {
     if (upgradeLogs.length === 0) return ""
     await writePackageJson({ data: packageJson })
     await installDependceny()
-    return getCommitMessage(CommitType.feature, `upgrade dependencies: ${upgradeLogs.join(", ")}`)
+    const upgradeLog = `upgrade dependencies: ${upgradeLogs.join(", ")}`
+    consola.success(upgradeLog)
+    return getCommitMessage(CommitType.feature, upgradeLog)
 }
