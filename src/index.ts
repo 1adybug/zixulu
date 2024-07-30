@@ -41,6 +41,7 @@ import { getCommitMessage } from "./utils/getCommitMessage"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
+import { replaceAssets } from "./utils/replaceAssets"
 
 declare global {
     var __USE_PROXY__: boolean
@@ -188,6 +189,14 @@ program.command("pnpm").description("设置 pnpm 配置").action(pnpm)
 program.command("rollup").description("rollup 打包").action(rollup)
 
 program.command("browserlistrc").alias("blr").description("添加 browserlistrc 配置").action(createBrowserlistrc)
+
+program
+    .command("asset")
+    .description("替换文件中的资源地址")
+    .argument("dir", "静态文件夹路径")
+    .argument("base", "资源地址 BaseUrl")
+    .option("-p, --proxy", "是否使用代理")
+    .action((dir, base, { proxy }) => replaceAssets({ base, dir, proxy }))
 
 program
     .command("upgrade-rsbuild")
