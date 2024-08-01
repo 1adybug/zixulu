@@ -42,20 +42,35 @@ async function main() {
     const PEM_PATH = process.env.PEM_PATH
     const https = !!PEM_PATH
     const PORT = process.env.PORT ? Number(process.env.PORT) : https ? 443 : 80
+    const LOCALHOST = process.env.LOCALHOST === "true"
     if (!checkPort(PORT)) throw new Error(\`无效的端口号: \${PORT}\`)
     const app = next({ experimentalHttpsServer: https })
     const handle = app.getRequestHandler()
     await app.prepare()
-    if (!https) return createHttpServer((request, response) => handle(request, response)).listen(PORT)
+    if (!https) {
+        const server = createHttpServer((request, response) => handle(request, response))
+        if (LOCALHOST) server.listen(PORT, "127.0.0.1")
+        else server.listen(PORT)
+        return
+    }
     const key = await readFile(join(PEM_PATH, "privkey.pem"), "utf8")
     const cert = await readFile(join(PEM_PATH, "cert.pem"), "utf8")
     const ca = await readFile(join(PEM_PATH, "chain.pem"), "utf8")
-    createHttpsServer({ key, cert, ca }, (request, response) => handle(request, response)).listen(PORT)
+    const server = createHttpsServer({ key, cert, ca }, (request, response) => handle(request, response))
+    if (LOCALHOST) server.listen(PORT, "127.0.0.1")
+    else server.listen(PORT)
 }
 
 main()`
 
-export async function addNextScript() {
+export type AddNextScriptOptions = {
+    pemPath?: string
+    port?: string
+    core?: string
+    localhost?: boolean
+}
+
+export async function addNextScript({ pemPath, port, core, localhost }: AddNextScriptOptions = {}) {
     await addDependency({
         package: ["dotenv", "get-port-please"],
         type: "devDependencies"
@@ -69,9 +84,23 @@ export async function addNextScript() {
     try {
         env = await readFile(".env", "utf-8")
     } catch (error) {}
-    if (!/^PEM_PATH=/m.test(env)) env += '\nPEM_PATH=""'
-    if (!/^PORT=/m.test(env)) env += '\nPORT=""'
-    if (!/^CORE=/m.test(env)) env += '\nCORE=""'
+
+    // 添加证书目录
+    if (/^ *PEM_PATH=/m.test(env)) env = env.replace(/^ *PEM_PATH=.*$/m, `PEM_PATH="${pemPath ?? ""}"`)
+    else env += `\nPEM_PATH="${pemPath ?? ""}"`
+
+    // 添加端口号
+    if (/^ *PORT=/m.test(env)) env = env.replace(/^ *PORT=.*$/m, `PORT="${port ?? ""}"`)
+    else env += `\nPORT="${port ?? ""}"`
+
+    // 添加实例数
+    if (/^ *CORE=/m.test(env)) env = env.replace(/^ *CORE=.*$/m, `CORE="${core ?? ""}"`)
+    else env += `\nCORE="${core ?? ""}"`
+
+    // 添加是否只监听本地
+    if (/^ *LOCALHOST=/m.test(env)) env = env.replace(/^ *LOCALHOST=.*$/m, `LOCALHOST="${localhost ? "true" : "false"}"`)
+    else env += `\nLOCALHOST="${localhost ? "true" : "false"}"`
+
     await writeFile(".env", env, "utf-8")
     const packageJson = await readPackageJson()
     packageJson.scripts ??= {}
