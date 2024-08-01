@@ -209,6 +209,6 @@ program
         await actionWithBackup(() => upgradeRsbuild())()
     })
 
-program.command("add-next-script").alias("ans").description("添加 next 启动脚本").action(addNextScript)
+program.command("add-next-script").alias("ans").description("添加 next 启动脚本").action(actionWithBackup(addNextScript))
 
 program.parse()
