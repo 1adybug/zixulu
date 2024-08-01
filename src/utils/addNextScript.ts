@@ -1,17 +1,42 @@
 import consola from "consola"
-import { existsSync } from "fs"
-import { mkdir, writeFile } from "fs/promises"
+import { mkdir, readFile, writeFile } from "fs/promises"
 import { addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
+import { getCommitMessage } from "./getCommitMessage"
+import { CommitType } from "@src/constant"
 
-const script = `import { readFile } from "fs/promises"
+const script = `// @ts-check
+import { spawn } from "child_process"
+import { config } from "dotenv"
+import { readFile } from "fs/promises"
+import { cpus } from "os"
+
+config()
+
+async function main() {
+    let core = parseInt(process.env.CORE || "1")
+    if (!Number.isInteger(core)) core = 1
+    if (core < 1) core = 1
+    if (core > cpus().length) core = cpus().length
+    const packageJson = JSON.parse(await readFile("package.json", "utf-8"))
+
+    spawn(\`pm2 start scripts/server.mjs --name \${packageJson.name} -i \${core}\`, { shell: true, stdio: "inherit" })
+}
+
+main()`
+
+const script2 = `// @ts-check
+import { config } from "dotenv"
+import { readFile } from "fs/promises"
 import { checkPort } from "get-port-please"
 import { createServer as createHttpServer } from "http"
 import { createServer as createHttpsServer } from "https"
 import next from "next"
 import { join } from "path"
+
+config()
 
 async function main() {
     const PEM_PATH = process.env.PEM_PATH
@@ -32,18 +57,27 @@ main()`
 
 export async function addNextScript() {
     await addDependency({
-        package: ["cross-env", "get-port-please"],
+        package: ["dotenv", "get-port-please"],
         type: "devDependencies"
     })
     await mkdir("scripts", { recursive: true })
-    const existed = existsSync("scripts/start.js")
-    await writeFile(`scripts/start${existed ? "2" : ""}.js`, script, "utf-8")
-    consola.success(`已添加 scripts/start${existed ? "2" : ""}.js`)
+    await writeFile("scripts/start.mjs", script, "utf-8")
+    consola.success("已添加 scripts/start.js")
+    await writeFile("scripts/server.mjs", script2, "utf-8")
+    consola.success("已添加 scripts/server.js")
+    let env = ""
+    try {
+        env = await readFile(".env", "utf-8")
+    } catch (error) {}
+    if (/^PEM_PATH=/m.test(env)) env += '\nPEM_PATH=""'
+    if (/^PORT=/m.test(env)) env += '\nPORT=""'
+    if (/^CORE=/m.test(env)) env += '\nCORE=""'
+    await writeFile(".env", env, "utf-8")
     const packageJson = await readPackageJson()
     packageJson.scripts ??= {}
-    if (packageJson.scripts.start) packageJson.scripts.start2 = `cross-env pm2 start scripts/start${existed ? "2" : ""}.js --name ${packageJson.name} -i 1`
-    else packageJson.scripts.start = `cross-env PEM_PATH="" PORT="" pm2 start scripts/start${existed ? "2" : ""}.js --name ${packageJson.name} -i 1`
+    packageJson.scripts.start = "node scripts/start.mjs"
     await writePackageJson({ data: packageJson })
-    consola.success(`已添加启动命令 start${packageJson.scripts.start ? "2" : ""}`)
+    consola.success("已添加启动命令 start")
     await installDependceny()
+    return getCommitMessage(CommitType.feature, "添加启动命令")
 }
