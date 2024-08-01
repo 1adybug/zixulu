@@ -41,8 +41,8 @@ export async function addNextScript() {
     consola.success(`已添加 scripts/start${existed ? "2" : ""}.js`)
     const packageJson = await readPackageJson()
     packageJson.scripts ??= {}
-    if (packageJson.scripts.start) packageJson.scripts.start2 = `cross-env pm2 start scripts/start${existed ? "2" : ""}.js -i 1`
-    else packageJson.scripts.start = `cross-env PEM_PATH="" PORT="" pm2 start scripts/start${existed ? "2" : ""}.js -i 1`
+    if (packageJson.scripts.start) packageJson.scripts.start2 = `cross-env pm2 start scripts/start${existed ? "2" : ""}.js --name ${packageJson.name} -i 1`
+    else packageJson.scripts.start = `cross-env PEM_PATH="" PORT="" pm2 start scripts/start${existed ? "2" : ""}.js --name ${packageJson.name} -i 1`
     await writePackageJson({ data: packageJson })
     consola.success(`已添加启动命令 start${packageJson.scripts.start ? "2" : ""}`)
     await installDependceny()
