@@ -36,12 +36,13 @@ import { vite } from "@utils/vite"
 import { Command } from "commander"
 import { resolve } from "path"
 import { actionWithBackup } from "./utils/actionWithBackup"
+import { addNextScript } from "./utils/addNextScript"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
+import { replaceAssets } from "./utils/replaceAssets"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
-import { replaceAssets } from "./utils/replaceAssets"
 
 declare global {
     var __USE_PROXY__: boolean
@@ -207,5 +208,7 @@ program
         global.__USE_PROXY__ = !!proxy
         await actionWithBackup(() => upgradeRsbuild())()
     })
+
+program.command("add-next-script").alias("ans").description("添加 next 启动脚本").action(addNextScript)
 
 program.parse()
