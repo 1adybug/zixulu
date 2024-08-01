@@ -69,9 +69,9 @@ export async function addNextScript() {
     try {
         env = await readFile(".env", "utf-8")
     } catch (error) {}
-    if (/^PEM_PATH=/m.test(env)) env += '\nPEM_PATH=""'
-    if (/^PORT=/m.test(env)) env += '\nPORT=""'
-    if (/^CORE=/m.test(env)) env += '\nCORE=""'
+    if (!/^PEM_PATH=/m.test(env)) env += '\nPEM_PATH=""'
+    if (!/^PORT=/m.test(env)) env += '\nPORT=""'
+    if (!/^CORE=/m.test(env)) env += '\nCORE=""'
     await writeFile(".env", env, "utf-8")
     const packageJson = await readPackageJson()
     packageJson.scripts ??= {}
