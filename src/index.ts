@@ -39,6 +39,7 @@ import { actionWithBackup } from "./utils/actionWithBackup"
 import { addNextScript } from "./utils/addNextScript"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
+import { logArgs } from "./utils/logArgs"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { replaceAssets } from "./utils/replaceAssets"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
@@ -209,6 +210,6 @@ program
         await actionWithBackup(() => upgradeRsbuild())()
     })
 
-program.command("add-next-script").alias("ans").description("添加 next 启动脚本").action(actionWithBackup(addNextScript))
+program.command("add-next-script").alias("ans").option("-p, --port <port>", "端口地址").option("-c, --core <core>", "实例数").option("-l, --localhost", "是否只开启本地监听").option("-pem, --pemPath <pemPath>", "证书目录").description("添加 next 启动脚本").action(actionWithBackup(addNextScript))
 
 program.parse()
