@@ -22,6 +22,10 @@ export async function addDependency(config: AddDependenciesConfig): Promise<void
         const packageJson = await readPackageJson(dir)
         packageJson[type] ??= {}
         for (const name of packages) {
+            if (packageJson.dependencies?.[name] || packageJson.devDependencies?.[name] || packageJson.peerDependencies?.[name] || packageJson.optionalDependencies?.[name]) {
+                consola.warn(`${name} 已存在于依赖中`)
+                continue
+            }
             const version = await retry({
                 action: () => getPackageLatestVersion(name),
                 count: 4,
