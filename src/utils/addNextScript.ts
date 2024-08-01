@@ -1,6 +1,8 @@
+import consola from "consola"
+import { existsSync } from "fs"
 import { mkdir, writeFile } from "fs/promises"
 import { addDependency } from "./addDependency"
-import { existsSync } from "fs"
+import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
 
@@ -35,11 +37,13 @@ export async function addNextScript() {
     })
     await mkdir("scripts", { recursive: true })
     const existed = existsSync("scripts/start.js")
-    if (!existed) await writeFile("scripts/start.js", script, "utf-8")
-    else writeFile("scripts/start2.js", script, "utf-8")
+    await writeFile(`scripts/start${existed ? "2" : ""}.js`, script, "utf-8")
+    consola.success(`已添加 scripts/start${existed ? "2" : ""}.js`)
     const packageJson = await readPackageJson()
     packageJson.scripts ??= {}
     if (packageJson.scripts.start) packageJson.scripts.start2 = `cross-env PEM_PATH="" PORT="" node scripts/start${existed ? "2" : ""}.js`
     else packageJson.scripts.start = `cross-env PEM_PATH="" PORT="" node scripts/start${existed ? "2" : ""}.js`
     await writePackageJson({ data: packageJson })
+    consola.success(`已添加启动命令 start${existed ? "2" : ""}`)
+    await installDependceny()
 }
