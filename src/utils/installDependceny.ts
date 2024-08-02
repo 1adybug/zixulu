@@ -34,7 +34,7 @@ export async function installDependceny(config?: InstallDependcenyConfig): Promi
 
     manager ??= await getPackageManager(dir)
 
-    await spawnAsync(`${manager} install`, { shell: true, stdio: "inherit", cwd: dir })
+    await spawnAsync(`${manager} install${global.__ZIXULU_REGISTRY__ ? ` --registry ${global.__ZIXULU_REGISTRY__}` : ""}${global.__ZIXULU_PROXY__ ? ` --proxy http://localhost:7890 --https-proxy http://localhost:7890` : ""}`, { shell: true, stdio: "inherit", cwd: dir })
 
     return true
 }
