@@ -39,15 +39,11 @@ import { actionWithBackup } from "./utils/actionWithBackup"
 import { addNextScript } from "./utils/addNextScript"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
-import { logArgs } from "./utils/logArgs"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { replaceAssets } from "./utils/replaceAssets"
+import { setGlobal } from "./utils/setGlobal"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
-
-declare global {
-    var __USE_PROXY__: boolean
-}
 
 const program = new Command()
 
@@ -101,9 +97,10 @@ program
     .command("upgrade-dependency")
     .alias("ud")
     .description("升级项目依赖")
+    .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
     .option("-p, --proxy", "是否使用代理")
-    .action(async ({ proxy }) => {
-        global.__USE_PROXY__ = !!proxy
+    .action(async optios => {
+        setGlobal(optios)
         await actionWithBackup(() => upgradeDependency())()
     })
 
@@ -111,10 +108,11 @@ program
     .command("upgrade-workspace-dependency")
     .alias("uwd")
     .description("升级工作区项目依赖")
+    .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
     .option("-p, --proxy", "是否使用代理")
     .argument("[dir]", "项目目录", "packages")
-    .action(async (dir, { proxy }) => {
-        global.__USE_PROXY__ = !!proxy
+    .action(async (dir, options) => {
+        setGlobal(options)
         await upgradeWorkspaceDependceny(dir)
     })
 
@@ -178,7 +176,15 @@ program.command("tsc").description("类型检查").action(checkType)
 
 program.command("beta-version").alias("bv").description("设置版本号").action(betaVersion)
 
-program.command("reinstall").alias("ri").description("重新安装依赖").action(reinstall)
+program
+    .command("reinstall")
+    .alias("ri")
+    .description("重新安装依赖")
+    .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
+    .action(async options => {
+        setGlobal(options)
+        reinstall()
+    })
 
 program.command("snippet").alias("sn").description("生成 vscode snippet").argument("path", "文件路径").action(code2Snippet)
 
@@ -204,9 +210,10 @@ program
     .command("upgrade-rsbuild")
     .alias("ur")
     .description("升级 rsbuild")
+    .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
     .option("-p, --proxy", "是否使用代理")
-    .action(async ({ proxy }) => {
-        global.__USE_PROXY__ = !!proxy
+    .action(async options => {
+        setGlobal(options)
         await actionWithBackup(() => upgradeRsbuild())()
     })
 
