@@ -1,6 +1,6 @@
 import consola from "consola"
 import { createWriteStream } from "fs"
-import { readdir, readFile, stat, writeFile } from "fs/promises"
+import { mkdir, readdir, readFile, stat, writeFile } from "fs/promises"
 import { HttpsProxyAgent } from "https-proxy-agent"
 import md5 from "md5"
 import { Response } from "node-fetch"
@@ -18,6 +18,8 @@ export type ReplaceAssetsOptions = {
 
 export async function replaceAssets(options: ReplaceAssetsOptions) {
     const { base, dir, proxy } = options
+
+    await mkdir("assets", { recursive: true })
 
     const agent = proxy ? new HttpsProxyAgent("http://localhost:7890") : undefined
 
