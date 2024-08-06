@@ -4,14 +4,16 @@ import { addPostCSSConfig } from "./addPostCSSConfig"
 import { addPrettier } from "./addPrettier"
 import { addTailwindConfig } from "./addTailwindConfig"
 import { addTailwindToCss } from "./addTailwindToCss"
+import { removeTailwindCssPreflight } from "./removeTailwindCssPreset"
 
 /** 添加 tailwind */
 export async function tailwind() {
     consola.start("开始添加 tailwind 配置")
-    await addDependency({
+    const addedPackages = await addDependency({
         package: ["tailwindcss", "autoprefixer", "postcss", "prettier", "prettier-plugin-tailwindcss"],
         type: "devDependencies"
     })
+    await removeTailwindCssPreflight(addedPackages.tailwindcss)
     await addTailwindConfig()
     await addPostCSSConfig()
     await addTailwindToCss()

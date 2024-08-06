@@ -15,14 +15,20 @@ export type AddDependenciesConfig = {
 /**
  * 写入依赖
  */
-export async function addDependency(config: AddDependenciesConfig): Promise<void> {
+export async function addDependency(config: AddDependenciesConfig): Promise<Record<string, string>> {
     try {
         const packages = Array.isArray(config.package) ? config.package : [config.package]
         const { type = "dependencies", dir } = config
         const packageJson = await readPackageJson(dir)
         packageJson[type] ??= {}
+        const addedPackages: Record<string, string> = {}
         for (const name of packages) {
-            if (packageJson.dependencies?.[name] || packageJson.devDependencies?.[name] || packageJson.peerDependencies?.[name] || packageJson.optionalDependencies?.[name]) {
+            if (
+                packageJson.dependencies?.[name] ||
+                packageJson.devDependencies?.[name] ||
+                packageJson.peerDependencies?.[name] ||
+                packageJson.optionalDependencies?.[name]
+            ) {
                 consola.warn(`${name} 已存在于依赖中`)
                 continue
             }
@@ -31,6 +37,7 @@ export async function addDependency(config: AddDependenciesConfig): Promise<void
                 count: 4,
                 callback: (error, current) => consola.error(`获取 ${name} 版本失败，第 ${current} 次重试`)
             })
+            addedPackages[name] = version
             packageJson[type][name] ??= `^${version}`
             consola.success(`添加 ${name} 至依赖成功`)
         }
@@ -42,6 +49,7 @@ export async function addDependency(config: AddDependenciesConfig): Promise<void
         }
         packageJson[type] = sortedDependencies
         await writePackageJson({ data: packageJson, dir })
+        return addedPackages
     } catch (error) {
         consola.error(error)
         throw error
