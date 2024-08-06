@@ -1,6 +1,5 @@
 import consola from "consola"
 import { readFile } from "fs/promises"
-import { exit } from "process"
 import { getPackageJsonPath } from "./getPackageJsonPath"
 
 /**
@@ -14,7 +13,7 @@ export async function readPackageJson(dir?: string): Promise<Record<string, any>
         return result
     } catch (error) {
         consola.error(error)
-        consola.fail("读取 package.json 失败")
+        consola.fail(`读取 ${getPackageJsonPath(dir)} 失败`)
         throw new Error("读取 package.json 失败")
     }
 }

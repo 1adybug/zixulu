@@ -44,6 +44,7 @@ import { replaceAssets } from "./utils/replaceAssets"
 import { setGlobal } from "./utils/setGlobal"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
+import { removeTailwindCssPreflight } from "./utils/removeTailwindCssPreset"
 
 const program = new Command()
 
@@ -218,5 +219,7 @@ program
     })
 
 program.command("add-next-script").alias("ans").option("-p, --port <port>", "端口地址").option("-c, --core <core>", "实例数").option("-l, --localhost", "是否只开启本地监听").option("-pem, --pemPath <pemPath>", "证书目录").description("添加 next 启动脚本").action(actionWithBackup(addNextScript))
+
+program.command("removeTailwindCssPreflight").alias("rtp").description("删除 tailwindcss 的 preflight.css 中的 img 和 video 样式").action(actionWithBackup(() => removeTailwindCssPreflight()))
 
 program.parse()
