@@ -9,11 +9,17 @@ import { Readable } from "stream"
 import { isAsset } from "./isAsset"
 import { retry } from "./retry"
 
-const reg = /(https?:|href=")\/\/[a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+/gm
+function getReg() {
+    return /(https?:|href=")\/\/[a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+/gm
+}
 
-const reg2 = /((from|import) *?["'])([a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+\.js)(["'])/gm
+function getReg2() {
+    return /((from|import) *?["'])([a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+\.js)(["'])/gm
+}
 
 const reg3 = /(["'])([a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+\.js)(["'])/
+
+const reg4 = /[a-z0-9]{32}\.js/
 
 export type ReplaceAssetsOptions = {
     base: string
@@ -64,7 +70,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
                 downloadMap.set(url, url)
                 return url
             }
-            // consola.start(`download ${url}`)
+            consola.start(`download ${url}`)
             const { ext } = parse(new URL(url).pathname)
             let response: Response
             let filename: string
@@ -89,12 +95,13 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
             const url2 = base ? new URL(`/${filename}`, base).toString() : `/${filename}`
             // consola.success(`${url} -> ${url2}`)
             downloadMap.set(url, url2)
+            errors.delete(url)
             if (filename.endsWith(".js")) {
                 await replace(join("assets", filename), url)
             }
             return url2
         } catch (error) {
-            // consola.error(error)
+            consola.error(error)
             errors.add(url)
             throw error
         }
@@ -114,40 +121,21 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
             } catch (error) {}
             return url
         }
-        if (url.includes("274496f1")) {
-            console.log(url.startsWith("from"))
-            console.log(url.startsWith("import"))
-        }
         if (url.startsWith("from") || url.startsWith("import")) {
-            console.log("import的原始", url)
-            const a = await (async () => {
-                const match = url.match(reg3)
-                if (!match) {
-                    console.log("没匹配到", url)
+            const match = url.match(reg3)
+            if (!match) return url
+            let url2 = match[2].trim()
+            if (!url2.startsWith("http")) {
+                if (url2.startsWith("/")) url2 = new URL(url2, source).toString()
+                else if (url2.startsWith("./")) url2 = parse(source!).dir + url2.slice(1)
+                else if (url2.startsWith("../")) url2 = parse(parse(source!).dir).dir + url2.slice(2)
+                else {
                     return url
                 }
-                let url2 = match[2].trim()
-                console.log("import的链接", url2)
-                if (!url2.startsWith("http")) {
-                    if (url2.startsWith("/")) url2 = new URL(url2, source).toString()
-                    else if (url2.startsWith("./")) url2 = parse(source!).dir + url2.slice(1)
-                    else if (url2.startsWith("../")) url2 = parse(parse(source!).dir).dir + url2.slice(2)
-                    else {
-                        console.log("没匹配到", url)
-                        return url
-                    }
-                }
-                const replaceUrl = await retry(() => download(url2), 4)
-                console.log("replaceUrl", replaceUrl)
-                if (replaceUrl === url2) return url
-                return url.replace(reg3, `$1${replaceUrl.startsWith("/") ? "." : ""}${replaceUrl}$3`)
-            })()
-            console.log(url, a)
-            if (url.includes("p-274496f1.js")) {
-                console.log(a)
-                process.exit()
             }
-            return a
+            const replaceUrl = await retry(() => download(url2), 4)
+            if (replaceUrl === url2) return url
+            return url.replace(reg3, `$1${replaceUrl.startsWith("/") ? "." : ""}${replaceUrl}$3`)
         }
         try {
             const replaceUrl = await retry(() => download(url), 4)
@@ -158,50 +146,29 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
     }
 
     async function replace(input: string, source?: string) {
-        // consola.start(`scanning ${input.replace(/\\/g, "/")}`)
+        consola.start(`scanning ${input.replace(/\\/g, "/")}`)
         const status = await stat(input)
         if (status.isFile()) {
             const path = parse(input)
             if (path.ext === ".js" || path.ext === ".html" || path.ext === ".css" || path.ext === ".json") {
                 const data = await readFile(input, "utf-8")
-                const match = data.match(source ? reg2 : reg)
+                const match = data.match(source ? getReg2() : getReg())
                 if (!match) return
                 const urlsToReplace: string[] = []
                 let index = 0
                 for (const url of match) {
-                    if (source && url === `from"./p-274496f1.js"`) {
-                        for (let i = 0; i < 20; i++) {
-                            console.log("isAsset(url)", url, isAsset(url))
-                            
-                            console.log("reg2.test(url)", url, reg2.test(url))
-
-                            console.log(isAsset(url) || reg2.test(url))
-
-                            if (isAsset(url) || reg2.test(url)) {
-                                console.log("真")
-                            } else {
-                                console.log("假")
-                            }
-                        }
-                    }
-                    if (isAsset(url) || reg2.test(url)) {
+                    if (isAsset(url) || getReg2().test(url)) {
                         const url2 = await getReplaceUrl(url, source)
-                        if (source) console.log("替换了", url, url2)
                         urlsToReplace.push(url2)
                     } else {
-                        if (source) {
-                            console.log("被跳过了", url)
-                            console.log(url === `from"./p-274496f1.js"`)
-                            process.exit()
-                        }
                         urlsToReplace.push(url)
                     }
                 }
-                const newData = data.replace(source ? reg2 : reg, () => urlsToReplace[index++])
+                const newData = data.replace(source ? getReg2() : getReg(), () => urlsToReplace[index++])
                 if (source) {
-                    console.log(input)
-                    console.log(match)
-                    console.log(urlsToReplace)
+                    urlsToReplace.forEach(url => {
+                        if (!reg4.test(url)) console.log(url)
+                    })
                 }
                 await writeFile(input, newData, "utf-8")
             }
