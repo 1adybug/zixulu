@@ -29,13 +29,13 @@ main()
 `
 
 const script2 = `// @ts-check
+import cors from "cors"
 import { config } from "dotenv"
+import express from "express"
 import { readFile } from "fs/promises"
-import { checkPort } from "get-port-please"
 import { createServer as createHttpServer } from "http"
 import { createServer as createHttpsServer } from "https"
-import next from "next"
-import { join } from "path"
+import { join, resolve } from "path"
 
 config()
 
@@ -44,12 +44,19 @@ async function main() {
     const https = !!PEM_PATH
     const PORT = process.env.PORT ? Number(process.env.PORT) : https ? 443 : 80
     const LOCALHOST = process.env.LOCALHOST === "true"
-    if (!checkPort(PORT)) throw new Error(\`无效的端口号: \${PORT}\`)
-    const app = next({ experimentalHttpsServer: https })
-    const handle = app.getRequestHandler()
-    await app.prepare()
+
+    const app = express()
+
+    app.use(cors())
+
+    app.use("/", express.static("dist"))
+
+    app.get("/*", async (request, response) => {
+        response.sendFile(resolve("dist", "index.html"))
+    })
+
     if (!https) {
-        const server = createHttpServer((request, response) => handle(request, response))
+        const server = createHttpServer(app)
         if (LOCALHOST) server.listen(PORT, "127.0.0.1")
         else server.listen(PORT)
         return
@@ -57,7 +64,7 @@ async function main() {
     const key = await readFile(join(PEM_PATH, "privkey.pem"), "utf8")
     const cert = await readFile(join(PEM_PATH, "cert.pem"), "utf8")
     const ca = await readFile(join(PEM_PATH, "chain.pem"), "utf8")
-    const server = createHttpsServer({ key, cert, ca }, (request, response) => handle(request, response))
+    const server = createHttpsServer({ key, cert, ca }, app)
     if (LOCALHOST) server.listen(PORT, "127.0.0.1")
     else server.listen(PORT)
 }
@@ -65,16 +72,16 @@ async function main() {
 main()
 `
 
-export type AddNextScriptOptions = {
+export type AddExpressScriptOptions = {
     pemPath?: string
     port?: string
     core?: string
     localhost?: boolean
 }
 
-export async function addNextScript({ pemPath, port, core, localhost }: AddNextScriptOptions = {}) {
+export async function addExpressScript({ pemPath, port, core, localhost }: AddExpressScriptOptions = {}) {
     await addDependency({
-        package: ["dotenv", "get-port-please"],
+        package: ["cors", "dotenv", "express"],
         type: "devDependencies"
     })
     await mkdir("scripts", { recursive: true })
