@@ -40,11 +40,13 @@ import { addNextScript } from "./utils/addNextScript"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
+import { removeTailwindCssPreflight } from "./utils/removeTailwindCssPreset"
 import { replaceAssets } from "./utils/replaceAssets"
 import { setGlobal } from "./utils/setGlobal"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
-import { removeTailwindCssPreflight } from "./utils/removeTailwindCssPreset"
+import { addExpressScript } from "./utils/addExpressScript"
+import { getHeaders } from "./utils/getHeaders"
 
 const program = new Command()
 
@@ -203,9 +205,9 @@ program
     .command("asset")
     .description("替换文件中的资源地址")
     .argument("dir", "静态文件夹路径")
-    .argument("base", "资源地址 BaseUrl")
+    .option("-b, --base <base>", "资源地址 BaseUrl")
     .option("-p, --proxy", "是否使用代理")
-    .action((dir, base, { proxy }) => replaceAssets({ base, dir, proxy }))
+    .action((dir, { proxy, base }) => replaceAssets({ base, dir, proxy }))
 
 program
     .command("upgrade-rsbuild")
@@ -218,8 +220,32 @@ program
         await actionWithBackup(() => upgradeRsbuild())()
     })
 
-program.command("add-next-script").alias("ans").option("-p, --port <port>", "端口地址").option("-c, --core <core>", "实例数").option("-l, --localhost", "是否只开启本地监听").option("-pem, --pemPath <pemPath>", "证书目录").description("添加 next 启动脚本").action(actionWithBackup(addNextScript))
+program
+    .command("add-express-script")
+    .alias("aes")
+    .option("-p, --port <port>", "端口地址")
+    .option("-c, --core <core>", "实例数")
+    .option("-l, --localhost", "是否只开启本地监听")
+    .option("-pem, --pemPath <pemPath>", "证书目录")
+    .description("添加 express 启动脚本")
+    .action(actionWithBackup(addExpressScript))
 
-program.command("removeTailwindCssPreflight").alias("rtp").description("删除 tailwindcss 的 preflight.css 中的 img 和 video 样式").action(actionWithBackup(() => removeTailwindCssPreflight()))
+program
+    .command("add-next-script")
+    .alias("ans")
+    .option("-p, --port <port>", "端口地址")
+    .option("-c, --core <core>", "实例数")
+    .option("-l, --localhost", "是否只开启本地监听")
+    .option("-pem, --pemPath <pemPath>", "证书目录")
+    .description("添加 next 启动脚本")
+    .action(actionWithBackup(addNextScript))
+
+program
+    .command("removeTailwindCssPreflight")
+    .alias("rtp")
+    .description("删除 tailwindcss 的 preflight.css 中的 img 和 video 样式")
+    .action(actionWithBackup(() => removeTailwindCssPreflight()))
+
+program.command("headers").description("将浏览器中直接复制的 headers 转换为对象").action(getHeaders)
 
 program.parse()
