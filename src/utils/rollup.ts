@@ -3,8 +3,10 @@ import { writeFile } from "fs/promises"
 import { addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
-import { Module, ModuleResolution, setTsConfig, Target } from "./setTsConfig"
+import { readTsConfig } from "./readTsConfig"
+import { Module, ModuleResolution, Target } from "./setTsConfig"
 import { writePackageJson } from "./writePackageJson"
+import { writeTsConfig } from "./writeTsConfig"
 
 const rollupConfig = `import commonjs from "@rollup/plugin-commonjs"
 import json from "@rollup/plugin-json"
@@ -18,7 +20,8 @@ const config: RollupOptions = {
         file: "dist/index.js",
         format: "cjs"
     },
-    plugins: [typescript(), resolve(), commonjs(), json()]
+    plugins: [typescript(), resolve(), commonjs(), json()],
+    external: ["@resvg/resvg-js", "@types/cors", "@types/express", "@types/node", "cors", "dotenv", "express", "get-port-please", "next", "react", "react-dom", "soda-nodejs"]
 }
 
 export default config
@@ -48,9 +51,14 @@ export async function rollup() {
     await writeFile("rollup.config.ts", rollupConfig, "utf-8")
 
     if (existsSync("tsconfig.json")) {
-        await setTsConfig("target", Target.ESNext)
-        await setTsConfig("module", Module.ESNext)
-        await setTsConfig("moduleResolution", ModuleResolution.Bundler)
+        const tsconfig = await readTsConfig()
+        tsconfig.compilerOptions ??= {}
+        tsconfig.compilerOptions.target = Target.ESNext
+        tsconfig.compilerOptions.module = Module.ESNext
+        tsconfig.compilerOptions.moduleResolution = ModuleResolution.Bundler
+        tsconfig.compilerOptions.strict = true
+        tsconfig.compilerOptions.skipLibCheck = true
+        await writeTsConfig({ data: tsconfig })
     } else {
         await writeFile("tsconfig.json", tsconfig, "utf-8")
     }
