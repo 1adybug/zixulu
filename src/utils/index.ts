@@ -19,7 +19,7 @@ export const prettierConfig: Config = {
     semi: false,
     tabWidth: 4,
     arrowParens: "avoid",
-    printWidth: 800,
+    printWidth: 160,
     trailingComma: "none"
 }
 

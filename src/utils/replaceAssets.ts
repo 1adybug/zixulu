@@ -22,17 +22,16 @@ const reg3 = /(["'])([a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+\.js)(["'])/
 const reg4 = /[a-z0-9]{32}\.js/
 
 export type ReplaceAssetsOptions = {
-    base: string
-    dir: string
+    base?: string
+    input: string
+    output?: string
     proxy?: boolean
 }
 
 export async function replaceAssets(options: ReplaceAssetsOptions) {
-    const { base, dir, proxy } = options
+    const { base, input, output = "assets", proxy } = options
 
-    if (base) new URL(base)
-
-    await mkdir("assets", { recursive: true })
+    await mkdir(output, { recursive: true })
 
     const agent = new HttpsProxyAgent("http://localhost:7890")
 
@@ -66,10 +65,6 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
     async function download(url: string) {
         try {
             if (downloadMap.has(url)) return downloadMap.get(url)!
-            if (url.startsWith(base) || new URL(url).hostname === "private-alipayobjects.alipay.com") {
-                downloadMap.set(url, url)
-                return url
-            }
             consola.start(`download ${url}`)
             const { ext } = parse(new URL(url).pathname)
             let response: Response
@@ -83,21 +78,21 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
                 })
                 filename = `${md5(url)}.${response.headers.get("content-type")?.split("/")[1].split("+")[0]}`
             }
-            const dir = await readdir("assets")
+            const dir = await readdir(output)
             if (!dir.includes(filename)) {
                 response ??= await fetch(url, {
                     agent: proxy ? agent : undefined,
                     headers
                 })
-                const file = createWriteStream(join("assets", filename))
+                const file = createWriteStream(join(output, filename))
                 await new Promise((resolve, reject) => Readable.from(response.body!).pipe(file).on("finish", resolve).on("error", reject))
             }
-            const url2 = base ? new URL(`/${filename}`, base).toString() : `/${filename}`
+            const url2 = `${base ? (base.endsWith("/") ? base.slice(0, -1) : base) : ""}/${filename}`
             // consola.success(`${url} -> ${url2}`)
             downloadMap.set(url, url2)
             errors.delete(url)
             if (filename.endsWith(".js")) {
-                await replace(join("assets", filename), url)
+                await replace(join(output, filename), url)
             }
             return url2
         } catch (error) {
@@ -182,7 +177,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
         }
     }
 
-    await replace(dir)
+    await replace(input)
 
     errors.forEach(url => consola.error(url))
 }

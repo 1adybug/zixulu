@@ -36,17 +36,16 @@ import { vite } from "@utils/vite"
 import { Command } from "commander"
 import { resolve } from "path"
 import { actionWithBackup } from "./utils/actionWithBackup"
-import { addNextScript } from "./utils/addNextScript"
+import { addStartScript } from "./utils/addStartScript"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
+import { getHeaders } from "./utils/getHeaders"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { removeTailwindCssPreflight } from "./utils/removeTailwindCssPreset"
 import { replaceAssets } from "./utils/replaceAssets"
 import { setGlobal } from "./utils/setGlobal"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
-import { addExpressScript } from "./utils/addExpressScript"
-import { getHeaders } from "./utils/getHeaders"
 
 const program = new Command()
 
@@ -204,10 +203,11 @@ program.command("browserlistrc").alias("blr").description("添加 browserlistrc 
 program
     .command("asset")
     .description("替换文件中的资源地址")
-    .argument("dir", "静态文件夹路径")
+    .argument("input", "静态文件夹路径")
     .option("-b, --base <base>", "资源地址 BaseUrl")
+    .option("-o, --output <output>", "输出文件夹")
     .option("-p, --proxy", "是否使用代理")
-    .action((dir, { proxy, base }) => replaceAssets({ base, dir, proxy }))
+    .action((input, { proxy, base, output }) => replaceAssets({ base, input, proxy, output }))
 
 program
     .command("upgrade-rsbuild")
@@ -221,24 +221,15 @@ program
     })
 
 program
-    .command("add-express-script")
-    .alias("aes")
+    .command("add-start-script")
+    .alias("ass")
+    .argument("type", "启动脚本类型：express、next")
     .option("-p, --port <port>", "端口地址")
     .option("-c, --core <core>", "实例数")
-    .option("-l, --localhost", "是否只开启本地监听")
+    .option("-h, --hostname <hostname>", "主机名")
     .option("-pem, --pemPath <pemPath>", "证书目录")
     .description("添加 express 启动脚本")
-    .action(actionWithBackup(addExpressScript))
-
-program
-    .command("add-next-script")
-    .alias("ans")
-    .option("-p, --port <port>", "端口地址")
-    .option("-c, --core <core>", "实例数")
-    .option("-l, --localhost", "是否只开启本地监听")
-    .option("-pem, --pemPath <pemPath>", "证书目录")
-    .description("添加 next 启动脚本")
-    .action(actionWithBackup(addNextScript))
+    .action(async (type, { port, core, pemPath }) => actionWithBackup(addStartScript)({ type, port, core, pemPath }))
 
 program
     .command("removeTailwindCssPreflight")
