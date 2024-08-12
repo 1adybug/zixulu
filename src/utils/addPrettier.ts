@@ -7,7 +7,7 @@ export const prettierConfigText = `module.exports = {
     semi: false,
     tabWidth: 4,
     arrowParens: "avoid",
-    printWidth: 800,
+    printWidth: 160,
     trailingComma: "none"
 }
 `
@@ -17,7 +17,7 @@ export const prettierConfigTextWithTailwind = `module.exports = {
     semi: false,
     tabWidth: 4,
     arrowParens: "avoid",
-    printWidth: 800,
+    printWidth: 160,
     trailingComma: "none"
 }
 `
