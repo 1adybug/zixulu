@@ -170,7 +170,10 @@ export async function downloadFromWinget({ name, id, dir, filter }: WingetDownlo
         }
         return 0
     })
-    const response2 = await fetch(`https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/${firstLetter}/${path}/${stables[0].name}/${id}.installer.yaml`, { agent })
+    const response2 = await fetch(
+        `https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/${firstLetter}/${path}/${stables[0].name}/${id}.installer.yaml`,
+        { agent }
+    )
     const yaml = await response2.text()
     const pkg: Winget.Package = YAML.parse(yaml)
 
@@ -276,7 +279,8 @@ export async function downloadGeekUninstaller(dir: string) {
 }
 
 export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
-    const response = await fetch(`https://marketplace.visualstudio.com/items?itemName=${ext}`)
+    const { default: fetch } = await import("node-fetch")
+    const response = await fetch(`https://marketplace.visualstudio.com/items?itemName=${ext}`, { agent })
     const html = await response.text()
     const reg = /^(.+?)\.(.+?)$/
     const [, author, name] = ext.match(reg)!
