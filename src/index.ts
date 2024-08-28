@@ -37,11 +37,12 @@ import { Command } from "commander"
 import { resolve } from "path"
 import { actionWithBackup } from "./utils/actionWithBackup"
 import { addStartScript } from "./utils/addStartScript"
+import { addZipDist } from "./utils/addZipDist"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
-import { removeTailwindCssPreflight } from "./utils/removeTailwindCssPreset"
+
 import { replaceAssets } from "./utils/replaceAssets"
 import { setGlobal } from "./utils/setGlobal"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
@@ -231,12 +232,12 @@ program
     .description("添加 express 启动脚本")
     .action(async (type, { port, core, pemPath }) => actionWithBackup(addStartScript)({ type, port, core, pemPath }))
 
-program
-    .command("removeTailwindCssPreflight")
-    .alias("rtp")
-    .description("删除 tailwindcss 的 preflight.css 中的 img 和 video 样式")
-    .action(actionWithBackup(() => removeTailwindCssPreflight()))
-
 program.command("headers").description("将浏览器中直接复制的 headers 转换为对象").action(getHeaders)
+
+program
+    .command("add-zip-dist")
+    .alias("azd")
+    .description("添加将 dist 压缩的脚本")
+    .action(actionWithBackup(() => addZipDist({ install: true })))
 
 program.parse()

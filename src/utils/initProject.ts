@@ -15,6 +15,7 @@ import { removeESLint } from "./removeESLint"
 import { rsbuild } from "./rsbuild"
 import { setTsConfig } from "./setTsConfig"
 import { vite } from "./vite"
+import { addZipDist } from "./addZipDist"
 
 export async function initProject() {
     consola.start("开始初始化项目")
@@ -26,10 +27,6 @@ export async function initProject() {
         consola.error("仅支持 React 项目")
         return
     }
-    await addDependency({
-        package: ["@types/node"],
-        type: "devDependencies"
-    })
     let type: ProjectType
     if (allDependcies.some(item => item === "next")) {
         type = ProjectType.next
@@ -44,6 +41,11 @@ export async function initProject() {
         return
     }
     await addGitignore()
+    await addDependency({
+        package: ["@types/node"],
+        type: "devDependencies"
+    })
+    await addZipDist({ install: false })
     const manager = await getPackageManager()
     if (allDependcies.some(item => item.includes("eslint"))) {
         const { removeEslintConfig } = await inquirer.prompt({
@@ -55,7 +57,9 @@ export async function initProject() {
         if (removeEslintConfig) await removeESLint()
     }
     const isFullStack = type === ProjectType.next || type === ProjectType.remix
-    const choices = isFullStack ? ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod", "@emotion/css", "stable-hash"] : ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "@emotion/css", "react-router-dom", "stable-hash"]
+    const choices = isFullStack
+        ? ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod", "@emotion/css", "stable-hash"]
+        : ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "@emotion/css", "react-router-dom", "stable-hash"]
 
     const { modules } = await inquirer.prompt({
         type: "checkbox",
