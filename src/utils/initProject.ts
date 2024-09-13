@@ -45,7 +45,6 @@ export async function initProject() {
         package: ["@types/node"],
         type: "devDependencies"
     })
-    await addZipDist({ install: false })
     const manager = await getPackageManager()
     if (allDependcies.some(item => item.includes("eslint"))) {
         const { removeEslintConfig } = await inquirer.prompt({
