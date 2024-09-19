@@ -46,6 +46,7 @@ import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { replaceAssets } from "./utils/replaceAssets"
 import { setGlobal } from "./utils/setGlobal"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
+import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 
 const program = new Command()
@@ -239,5 +240,16 @@ program
     .alias("azd")
     .description("添加将 dist 压缩的脚本")
     .action(actionWithBackup(() => addZipDist({ install: true })))
+
+program
+    .command("upgrade-tailwind")
+    .alias("ut")
+    .description("升级 tailwind")
+    .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
+    .option("-p, --proxy", "是否使用代理")
+    .action(async options => {
+        setGlobal(options)
+        await actionWithBackup(() => upgradeTailwind())()
+    })
 
 program.parse()
