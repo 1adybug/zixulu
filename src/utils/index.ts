@@ -19,7 +19,7 @@ export const prettierConfig: Config = {
     semi: false,
     tabWidth: 4,
     arrowParens: "avoid",
-    printWidth: 160
+    printWidth: 160,
 }
 
 export function getFilename(headers: Headers | NodeFetchHeaders) {
@@ -45,7 +45,7 @@ export async function downloadVscode(dir: string) {
         name: "VSCode",
         id: "Microsoft.VisualStudioCode",
         dir,
-        filter: item => item.Architecture === "x64" && item.Scope === "machine"
+        filter: item => item.Architecture === "x64" && item.Scope === "machine",
     })
 }
 
@@ -220,7 +220,7 @@ export async function downloadChrome(dir: string) {
         name: "Chrome",
         id: "Google.Chrome",
         dir,
-        filter: item => item.Architecture === "x64"
+        filter: item => item.Architecture === "x64",
     })
 }
 
@@ -229,7 +229,7 @@ export async function downloadNodeJS(dir: string) {
         name: "NodeJS",
         id: "OpenJS.NodeJS.LTS",
         dir,
-        filter: item => item.Architecture === "x64"
+        filter: item => item.Architecture === "x64",
     })
 }
 
@@ -238,7 +238,7 @@ export async function download7Zip(dir: string) {
         name: "7Zip",
         id: "7zip.7zip",
         dir,
-        filter: item => item.Architecture === "x64" && item.InstallerType === "exe"
+        filter: item => item.Architecture === "x64" && item.InstallerType === "exe",
     })
 }
 
@@ -247,7 +247,7 @@ export async function downloadGit(dir: string) {
         name: "Git",
         id: "Git.Git",
         dir,
-        filter: item => item.Architecture === "x64" && item.Scope === "machine"
+        filter: item => item.Architecture === "x64" && item.Scope === "machine",
     })
 }
 
@@ -268,7 +268,7 @@ export async function downloadGeekUninstaller(dir: string) {
     await download(`https://geekuninstaller.com/geek.zip`, dir)
     await unzip({
         input: join(dir, "geek.zip"),
-        output: dir
+        output: dir,
     })
     await rm(join(dir, "geek.zip"), { force: true })
     const response = await fetch("https://geekuninstaller.com/download")
@@ -283,10 +283,26 @@ export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
     const html = await response.text()
     const reg = /^(.+?)\.(.+?)$/
     const [, author, name] = ext.match(reg)!
-    const reg2 = /"Version":"(.+?)"/
-    const version = html.match(reg2)![1]
-    const reg3 = /<span class="ux-item-name">(.+?)<\/span>/
-    const displayName = html.match(reg3)![1]
+    let version: string
+    if (ext === "ms-ceintl.vscode-language-pack-zh-hans") {
+        const reg2 = /"Versions"\:(\[\{".+?\])/
+        const versions = JSON.parse(html.match(reg2)![1]) as { version: string }[]
+        const output = await execAsync("code --version")
+        const codeVersions = output.split("\n")[0].split(".").map(Number)
+        const item =
+            versions.find(({ version }) =>
+                version
+                    .split(".")
+                    .map(Number)
+                    .every((item, index) => index >= 2 || item <= codeVersions[index])
+            ) ?? versions[0]
+        version = item.version
+    } else {
+        const reg2 = /"Version":"(.+?)"/
+        version = html.match(reg2)![1]
+    }
+    const reg4 = /<span class="ux-item-name">(.+?)<\/span>/
+    const displayName = html.match(reg4)![1]
     const url = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${author}/vsextensions/${name}/${version}/vspackage`
     return { id: ext, name: displayName, version, url }
     // await download(url, dir, `${ext}-${version}.vsix`)
@@ -317,7 +333,7 @@ export async function downloadVscodeExts(dir: string) {
         name: "exts",
         message: "选择需要下载的扩展",
         choices: exts.map(ext => ({ name: ext.name, value: ext.id })),
-        default: vscodeExts?.filter(ext => exts.some(item => item.id === ext)) || exts.map(ext => ext.id)
+        default: vscodeExts?.filter(ext => exts.some(item => item.id === ext)) || exts.map(ext => ext.id),
     })
     setting.vscodeExts = exts2.exts
     await setSetting(setting)
