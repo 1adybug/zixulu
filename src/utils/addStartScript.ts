@@ -33,16 +33,16 @@ import compression from "compression"
 import cors from "cors"
 import { config } from "dotenv"
 import express from "express"
-import { readFile } from "fs/promises"
+import { readFileSync } from "fs"
 import { createServer as createHttpServer } from "http"
 import { createServer as createHttpsServer } from "https"
-import { join, resolve } from "path"
-import { readFile } from "fs/promises"
 import morgan from "morgan"
+import { join, resolve } from "path"
 
 config()
 
-export async function createServer(app) {
+function createServer() {
+    const app = express()
     app.disable("x-powered-by")
     app.use(compression())
     app.use(cors())
@@ -51,67 +51,53 @@ export async function createServer(app) {
     const PEM_PATH = process.env.PEM_PATH
     const HTTPS = !!PEM_PATH
     const PORT = process.env.PORT ? Number(process.env.PORT) : HTTPS ? 443 : 80
-    const HOSTNAME = process.env.HOSTNAME
+    const HOSTNAME = process.env.HOSTNAME?.trim() || undefined
 
-    if (!HTTPS) return createHttpServer(app).listen(PORT, HOSTNAME)
+    if (!HTTPS) {
+        createHttpServer(app).listen(PORT, HOSTNAME)
+    } else {
+        const key = readFileSync(join(PEM_PATH, "privkey.pem"), "utf8")
+        const cert = readFileSync(join(PEM_PATH, "cert.pem"), "utf8")
+        const ca = readFileSync(join(PEM_PATH, "chain.pem"), "utf8")
+        createHttpsServer({ key, cert, ca }, app).listen(PORT, HOSTNAME)
+    }
 
-    const key = await readFile(join(PEM_PATH, "privkey.pem"), "utf8")
-    const cert = await readFile(join(PEM_PATH, "cert.pem"), "utf8")
-    const ca = await readFile(join(PEM_PATH, "chain.pem"), "utf8")
-
-    createHttpsServer({ key, cert, ca }, app).listen(PORT, HOSTNAME)
+    return app
 }
 
-
 async function main() {
-    const PEM_PATH = process.env.PEM_PATH
-    const https = !!PEM_PATH
-    const PORT = process.env.PORT ? Number(process.env.PORT) : https ? 443 : 80
-    const HOSTNAME = process.env.HOSTNAME
     const ROOT = process.env.ROOT || "dist"
     if (!!process.env.BASE && !process.env.BASE.startsWith("/")) throw new Error("BASE 必须以 / 开头")
     const BASE = process.env.BASE || "/"
 
-    const app = express()
+    const server = createServer()
 
-    app.use(cors())
+    server.use(\`\${BASE.replace(/\\/+$/, "")}/\`, express.static(ROOT))
 
-    app.use(\`\${BASE.replace(/\\/+$/, "")}/\`, express.static(ROOT))
+    server.get(\`\${BASE.replace(/\\/+$/, "")}/*\`, async (request, response) => response.sendFile(resolve(ROOT, "index.html")))
 
-    app.get(\`\${BASE.replace(/\\/+$/, "")}/*\`, async (request, response) => response.sendFile(resolve(ROOT, "index.html")))
-
-    if (BASE !== "/") app.get("/", async (request, response) => response.redirect(BASE))
-
-    if (!https) return createHttpServer(app).listen(PORT, HOSTNAME)
-
-    const key = await readFile(join(PEM_PATH, "privkey.pem"), "utf8")
-    const cert = await readFile(join(PEM_PATH, "cert.pem"), "utf8")
-    const ca = await readFile(join(PEM_PATH, "chain.pem"), "utf8")
-    createHttpsServer({ key, cert, ca }, app).listen(PORT, HOSTNAME)
+    if (BASE !== "/") server.get("/", async (request, response) => response.redirect(BASE))
 }
 
 main()
 `
 
 const nextScript = `// @ts-check
-import { config } from "dotenv"
-import { readFile } from "fs/promises"
-import { checkPort } from "get-port-please"
-import { createServer as createHttpServer } from "http"
-import { createServer as createHttpsServer } from "https"
-import next from "next"
-import { join } from "path"
 import compression from "compression"
 import cors from "cors"
+import { config } from "dotenv"
 import express from "express"
-
-
+import { readFileSync } from "fs"
+import { createServer as createHttpServer } from "http"
+import { createServer as createHttpsServer } from "https"
 import morgan from "morgan"
+import next from "next"
+import { join } from "path"
 
 config()
 
-
-export async function createServer(app: Express) {
+function createServer() {
+    const app = express()
     app.disable("x-powered-by")
     app.use(compression())
     app.use(cors())
@@ -120,35 +106,30 @@ export async function createServer(app: Express) {
     const PEM_PATH = process.env.PEM_PATH
     const HTTPS = !!PEM_PATH
     const PORT = process.env.PORT ? Number(process.env.PORT) : HTTPS ? 443 : 80
-    const HOSTNAME = process.env.HOSTNAME
+    const HOSTNAME = process.env.HOSTNAME?.trim() || undefined
 
-    if (!HTTPS) return createHttpServer(app).listen(PORT, HOSTNAME)
+    if (!HTTPS) {
+        createHttpServer(app).listen(PORT, HOSTNAME)
+    } else {
+        const key = readFileSync(join(PEM_PATH, "privkey.pem"), "utf8")
+        const cert = readFileSync(join(PEM_PATH, "cert.pem"), "utf8")
+        const ca = readFileSync(join(PEM_PATH, "chain.pem"), "utf8")
+        createHttpsServer({ key, cert, ca }, app).listen(PORT, HOSTNAME)
+    }
 
-    const key = await readFile(join(PEM_PATH, "privkey.pem"), "utf8")
-    const cert = await readFile(join(PEM_PATH, "cert.pem"), "utf8")
-    const ca = await readFile(join(PEM_PATH, "chain.pem"), "utf8")
-
-    createHttpsServer({ key, cert, ca }, app).listen(PORT, HOSTNAME)
+    return app
 }
 
 async function main() {
     const PEM_PATH = process.env.PEM_PATH
     const HTTPS = !!PEM_PATH
-    const PORT = process.env.PORT ? Number(process.env.PORT) : HTTPS ? 443 : 80
-    const HOSTNAME = process.env.HOSTNAME
-    if (!checkPort(PORT)) throw new Error(\`无效的端口号: \${PORT}\`)
-    
+
     const app = next({ experimentalHttpsServer: HTTPS })
     const handle = app.getRequestHandler()
     await app.prepare()
 
-    if (!HTTPS) return createHttpServer((request, response) => handle(request, response)).listen(PORT, HOSTNAME)
-
-    const key = await readFile(join(PEM_PATH, "privkey.pem"), "utf8")
-    const cert = await readFile(join(PEM_PATH, "cert.pem"), "utf8")
-    const ca = await readFile(join(PEM_PATH, "chain.pem"), "utf8")
-
-    createHttpsServer({ key, cert, ca }, (request, response) => handle(request, response)).listen(PORT, HOSTNAME)
+    const server = createServer()
+    server.all("*", (request, response) => handle(request, response))
 }
 
 main()
@@ -156,7 +137,7 @@ main()
 
 const scripts = {
     express: expressScript,
-    next: nextScript
+    next: nextScript,
 }
 
 export type AddStartScriptOptions = {
@@ -169,8 +150,8 @@ export type AddStartScriptOptions = {
 
 export async function addStartScript({ type, pemPath, port, core, hostname }: AddStartScriptOptions) {
     await addDependency({
-        package: ["cors", "dotenv", "express", "get-port-please"],
-        type: "devDependencies"
+        package: ["@types/compression", "@types/cors", "@types/express", "@types/morgan", "@types/node", "compression", "cors", "dotenv", "express", "morgan"],
+        type: "devDependencies",
     })
     await mkdir("scripts", { recursive: true })
     await writeFile("scripts/start.mjs", script, "utf-8")
