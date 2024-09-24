@@ -1,5 +1,6 @@
 import { PackageManager } from "@src/constant"
 import { readdir, writeFile } from "fs/promises"
+import { join } from "path"
 
 /**
  * 获取包管理器
@@ -14,10 +15,10 @@ export async function getPackageManager(dir = "."): Promise<PackageManager> {
         type: "list",
         name: "manager",
         message: "请选择包管理器",
-        choices: ["yarn", "npm", "pnpm"]
+        choices: ["yarn", "npm", "pnpm"],
     })
-    if (manager === "yarn") await writeFile("yarn.lock", "")
-    if (manager === "npm") await writeFile("package-lock.json", "")
-    if (manager === "pnpm") await writeFile("pnpm-lock.yaml", "")
+    if (manager === "yarn") await writeFile(join(dir, "yarn.lock"), "")
+    if (manager === "npm") await writeFile(join(dir, "package-lock.json"), "")
+    if (manager === "pnpm") await writeFile(join(dir, "pnpm-lock.yaml"), "")
     return manager
 }

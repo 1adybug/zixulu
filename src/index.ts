@@ -42,7 +42,6 @@ import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
-
 import { replaceAssets } from "./utils/replaceAssets"
 import { setGlobal } from "./utils/setGlobal"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
@@ -162,7 +161,7 @@ program.command("npm-download").alias("nd").description("下载 npm 包").argume
 program
     .command("prisma")
     .description("添加 prisma 配置")
-    .action(actionWithBackup(addPrisma, getCommitMessage(CommitType.feature, "添加 prisma 配置")))
+    .action(actionWithBackup(() => addPrisma(), getCommitMessage(CommitType.feature, "添加 prisma 配置")))
 
 program.command("prisma-generate").alias("pg").description("生成 prisma client").action(generatePrisma)
 
