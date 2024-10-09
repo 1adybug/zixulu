@@ -5,6 +5,6 @@ export async function downloadHoneyview(dir: string) {
         name: "Honeyview",
         id: "Bandisoft.Honeyview",
         dir,
-        filter: item => item.InstallerLocale === "en-US"
+        filter: item => item.InstallerLocale === "en-US",
     })
 }

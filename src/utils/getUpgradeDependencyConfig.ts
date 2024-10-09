@@ -12,7 +12,9 @@ export type UpgradeDependencyConfig = {
 /**
  * 获取升级配置
  */
-export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependencyConfig = keyof UpgradeDependencyConfig>(...keys: T[]): Promise<Pick<UpgradeDependencyConfig, T>> {
+export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependencyConfig = keyof UpgradeDependencyConfig>(
+    ...keys: T[]
+): Promise<Pick<UpgradeDependencyConfig, T>> {
     const ks = keys.length === 0 ? ["dir", "types", "level"] : keys
     const { default: inquirer } = await import("inquirer")
 
@@ -23,7 +25,7 @@ export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependen
             type: "input",
             name: "dir2",
             message: "请输入升级的目录",
-            default: "."
+            default: ".",
         })
 
     if (ks.includes("types"))
@@ -32,7 +34,7 @@ export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependen
             name: "types",
             message: "请选择要升级的依赖类型",
             choices: ["dependencies", "devDependencies"],
-            default: ["dependencies", "devDependencies"]
+            default: ["dependencies", "devDependencies"],
         })
 
     if (ks.includes("level"))
@@ -41,7 +43,7 @@ export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependen
             name: "level",
             message: "请选择升级的级别",
             choices: ["major", "minor", "patch"],
-            default: "minor"
+            default: "minor",
         })
 
     const config = await inquirer.prompt<UpgradeDependencyConfig>(questions)

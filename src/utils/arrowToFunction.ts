@@ -18,13 +18,13 @@ export async function arrowToFunction() {
     const { default: inquirer } = await import("inquirer")
     const files = await getFiles({
         dir: "src",
-        match: (path, stats) => path.ext === ".tsx" && stats.isFile()
+        match: (path, stats) => path.ext === ".tsx" && stats.isFile(),
     })
     const reg = /^(export )?const \w+?: FC.+?$/gm
     const { auto } = await inquirer.prompt({
         type: "confirm",
         name: "auto",
-        message: "是否自动选择要转换的组件"
+        message: "是否自动选择要转换的组件",
     })
 
     const warnFiles: Set<string> = new Set()
@@ -104,7 +104,7 @@ export async function arrowToFunction() {
                 type: "checkbox",
                 name: "indexs",
                 message: `total ${choices.length} component${choices.length > 1 ? "s" : ""}`,
-                choices
+                choices,
             })
 
             let index = 0

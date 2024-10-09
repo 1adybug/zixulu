@@ -30,7 +30,7 @@ export async function downloadNpm(name: string) {
     await zip({
         input: name,
         output: file,
-        cwd: join(folder, "node_modules")
+        cwd: join(folder, "node_modules"),
     })
     await rename(join(folder, "node_modules", file), join(file))
     await rm(folder, { recursive: true })

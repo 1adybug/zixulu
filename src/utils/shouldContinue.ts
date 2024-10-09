@@ -8,7 +8,7 @@ export async function shouldContinue(message = "是否继续"): Promise<boolean>
     const { continue: cont } = await inquirer.prompt({
         type: "confirm",
         name: "continue",
-        message
+        message,
     })
     return cont
 }

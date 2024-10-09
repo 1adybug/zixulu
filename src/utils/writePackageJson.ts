@@ -1,5 +1,4 @@
 import consola from "consola"
-import { exit } from "process"
 import { getPackageJsonPath } from "./getPackageJsonPath"
 import { writeJson } from "./writeJson"
 

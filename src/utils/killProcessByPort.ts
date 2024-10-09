@@ -1,6 +1,5 @@
 import { exec } from "child_process"
 import consola from "consola"
-import { exit } from "process"
 import { getPidInfoFromPort, getProcessInfoFromPid } from "."
 
 export async function killProcessByPort(port: string | number) {
@@ -25,7 +24,7 @@ export async function killProcessByPort(port: string | number) {
         name: "chosenPids",
         message: "请选择要结束的进程",
         choices,
-        default: choices.map(choice => choice.value)
+        default: choices.map(choice => choice.value),
     })
     for (const pid of chosenPids) {
         exec(`taskkill /f /pid ${pid}`)

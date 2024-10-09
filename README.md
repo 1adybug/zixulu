@@ -1,4 +1,4 @@
-# 
+#
 
 [![NPM version](https://img.shields.io/npm/v/.svg?style=flat)](https://npmjs.org/package/)
 [![NPM downloads](http://img.shields.io/npm/dm/.svg?style=flat)](https://npmjs.org/package/)

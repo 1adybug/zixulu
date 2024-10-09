@@ -8,6 +8,8 @@ import { getPackageManager } from "./getPackageManager"
 export async function getRegistry() {
     if (global.__ZIXULU_REGISTRY__) return global.__ZIXULU_REGISTRY__
     const packageManager = await getPackageManager()
-    const registry = await execAsync(`${packageManager === PackageManager.yarn || packageManager === PackageManager.pnpm ? packageManager : "npm"} config get registry`)
+    const registry = await execAsync(
+        `${packageManager === PackageManager.yarn || packageManager === PackageManager.pnpm ? packageManager : "npm"} config get registry`,
+    )
     return registry
 }

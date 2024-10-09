@@ -11,7 +11,7 @@ export async function code2Snippet(path: string) {
         let { placeholder } = await inquirer.prompt({
             type: "input",
             name: "placeholder",
-            message: "请输入需要替换的占位符，输入空字符串结束"
+            message: "请输入需要替换的占位符，输入空字符串结束",
         })
         placeholder = placeholder.trim()
         if (!placeholder) break

@@ -9,18 +9,10 @@
         "moduleResolution": "Bundler",
         "esModuleInterop": true,
         "paths": {
-            "@src/*": [
-                "./src/*"
-            ],
-            "@constant/*": [
-                "./src/constant/*"
-            ],
-            "@utils/*": [
-                "./src/utils/*"
-            ]
+            "@src/*": ["./src/*"],
+            "@constant/*": ["./src/constant/*"],
+            "@utils/*": ["./src/utils/*"]
         }
     },
-    "exclude": [
-        "dist"
-    ]
+    "exclude": ["dist"]
 }

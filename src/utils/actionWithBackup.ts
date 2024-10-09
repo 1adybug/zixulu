@@ -1,5 +1,4 @@
 import consola from "consola"
-import { exit } from "process"
 import { addGitCommit } from "./addGitCommit"
 import { backupFirst } from "./backupFirst"
 import { hasChangeNoCommit } from "./hasChangeNoCommit"
@@ -17,7 +16,7 @@ export function actionWithBackup(action: (...args: any[]) => Promise<string | vo
             type: "confirm",
             name: "commit",
             message: "是否自动提交代码",
-            default: true
+            default: true,
         })
         if (!commit) return
         let commitMessage: string

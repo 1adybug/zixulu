@@ -5,6 +5,6 @@ export async function downloadAnydesk(dir: string) {
         name: "AnyDesk",
         id: "AnyDeskSoftwareGmbH.AnyDesk",
         dir,
-        filter: item => item.InstallerType === "exe"
+        filter: item => item.InstallerType === "exe",
     })
 }

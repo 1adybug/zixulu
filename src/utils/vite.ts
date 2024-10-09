@@ -1,6 +1,6 @@
 import consola from "consola"
-import { setTsConfig } from "./setTsConfig"
 import { readPackageJson } from "./readPackageJson"
+import { setTsConfig } from "./setTsConfig"
 import { writePackageJson } from "./writePackageJson"
 
 export async function vite() {

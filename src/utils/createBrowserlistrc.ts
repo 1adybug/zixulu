@@ -7,6 +7,6 @@ export async function createBrowserlistrc() {
 edge >= 88
 firefox >= 78
 safari >= 14`,
-        "utf-8"
+        "utf-8",
     )
 }

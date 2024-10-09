@@ -1,6 +1,5 @@
 import consola from "consola"
 import { readFileSync } from "fs"
-import { exit } from "process"
 import { getPackageJsonPath } from "./getPackageJsonPath"
 
 /**

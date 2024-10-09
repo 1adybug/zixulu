@@ -21,7 +21,7 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
     [Software.Honeyview]: downloadHoneyview,
     [Software.AnyDesk]: downloadAnydesk,
     [Software.Firefox]: downloadFirefox,
-    [Software.PotPlayer]: downloadPotPlayer
+    [Software.PotPlayer]: downloadPotPlayer,
 }
 
 export async function downloadLatestSoftware() {
@@ -33,7 +33,7 @@ export async function downloadLatestSoftware() {
         name: "softwares",
         message: "请选择要下载的软件",
         choices: Object.values(Software),
-        default: Object.values(Software)
+        default: Object.values(Software),
     })
     if (softwares.length === 0) return
     await mkdir(dir, { recursive: true })

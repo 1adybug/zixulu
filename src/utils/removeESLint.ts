@@ -13,7 +13,7 @@ export async function removeESLint() {
 
     const files = await getFiles({
         match: (path, stats) => path.base.toLowerCase().includes("eslint") && stats.isFile(),
-        exclude: (path, stats) => path.base === "node_modules" && stats.isDirectory()
+        exclude: (path, stats) => path.base === "node_modules" && stats.isDirectory(),
     })
 
     const { selectedFiles } = await inquirer.prompt({
@@ -21,7 +21,7 @@ export async function removeESLint() {
         name: "selectedFiles",
         message: "选择要删除的文件",
         choices: files,
-        default: files
+        default: files,
     })
 
     for (const file of selectedFiles) {

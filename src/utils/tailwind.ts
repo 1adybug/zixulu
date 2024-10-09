@@ -10,7 +10,7 @@ export async function tailwind() {
     consola.start("开始添加 tailwind 配置")
     const addedPackages = await addDependency({
         package: ["tailwindcss", "autoprefixer", "postcss", "prettier", "prettier-plugin-tailwindcss"],
-        type: "devDependencies"
+        type: "devDependencies",
     })
     await addTailwindConfig()
     await addPostCSSConfig()

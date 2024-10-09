@@ -8,11 +8,11 @@ import { installDependceny } from "./installDependceny"
 export async function addPrisma(manager?: PackageManager) {
     consola.start("开始添加 Prisma 配置")
     await addDependency({
-        package: "@prisma/client"
+        package: "@prisma/client",
     })
     await addDependency({
         package: ["prisma", "ts-node", "@types/node", "typescript"],
-        type: "devDependencies"
+        type: "devDependencies",
     })
     const dir = await readdir(".")
     await installDependceny({ silent: true, manager })

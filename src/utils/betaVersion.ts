@@ -1,6 +1,5 @@
 import consola from "consola"
 import dayjs from "dayjs"
-import { exit } from "process"
 import { execAsync, spawnAsync } from "soda-nodejs"
 import { backupFirst } from "./backupFirst"
 import { isRepository } from "./isRepository"
@@ -27,7 +26,7 @@ export async function getBetaVersion() {
         type: "list",
         name: "level",
         message: "请选择升级的级别",
-        choices: ["major", "minor", "patch", "none"]
+        choices: ["major", "minor", "patch", "none"],
     })
     let newBaseVersion = ""
     switch (level) {
@@ -64,7 +63,7 @@ export async function betaVersion() {
     const { publish } = await inquirer.prompt({
         type: "confirm",
         name: "publish",
-        message: "是否现在发布"
+        message: "是否现在发布",
     })
     if (publish) await spawnAsync("npm publish --tag beta", { shell: true, stdio: "inherit" })
 }

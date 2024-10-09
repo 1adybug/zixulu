@@ -35,7 +35,7 @@ export async function addDependency(config: AddDependenciesConfig): Promise<Reco
             const version = await retry({
                 action: () => getPackageLatestVersion(name),
                 count: 4,
-                callback: (error, current) => consola.error(`获取 ${name} 版本失败，第 ${current} 次重试`)
+                callback: (error, current) => consola.error(`获取 ${name} 版本失败，第 ${current} 次重试`),
             })
             addedPackages[name] = version
             packageJson[type][name] ??= `^${version}`

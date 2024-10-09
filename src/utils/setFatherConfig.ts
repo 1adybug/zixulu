@@ -1,9 +1,9 @@
 import consola from "consola"
 import { rm, writeFile } from "fs/promises"
-import { sortArrayOrObject } from "./sortArrayOrObject"
 import { addGitignore } from "./addGitignore"
 import { readPackageJson } from "./readPackageJson"
 import { Module, ModuleResolution, setTsConfig, Target } from "./setTsConfig"
+import { sortArrayOrObject } from "./sortArrayOrObject"
 import { writePackageJson } from "./writePackageJson"
 
 const fatherrcCode = `import { defineConfig } from "father"
