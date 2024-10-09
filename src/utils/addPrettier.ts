@@ -3,6 +3,7 @@ import { writeFile } from "fs/promises"
 import { AddDependenciesConfig, addDependency } from "./addDependency"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
+import { installDependceny } from "./installDependceny"
 
 export const prettierConfigText = `/**
  * @type {import("prettier").Options}
@@ -49,5 +50,6 @@ export async function addPrettier() {
     packageJson2.scripts ??= {}
     packageJson2.scripts.format = "prettier --write ."
     await writePackageJson({ data: packageJson2 })
+    await installDependceny()
     consola.success("添加 prettier 配置成功")
 }
