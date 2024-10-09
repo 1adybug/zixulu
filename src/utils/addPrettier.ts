@@ -24,11 +24,12 @@ export const prettierConfigTextWithTailwind = `module.exports = {
 export async function addPrettier() {
     consola.start("开始添加 prettier 配置")
     const packageJson = await readPackageJson()
-    const tailwind = Object.keys(packageJson.dependencies ?? {}).includes("tailwindcss") || Object.keys(packageJson.devDependencies ?? {}).includes("tailwindcss")
+    const tailwind =
+        Object.keys(packageJson.dependencies ?? {}).includes("tailwindcss") || Object.keys(packageJson.devDependencies ?? {}).includes("tailwindcss")
     await writeFile("./prettier.config.cjs", tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
     const config: AddDependenciesConfig = {
         package: ["prettier"],
-        type: "devDependencies"
+        type: "devDependencies",
     }
     if (tailwind) (config.package as string[]).push("prettier-plugin-tailwindcss")
     await addDependency(config)

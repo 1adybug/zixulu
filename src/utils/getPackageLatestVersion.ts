@@ -12,7 +12,7 @@ export async function getPackageLatestVersion(packageName: string) {
         const url = new URL(`/${packageName}/latest`, registry)
         const { default: fetch } = await import("node-fetch")
         const response = await fetch(url, {
-            agent: global.__ZIXULU_PROXY__ ? agent : undefined
+            agent: global.__ZIXULU_PROXY__ ? agent : undefined,
         })
         const data = (await response.json()) as any
         return data.version as string

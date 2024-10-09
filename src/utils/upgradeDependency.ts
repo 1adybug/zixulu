@@ -39,11 +39,16 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
                 const version = await getPackageUpgradeVersion({
                     packageName: pkg,
                     version: cv,
-                    level
+                    level,
                 })
 
                 if (!version) continue
-                upgrades.push({ package: pkg, oldVersion: cv, newVersion: version, strVersion: `${s}${version}` })
+                upgrades.push({
+                    package: pkg,
+                    oldVersion: cv,
+                    newVersion: version,
+                    strVersion: `${s}${version}`,
+                })
             } catch (error) {
                 continue
             }
@@ -51,14 +56,17 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
 
         if (upgrades.length === 0) continue
 
-        const choices = upgrades.map(upgrade => ({ name: `${upgrade.package} ${upgrade.oldVersion} => ${upgrade.newVersion}`, value: upgrade.package }))
+        const choices = upgrades.map(upgrade => ({
+            name: `${upgrade.package} ${upgrade.oldVersion} => ${upgrade.newVersion}`,
+            value: upgrade.package,
+        }))
 
         const { pkgs } = await inquirer.prompt({
             type: "checkbox",
             name: "pkgs",
             message: "请选择要升级的包",
             choices,
-            default: upgrades.map(upgrade => upgrade.package)
+            default: upgrades.map(upgrade => upgrade.package),
         })
 
         pkgs.forEach((pkg: string) => {

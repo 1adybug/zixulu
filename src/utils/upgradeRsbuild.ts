@@ -8,7 +8,9 @@ import { writePackageJson } from "./writePackageJson"
 
 export async function upgradeRsbuild() {
     const packageJson = await readPackageJson()
-    const rsbuildDependencies = Object.entries({ ...packageJson.dependencies, ...packageJson.devDependencies }).filter(([key]) => key.startsWith("@rsbuild/")) as [string, string][]
+    const rsbuildDependencies = Object.entries({ ...packageJson.dependencies, ...packageJson.devDependencies }).filter(([key]) =>
+        key.startsWith("@rsbuild/"),
+    ) as [string, string][]
     const upgradeLogs: string[] = []
     for (const [key, value] of rsbuildDependencies) {
         const version = await getPackageLatestVersion(key)

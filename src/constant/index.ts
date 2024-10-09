@@ -3,13 +3,13 @@ import { HttpsProxyAgent } from "https-proxy-agent"
 export enum PackageManager {
     npm = "npm",
     yarn = "yarn",
-    pnpm = "pnpm"
+    pnpm = "pnpm",
 }
 
 export enum Registry {
     npm = "https://registry.npmjs.org/",
     taobao = "https://registry.npmmirror.com/",
-    tencent = "https://mirrors.cloud.tencent.com/npm/"
+    tencent = "https://mirrors.cloud.tencent.com/npm/",
 }
 
 export enum Software {
@@ -24,14 +24,14 @@ export enum Software {
     "Honeyview" = "Honeyview",
     "AnyDesk" = "AnyDesk",
     "Firefox" = "Firefox",
-    "PotPlayer" = "PotPlayer"
+    "PotPlayer" = "PotPlayer",
 }
 
 export enum ProjectType {
     next = "next",
     remix = "remix",
     vite = "vite",
-    rsbuild = "rsbuild"
+    rsbuild = "rsbuild",
 }
 
 export enum CommitType {
@@ -41,7 +41,7 @@ export enum CommitType {
     wip = "wip",
     perfs = "perfs",
     rollback = "rollback",
-    other = "other"
+    other = "other",
 }
 
 export const CommitTypeMap = {
@@ -51,14 +51,26 @@ export const CommitTypeMap = {
     [CommitType.wip]: "🖥️ wip: ",
     [CommitType.perfs]: "🚅 perfs: ",
     [CommitType.rollback]: "⏪ rollback: ",
-    [CommitType.other]: "🔵 other: "
+    [CommitType.other]: "🔵 other: ",
 }
 
 export const SpawnOptions = {
     shell: true,
-    stdio: "inherit"
+    stdio: "inherit",
 }
 
 export const agent = new HttpsProxyAgent("http://localhost:7890")
 
-export const addedRules = ["package-lock.json", "yarn.lock", "node_modules", "dist", "build", "pnpm-lock.yaml", "yarn-error.log", "test.js", "test.mjs", "test.ts", "test"]
+export const addedRules = [
+    "package-lock.json",
+    "yarn.lock",
+    "node_modules",
+    "dist",
+    "build",
+    "pnpm-lock.yaml",
+    "yarn-error.log",
+    "test.js",
+    "test.mjs",
+    "test.ts",
+    "test",
+]

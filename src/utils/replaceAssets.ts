@@ -40,7 +40,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
     const headers = new Headers()
     headers.set(
         "accept",
-        `text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7`
+        `text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7`,
     )
     headers.set("accept-encoding", `gzip, deflate, br, zstd`)
     headers.set("accept-language", `en,zh-CN;q=0.9,zh;q=0.8`)
@@ -74,7 +74,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
             } else {
                 response = await fetch(url, {
                     agent: proxy ? agent : undefined,
-                    headers
+                    headers,
                 })
                 filename = `${md5(url)}.${response.headers.get("content-type")?.split("/")[1].split("+")[0]}`
             }
@@ -82,7 +82,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
             if (!dir.includes(filename)) {
                 response ??= await fetch(url, {
                     agent: proxy ? agent : undefined,
-                    headers
+                    headers,
                 })
                 const file = createWriteStream(join(output, filename))
                 await new Promise((resolve, reject) => Readable.from(response.body!).pipe(file).on("finish", resolve).on("error", reject))

@@ -5,7 +5,6 @@ import { addDependency } from "./addDependency"
 import { addGitignore } from "./addGitignore"
 import { addPrettier } from "./addPrettier"
 import { addPrisma } from "./addPrisma"
-import { tailwind } from "./tailwind"
 import { createBrowserlistrc } from "./createBrowserlistrc"
 import { getPackageManager } from "./getPackageManager"
 import { installDependceny } from "./installDependceny"
@@ -14,8 +13,8 @@ import { readPackageJson } from "./readPackageJson"
 import { removeESLint } from "./removeESLint"
 import { rsbuild } from "./rsbuild"
 import { setTsConfig } from "./setTsConfig"
+import { tailwind } from "./tailwind"
 import { vite } from "./vite"
-import { addZipDist } from "./addZipDist"
 
 export async function initProject() {
     consola.start("开始初始化项目")
@@ -43,7 +42,7 @@ export async function initProject() {
     await addGitignore()
     await addDependency({
         package: ["@types/node"],
-        type: "devDependencies"
+        type: "devDependencies",
     })
     const manager = await getPackageManager()
     if (allDependcies.some(item => item.includes("eslint"))) {
@@ -51,7 +50,7 @@ export async function initProject() {
             type: "confirm",
             name: "removeEslintConfig",
             message: "是否删除 ESLint 配置文件",
-            default: true
+            default: true,
         })
         if (removeEslintConfig) await removeESLint()
     }
@@ -65,7 +64,7 @@ export async function initProject() {
         name: "modules",
         message: "请选择要添加的模块",
         choices,
-        default: choices
+        default: choices,
     })
 
     const added: string[] = []
@@ -83,7 +82,7 @@ export async function initProject() {
 
     await addDependency({
         package: added,
-        type: "dependencies"
+        type: "dependencies",
     })
 
     switch (type) {
