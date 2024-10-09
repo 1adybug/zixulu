@@ -5,7 +5,6 @@ import { mkdir, readFile, readdir, rename, rm, writeFile } from "fs/promises"
 import { type Headers as NodeFetchHeaders } from "node-fetch"
 import { homedir } from "os"
 import { join } from "path"
-import { Config } from "prettier"
 import { execAsync, unzip } from "soda-nodejs"
 import { Readable } from "stream"
 import YAML from "yaml"
@@ -13,13 +12,6 @@ import { retry } from "./retry"
 
 export function isPositiveInteger(value: any, allowZero = false): value is number {
     return Number.isInteger(value) && (allowZero ? value >= 0 : value > 0)
-}
-
-export const prettierConfig: Config = {
-    semi: false,
-    tabWidth: 4,
-    arrowParens: "avoid",
-    printWidth: 160,
 }
 
 export function getFilename(headers: Headers | NodeFetchHeaders) {
