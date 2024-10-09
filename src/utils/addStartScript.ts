@@ -1,11 +1,11 @@
+import { CommitType } from "@src/constant"
 import consola from "consola"
 import { mkdir, readFile, writeFile } from "fs/promises"
 import { addDependency } from "./addDependency"
+import { getCommitMessage } from "./getCommitMessage"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
-import { getCommitMessage } from "./getCommitMessage"
-import { CommitType } from "@src/constant"
 
 const script = `// @ts-check
 import { spawn } from "child_process"

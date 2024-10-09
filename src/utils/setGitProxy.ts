@@ -9,13 +9,13 @@ export async function setGitProxy() {
         choices: [
             {
                 name: "全局代理",
-                value: true
+                value: true,
             },
             {
                 name: "当前项目",
-                value: false
-            }
-        ]
+                value: false,
+            },
+        ],
     })
     const { open } = await inquirer.prompt({
         type: "list",
@@ -24,20 +24,20 @@ export async function setGitProxy() {
         choices: [
             {
                 name: "打开代理",
-                value: true
+                value: true,
             },
             {
                 name: "关闭代理",
-                value: false
-            }
-        ]
+                value: false,
+            },
+        ],
     })
     if (!open) {
         try {
-            await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`, {shell: true, stdio: "inherit"})
+            await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`, { shell: true, stdio: "inherit" })
         } catch (error) {}
         try {
-            await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`, {shell: true, stdio: "inherit"})
+            await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`, { shell: true, stdio: "inherit" })
         } catch (error) {}
         return
     }
@@ -45,8 +45,8 @@ export async function setGitProxy() {
         type: "input",
         name: "proxy",
         message: "请输入代理地址",
-        default: "http://localhost:7890"
+        default: "http://localhost:7890",
     })
-    await spawnAsync(`git config${global ? " --global" : ""} http.proxy ${proxy}`, {shell: true, stdio: "inherit"})
-    await spawnAsync(`git config${global ? " --global" : ""} https.proxy ${proxy}`, {shell: true, stdio: "inherit"})
+    await spawnAsync(`git config${global ? " --global" : ""} http.proxy ${proxy}`, { shell: true, stdio: "inherit" })
+    await spawnAsync(`git config${global ? " --global" : ""} https.proxy ${proxy}`, { shell: true, stdio: "inherit" })
 }

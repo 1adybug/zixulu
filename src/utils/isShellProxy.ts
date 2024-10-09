@@ -6,7 +6,7 @@ import { execAsync } from "soda-nodejs"
 export async function isShellProxy() {
     const result = await execAsync("netsh winhttp show proxy", {
         encoding: "buffer",
-        decode: { encoding: "gbk" }
+        decode: { encoding: "gbk" },
     })
     return !result.includes("直接访问")
 }

@@ -4,7 +4,7 @@ import { checkType } from "./checkType"
 import { getFiles } from "./getFiles"
 import { splitExtendsType } from "./splitExtendsType"
 
-/** 
+/**
  * 将项目中的 interface 转换为 type
  */
 export async function interfaceToType() {
@@ -12,7 +12,7 @@ export async function interfaceToType() {
 
     const files = await getFiles({
         match: (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile(),
-        exclude: (path, stats) => stats.isDirectory() && path.base === "node_modules"
+        exclude: (path, stats) => stats.isDirectory() && path.base === "node_modules",
     })
 
     const { default: inquirer } = await import("inquirer")
@@ -20,7 +20,7 @@ export async function interfaceToType() {
     const { cont } = await inquirer.prompt({
         type: "confirm",
         name: "cont",
-        message: "是否继续"
+        message: "是否继续",
     })
 
     if (!cont) return

@@ -1,10 +1,10 @@
+import { CommitType } from "@src/constant"
 import { mkdir, writeFile } from "fs/promises"
 import { addDependency } from "./addDependency"
+import { getCommitMessage } from "./getCommitMessage"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
-import { getCommitMessage } from "./getCommitMessage"
-import { CommitType } from "@src/constant"
 
 const zipDistContent = `// @ts-check
 import { rm } from "fs/promises"
@@ -28,7 +28,7 @@ type AddZipDistConfig = {
 export async function addZipDist({ install }: AddZipDistConfig = {}) {
     await addDependency({
         package: ["soda-nodejs"],
-        type: "devDependencies"
+        type: "devDependencies",
     })
     await mkdir("scripts", { recursive: true })
     await writeFile("scripts/zipDist.mjs", zipDistContent, "utf-8")

@@ -27,7 +27,7 @@ export async function syncVscode() {
     const { vscode } = await inquirer.prompt({
         type: "confirm",
         name: "vscode",
-        message: "是否下载最新版 VSCode"
+        message: "是否下载最新版 VSCode",
     })
     if (vscode) {
         consola.start("开始下载最新 VSCode")

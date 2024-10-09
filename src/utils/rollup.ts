@@ -41,7 +41,7 @@ const tsconfig = `{
 export async function rollup() {
     await addDependency({
         package: ["@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "rollup", "typescript"],
-        type: "devDependencies"
+        type: "devDependencies",
     })
 
     const packageJson = await readPackageJson()

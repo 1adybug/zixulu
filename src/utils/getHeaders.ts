@@ -1,5 +1,3 @@
-
- 
 /**
  * 将浏览器中直接复制的 headers 转换为对象
  * @param str 复制的 headers
@@ -15,7 +13,7 @@ export async function getHeaders() {
     if (!match) throw new Error("headers 格式错误")
     Array.from(match).forEach(item => {
         const match2 = item.match(reg2)
-        result.push (`headers.set("${match2![1].trim()}", \`${match2![2].trim()}\`)`)
+        result.push(`headers.set("${match2![1].trim()}", \`${match2![2].trim()}\`)`)
     })
     await clipboard.write(result.join("\n"))
 }

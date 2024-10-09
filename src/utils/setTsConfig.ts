@@ -16,7 +16,7 @@ export enum Target {
     ES3 = "ES3",
     ES5 = "ES5",
     ES6 = "ES6",
-    ESNext = "ESNext"
+    ESNext = "ESNext",
 }
 
 export enum Module {
@@ -31,7 +31,7 @@ export enum Module {
     NodeNext = "NodeNext",
     None = "None",
     System = "System",
-    UMD = "UMD"
+    UMD = "UMD",
 }
 
 export enum ModuleResolution {
@@ -40,7 +40,7 @@ export enum ModuleResolution {
     Node = "Node",
     Node10 = "Node10",
     Node16 = "Node16",
-    NodeNext = "NodeNext"
+    NodeNext = "NodeNext",
 }
 
 export async function setTsConfig(key: string, value?: any) {

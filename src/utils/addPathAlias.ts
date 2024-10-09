@@ -15,16 +15,19 @@ export async function getPathAlias(name: string) {
             return stats.isDirectory() && path.base === name
         },
         exclude(path, stats) {
-            return stats.isDirectory() && (path.base === "node_modules" || path.base === ".git" || path.base === ".vscode" || path.base === "dist" || path.base === "build")
+            return (
+                stats.isDirectory() &&
+                (path.base === "node_modules" || path.base === ".git" || path.base === ".vscode" || path.base === "dist" || path.base === "build")
+            )
         },
-        count: 1
+        count: 1,
     })
     const defaultPath = folder[0] ? getRelativePath(folder[0]) : undefined
     const { path } = await inquirer.prompt({
         type: "input",
         name: "path",
         message: `请输入你的 @${name}/ 的路径`,
-        default: defaultPath
+        default: defaultPath,
     })
     return path
 }
@@ -61,8 +64,11 @@ export async function replacePathAlias() {
             return (path.ext === ".ts" || path.ext === ".tsx") && stats.isFile()
         },
         exclude(path, stats) {
-            return stats.isDirectory() && (path.base === "node_modules" || path.base === ".git" || path.base === ".vscode" || path.base === "dist" || path.base === "build")
-        }
+            return (
+                stats.isDirectory() &&
+                (path.base === "node_modules" || path.base === ".git" || path.base === ".vscode" || path.base === "dist" || path.base === "build")
+            )
+        },
     })
     const reg = /(import [\d\D]*?")(.+?)(")/gm
     for (const file of files) {
@@ -121,14 +127,14 @@ export async function addFolderPathAlias() {
         type: "input",
         name: "folder",
         message: "请输入文件夹路径",
-        default: "."
+        default: ".",
     })
     const dir = await getFiles({
         match(path, stats) {
             return stats.isDirectory()
         },
         depth: 1,
-        dir: folder
+        dir: folder,
     })
     const names = dir.map(item => parse(item).name)
     const { result } = await inquirer.prompt({
@@ -136,7 +142,7 @@ export async function addFolderPathAlias() {
         name: "result",
         message: "请选择要添加的文件夹",
         choices: names,
-        default: names.filter(item => item !== "node_modules" && item !== ".git" && item !== ".vscode" && item !== "dist" && item !== "build")
+        default: names.filter(item => item !== "node_modules" && item !== ".git" && item !== ".vscode" && item !== "dist" && item !== "build"),
     })
     await addPathAlias(result.map((item: string) => ({ name: item, path: getRelativePath(join(folder, item)) })))
     return getCommitMessage(CommitType.feature, `add path alias: ${result.join(", ")}`)

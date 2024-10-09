@@ -40,7 +40,7 @@ const AntdNextRegistry: FC<AntdNextRegistryProps> = props => {
 }
 
 export default AntdNextRegistry
-`
+`,
         )
     } else {
         await writeFile(
@@ -65,7 +65,7 @@ const AntdRegistry: FC<AntdRegistryProps> = props => {
 }
 
 export default AntdRegistry
-`
+`,
         )
     }
     consola.success("添加 antd 配置成功")

@@ -5,6 +5,6 @@ export async function downloadPotPlayer(dir: string) {
         name: "PotPlayer",
         id: "Daum.PotPlayer",
         dir,
-        filter: item => item.Architecture === "x64"
+        filter: item => item.Architecture === "x64",
     })
 }

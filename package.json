@@ -10,7 +10,8 @@
         "dev": "father dev",
         "build": "father build",
         "build:deps": "father prebundle",
-        "prepublishOnly": "father doctor && npm run build"
+        "prepublishOnly": "father doctor && npm run build",
+        "prettier": "prettier --write ."
     },
     "keywords": [],
     "authors": [],
@@ -29,29 +30,26 @@
         "url": "git+https://github.com/1adybug/zixulu.git"
     },
     "dependencies": {
-        "archiver": "^7.0.1",
         "clipboardy": "^4.0.0",
         "commander": "^12.1.0",
         "consola": "^3.2.3",
         "dayjs": "^1.11.13",
-        "deepsea-tools": "^5.11.0",
         "https-proxy-agent": "^7.0.5",
         "inquirer": "^9.3.6",
         "json5": "^2.2.3",
         "md5": "^2.3.0",
         "node-fetch": "^3.3.2",
-        "prettier": "^3.3.3",
         "soda-nodejs": "^0.4.0",
-        "which": "^4.0.0",
         "yaml": "^2.5.1"
     },
     "devDependencies": {
-        "@types/archiver": "^6.0.2",
         "@types/inquirer": "^9.0.7",
         "@types/md5": "^2.3.5",
-        "@types/node": "^20.16.6",
+        "@types/node": "^22.7.5",
         "father": "^4.5.0",
-        "typescript": "^5.6.2"
+        "prettier": "^3.3.3",
+        "prettier-plugin-organize-imports": "^4.1.0",
+        "typescript": "^5.6.3"
     },
     "resolutions": {
         "string-width": "^4",

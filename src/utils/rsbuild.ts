@@ -13,7 +13,7 @@ export async function rsbuild() {
     const { default: inquirer } = await import("inquirer")
     await addDependency({
         package: ["@rsbuild/plugin-svgr", "get-port-please"],
-        type: "devDependencies"
+        type: "devDependencies",
     })
     const packageJson = await readPackageJson()
     const tsConfig = await readTsConfig()
@@ -25,20 +25,20 @@ export async function rsbuild() {
             type: "input",
             name: "description",
             message: "项目描述",
-            default: "designed by someone"
+            default: "designed by someone",
         },
         {
             type: "input",
             name: "title",
             message: "项目标题",
-            default: packageJson.name
+            default: packageJson.name,
         },
         {
             type: "input",
             name: "entryId",
             message: "入口 id",
-            default: "root"
-        }
+            default: "root",
+        },
     ])
     await writeRsbuildConfig()
     await createIndexHtml({ description, title, entryId })
@@ -52,7 +52,7 @@ export async function rsbuild() {
 @tailwind utilities;
 `
             : ``,
-        "utf-8"
+        "utf-8",
     )
 
     await writeFile(
@@ -64,7 +64,7 @@ const App: FC = () => {
 }
 
 export default App`,
-        "utf-8"
+        "utf-8",
     )
 
     await writeFile(
@@ -79,7 +79,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <App />
     </React.StrictMode>
 )`,
-        "utf-8"
+        "utf-8",
     )
     consola.success("设置 rsbuild 配置成功")
 }

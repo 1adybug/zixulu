@@ -12,13 +12,13 @@ export async function setShellProxy() {
             choices: [
                 {
                     name: "✏️ 更改地址",
-                    value: true
+                    value: true,
                 },
                 {
                     name: "🚫 关闭代理",
-                    value: false
-                }
-            ]
+                    value: false,
+                },
+            ],
         })
         if (!open) return await spawnAsync(`netsh winhttp reset proxy`, { shell: true, stdio: "inherit" })
     }
@@ -26,7 +26,7 @@ export async function setShellProxy() {
         type: "input",
         name: "proxy",
         message: "请输入代理地址",
-        default: "http://localhost:7890"
+        default: "http://localhost:7890",
     })
     await spawnAsync(`netsh winhttp set proxy "${proxy}" "<local>"`, { shell: true, stdio: "inherit" })
 }

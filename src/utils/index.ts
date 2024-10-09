@@ -171,7 +171,7 @@ export async function downloadFromWinget({ name, id, dir, filter }: WingetDownlo
     })
     const response2 = await fetch(
         `https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/${firstLetter}/${path}/${stables[0].name}/${id}.installer.yaml`,
-        { agent }
+        { agent },
     )
     const yaml = await response2.text()
     const pkg: Winget.Package = YAML.parse(yaml)
@@ -259,8 +259,8 @@ export async function downloadDeskGo(dir: string) {
         join(dir, file),
         join(
             dir,
-            file.replace(/^DeskGo_(.+)_full\.exe$/, (match, arg) => `DeskGo-${arg.replace(/\_/g, ".")}-x64.exe`)
-        )
+            file.replace(/^DeskGo_(.+)_full\.exe$/, (match, arg) => `DeskGo-${arg.replace(/\_/g, ".")}-x64.exe`),
+        ),
     )
 }
 
@@ -294,7 +294,7 @@ export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
                 version
                     .split(".")
                     .map(Number)
-                    .every((item, index) => index >= 2 || item <= codeVersions[index])
+                    .every((item, index) => index >= 2 || item <= codeVersions[index]),
             ) ?? versions[0]
         version = item.version
     } else {
@@ -324,7 +324,7 @@ export async function downloadVscodeExts(dir: string) {
         extList
             .split(/[\n\r]/)
             .filter(Boolean)
-            .map(ext => getVscodeExtInfo(ext))
+            .map(ext => getVscodeExtInfo(ext)),
     )
     const setting = await getSetting()
     const vscodeExts = setting?.vscodeExts as string[] | undefined
@@ -413,8 +413,8 @@ export async function getPidInfoFromPort(port: number) {
                 stdout
                     .split(/[\n\r]/)
                     .filter(line => reg.test(line))
-                    .map(line => ({ pid: parseInt(line.match(reg)![1]), info: line }))
-            )
+                    .map(line => ({ pid: parseInt(line.match(reg)![1]), info: line })),
+            ),
         )
         for (let i = 0; ; ) {
             if (result.some(({ info }) => info[i] === undefined)) break
