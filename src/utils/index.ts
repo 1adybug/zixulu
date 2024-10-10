@@ -3,13 +3,13 @@ import consola from "consola"
 import { createWriteStream } from "fs"
 import { mkdir, readdir, rename, rm, writeFile } from "fs/promises"
 import { type Headers as NodeFetchHeaders } from "node-fetch"
-import { homedir } from "os"
 import { join } from "path"
 import { execAsync, unzip } from "soda-nodejs"
 import { Readable } from "stream"
 import YAML from "yaml"
 import { getZixuluSetting } from "./getZixuluSetting"
 import { retry } from "./retry"
+import { setZixuluSetting } from "./setZixuluSetting"
 
 export function isPositiveInteger(value: any, allowZero = false): value is number {
     return Number.isInteger(value) && (allowZero ? value >= 0 : value > 0)
@@ -320,16 +320,16 @@ export async function downloadVscodeExts(dir: string) {
             .map(ext => getVscodeExtInfo(ext)),
     )
     const setting = await getZixuluSetting()
-    const vscodeExts = setting?.vscodeExts as string[] | undefined
+    const vscodeDownloadHistory = setting?.vscodeDownloadHistory as string[] | undefined
     const exts2 = await inquirer.prompt({
         type: "checkbox",
         name: "exts",
         message: "选择需要下载的扩展",
         choices: exts.map(ext => ({ name: ext.name, value: ext.id })),
-        default: vscodeExts?.filter(ext => exts.some(item => item.id === ext)) || exts.map(ext => ext.id),
+        default: vscodeDownloadHistory?.filter(ext => exts.some(item => item.id === ext)) || exts.map(ext => ext.id),
     })
-    setting.vscodeExts = exts2.exts
-    await setSetting(setting)
+    setting.vscodeDownloadHistory = exts2.exts
+    await setZixuluSetting(setting)
     for (const ext of exts) {
         if (!exts2.exts.includes(ext.id)) continue
         consola.start(`正在下载 ${ext.name}`)
@@ -421,10 +421,4 @@ export async function getPidInfoFromPort(port: number) {
     } catch (error) {
         return []
     }
-}
-
-export async function setSetting(setting: Record<string, any>) {
-    const userDir = homedir()
-    const settingPath = join(userDir, ".zixulu.json")
-    await writeFile(settingPath, JSON.stringify(setting, undefined, 4), "utf-8")
 }

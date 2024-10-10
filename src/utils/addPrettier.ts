@@ -1,9 +1,9 @@
 import consola from "consola"
 import { writeFile } from "fs/promises"
 import { AddDependenciesConfig, addDependency } from "./addDependency"
+import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
-import { installDependceny } from "./installDependceny"
 
 export const prettierConfigText = `/**
  * @type {import("prettier").Options}

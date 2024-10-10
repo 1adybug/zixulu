@@ -10,6 +10,7 @@ import { downloadHoneyview } from "./downloadHoneyview"
 import { downloadPotPlayer } from "./downloadPotPlayer"
 import { downloadPowerToys } from "./downloadPowerToys"
 import { getZixuluSetting } from "./getZixuluSetting"
+import { setZixuluSetting } from "./setZixuluSetting"
 
 export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void>> = {
     [Software.Chrome]: downloadChrome,
@@ -40,6 +41,8 @@ export async function downloadLatestSoftware() {
         choices: Object.values(Software),
         default: softwareDownloadHistory?.filter(software => Object.values(Software).includes(software)) ?? Object.values(Software),
     })
+    setting.softwareDownloadHistory = softwares
+    await setZixuluSetting(setting)
     if (softwares.length === 0) return
     await mkdir(dir, { recursive: true })
     for (const software of softwares) {
