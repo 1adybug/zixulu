@@ -43,6 +43,7 @@ import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { replaceAssets } from "./utils/replaceAssets"
+import { setBun } from "./utils/setBun"
 import { setGlobal } from "./utils/setGlobal"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
@@ -250,5 +251,7 @@ program
         setGlobal(options)
         await actionWithBackup(() => upgradeTailwind())()
     })
+
+program.command("bun").description("设置 bun").action(setBun)
 
 program.parse()

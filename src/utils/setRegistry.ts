@@ -1,6 +1,8 @@
 import { PackageManager, Registry } from "@constant/index"
 import { getEnumKeys, getEnumValues } from "deepsea-tools"
 import { spawnAsync } from "soda-nodejs"
+import { readBunConfig } from "./readBunConfig"
+import { writeBunConfig } from "./writeBunConfig"
 
 export async function setRegistry() {
     const { default: inquirer } = await import("inquirer")
@@ -12,14 +14,20 @@ export async function setRegistry() {
         choices: getEnumValues(PackageManager),
     })
 
-    if (manager === PackageManager.bun) manager = PackageManager.npm
-
     const { registry } = await inquirer.prompt({
         type: "list",
         name: "registry",
         message: "请选择要更换的源",
         choices: getEnumKeys(Registry),
     })
+
+    if (manager === PackageManager.bun) {
+        const config = await readBunConfig()
+        config.install ??= {}
+        config.install.registry = "https://registry.npmmirror.com"
+        await writeBunConfig(config)
+        return
+    }
 
     await spawnAsync(`${manager} config set registry ${Registry[registry as keyof typeof Registry]}`, { shell: true, stdio: "inherit" })
 }
