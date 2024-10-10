@@ -9,6 +9,7 @@ import { downloadFirefox } from "./downloadFirefox"
 import { downloadHoneyview } from "./downloadHoneyview"
 import { downloadPotPlayer } from "./downloadPotPlayer"
 import { downloadPowerToys } from "./downloadPowerToys"
+import { getZixuluSetting } from "./getZixuluSetting"
 
 export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void>> = {
     [Software.Chrome]: downloadChrome,
@@ -30,12 +31,14 @@ export async function downloadLatestSoftware() {
     consola.start("开始下载软件")
     const { default: inquirer } = await import("inquirer")
     const dir = `softwares-${dayjs().format("YYYYMMDDHHmmss")}`
+    const setting = await getZixuluSetting()
+    const softwareDownloadHistory = setting?.softwareDownloadHistory as Software[] | undefined
     const { softwares } = await inquirer.prompt({
         type: "checkbox",
         name: "softwares",
         message: "请选择要下载的软件",
         choices: Object.values(Software),
-        default: Object.values(Software),
+        default: softwareDownloadHistory?.filter(software => Object.values(Software).includes(software)) ?? Object.values(Software),
     })
     if (softwares.length === 0) return
     await mkdir(dir, { recursive: true })

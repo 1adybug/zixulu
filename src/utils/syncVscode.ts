@@ -17,9 +17,7 @@ export async function syncVscode() {
     consola.start("开始下载最新 VSCode 配置")
     await copyFile(setting, join(dir, "settings.json"))
     const files = await readdir(snippetSource)
-    for (const file of files) {
-        await copyFile(join(snippetSource, file), join(snippetTarget, file))
-    }
+    for (const file of files) await copyFile(join(snippetSource, file), join(snippetTarget, file))
     consola.success("下载最新 VSCode 配置完成")
     await downloadVscodeExts(join(dir, "extensions"))
     consola.success("下载最新 VSCode 插件完成")
