@@ -4,6 +4,7 @@ import dayjs from "dayjs"
 import { mkdir } from "fs/promises"
 import { download7Zip, downloadChrome, downloadDeskGo, downloadGeekUninstaller, downloadGit, downloadNodeJS, downloadVscode } from "."
 import { downloadAnydesk } from "./downloadAnydesk"
+import { downloadBun } from "./downloadBun"
 import { downloadFirefox } from "./downloadFirefox"
 import { downloadHoneyview } from "./downloadHoneyview"
 import { downloadPotPlayer } from "./downloadPotPlayer"
@@ -22,6 +23,7 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
     [Software.AnyDesk]: downloadAnydesk,
     [Software.Firefox]: downloadFirefox,
     [Software.PotPlayer]: downloadPotPlayer,
+    [Software.Bun]: downloadBun,
 }
 
 export async function downloadLatestSoftware() {
