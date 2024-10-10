@@ -25,6 +25,7 @@ export enum Software {
     "AnyDesk" = "AnyDesk",
     "Firefox" = "Firefox",
     "PotPlayer" = "PotPlayer",
+    "Bun" = "Bun",
 }
 
 export enum ProjectType {
