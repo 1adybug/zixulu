@@ -1,13 +1,14 @@
 import { agent } from "@constant/index"
 import consola from "consola"
-import { createWriteStream, existsSync } from "fs"
-import { mkdir, readFile, readdir, rename, rm, writeFile } from "fs/promises"
+import { createWriteStream } from "fs"
+import { mkdir, readdir, rename, rm, writeFile } from "fs/promises"
 import { type Headers as NodeFetchHeaders } from "node-fetch"
 import { homedir } from "os"
 import { join } from "path"
 import { execAsync, unzip } from "soda-nodejs"
 import { Readable } from "stream"
 import YAML from "yaml"
+import { getZixuluSetting } from "./getZixuluSetting"
 import { retry } from "./retry"
 
 export function isPositiveInteger(value: any, allowZero = false): value is number {
@@ -318,7 +319,7 @@ export async function downloadVscodeExts(dir: string) {
             .filter(Boolean)
             .map(ext => getVscodeExtInfo(ext)),
     )
-    const setting = await getSetting()
+    const setting = await getZixuluSetting()
     const vscodeExts = setting?.vscodeExts as string[] | undefined
     const exts2 = await inquirer.prompt({
         type: "checkbox",
@@ -420,16 +421,6 @@ export async function getPidInfoFromPort(port: number) {
     } catch (error) {
         return []
     }
-}
-
-export async function getSetting() {
-    const userDir = homedir()
-    const settingPath = join(userDir, ".zixulu.json")
-    if (existsSync(settingPath)) {
-        const setting = JSON.parse(await readFile(settingPath, "utf-8"))
-        return setting
-    }
-    return {}
 }
 
 export async function setSetting(setting: Record<string, any>) {
