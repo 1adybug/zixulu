@@ -30,10 +30,12 @@
         "url": "git+https://github.com/1adybug/zixulu.git"
     },
     "dependencies": {
+        "@iarna/toml": "^2.2.5",
         "clipboardy": "^4.0.0",
         "commander": "^12.1.0",
         "consola": "^3.2.3",
         "dayjs": "^1.11.13",
+        "deepsea-tools": "^5.14.0",
         "https-proxy-agent": "^7.0.5",
         "inquirer": "^9.3.6",
         "json5": "^2.2.3",
