@@ -1,5 +1,4 @@
 import { agent } from "@src/constant"
-import fetch from "node-fetch"
 
 export interface Release {
     url: string
@@ -75,6 +74,7 @@ export interface Author {
 }
 
 export async function getLatestRelease(owner: string, repo: string): Promise<Release> {
+    const { default: fetch } = await import("node-fetch")
     const url = `https://api.github.com/repos/${owner}/${repo}/releases/latest`
     const response = await fetch(url, { agent })
     const data = await response.json()
