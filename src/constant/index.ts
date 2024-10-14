@@ -75,4 +75,5 @@ export const addedRules = [
     "test.mjs",
     "test.ts",
     "test",
+    "bun.lockb",
 ]
