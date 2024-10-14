@@ -1,7 +1,7 @@
 import { PackageManager } from "@src/constant"
 import { execAsync } from "soda-nodejs"
-import { readBunConfig } from "./readBunConfig"
 import { getPackageManager } from "./getPackageManager"
+import { readBunConfig } from "./readBunConfig"
 
 /**
  * 获取包管理器的源

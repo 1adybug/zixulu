@@ -12,7 +12,7 @@ export async function rsbuild() {
     consola.start("开始设置 rsbuild 配置")
     const { default: inquirer } = await import("inquirer")
     await addDependency({
-        package: ["@rsbuild/plugin-svgr", "get-port-please"],
+        package: ["@rsbuild/plugin-svgr"],
         type: "devDependencies",
     })
     const packageJson = await readPackageJson()
@@ -69,15 +69,15 @@ export default App`,
 
     await writeFile(
         `src/index.tsx`,
-        `import React from "react"
+        `import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import App from "./App"
 import "./index.css"
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
+ReactDOM.createRoot(document.getElementById("${entryId}") as HTMLDivElement).render(
+    <StrictMode>
         <App />
-    </React.StrictMode>
+    </StrictMode>
 )`,
         "utf-8",
     )
