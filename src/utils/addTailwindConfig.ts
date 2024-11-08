@@ -1,7 +1,7 @@
 import consola from "consola"
 import { writeFile } from "fs/promises"
 
-export const tailwindConfig = `import type { Config } from "tailwindcss"
+export const tailwindConfig = `import { Config } from "tailwindcss"
 const config: Config = {
     content: [
         "./index.html",
