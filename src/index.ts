@@ -45,6 +45,7 @@ import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { replaceAssets } from "./utils/replaceAssets"
 import { setBun } from "./utils/setBun"
 import { setGlobal } from "./utils/setGlobal"
+import { tailwindPatch } from "./utils/tailwindPatch"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
@@ -253,5 +254,7 @@ program
     })
 
 program.command("bun").description("设置 bun").action(setBun)
+
+program.command("tailwind-patch").alias("tp").description("tailwind 补丁").action(tailwindPatch)
 
 program.parse()
