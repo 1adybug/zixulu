@@ -1,9 +1,9 @@
-import consola from "consola"
-import dayjs from "dayjs"
 import { copyFile, mkdir, readdir } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
 import { downloadVscode, downloadVscodeExts, writeSyncVscodeScript } from "."
+import consola from "consola"
+import dayjs from "dayjs"
 
 export async function syncVscode() {
     const { default: inquirer } = await import("inquirer")

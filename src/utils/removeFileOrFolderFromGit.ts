@@ -1,6 +1,7 @@
-import consola from "consola"
 import { stat } from "fs/promises"
+import consola from "consola"
 import { execAsync } from "soda-nodejs"
+
 import { backupFirst } from "./backupFirst"
 
 /**

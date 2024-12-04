@@ -1,6 +1,7 @@
-import consola from "consola"
 import { readdir } from "fs/promises"
 import { join } from "path"
+import consola from "consola"
+
 import { getUpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
 import { upgradeDependency } from "./upgradeDependency"
 

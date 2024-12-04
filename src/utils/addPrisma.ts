@@ -1,7 +1,8 @@
-import consola from "consola"
 import { readdir } from "fs/promises"
+import consola from "consola"
 import { spawnAsync } from "soda-nodejs"
 import { PackageManager } from "src/constant"
+
 import { addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"
 

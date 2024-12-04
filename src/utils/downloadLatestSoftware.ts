@@ -1,8 +1,9 @@
-import { Software } from "@constant/index"
-import consola from "consola"
-import dayjs from "dayjs"
 import { mkdir } from "fs/promises"
 import { download7Zip, downloadChrome, downloadDeskGo, downloadGeekUninstaller, downloadGit, downloadNodeJS, downloadVscode } from "."
+import consola from "consola"
+import dayjs from "dayjs"
+
+import { Software } from "@constant/index"
 import { downloadAnydesk } from "./downloadAnydesk"
 import { downloadBun } from "./downloadBun"
 import { downloadFirefox } from "./downloadFirefox"

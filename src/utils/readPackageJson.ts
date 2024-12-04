@@ -1,5 +1,6 @@
-import consola from "consola"
 import { readFile } from "fs/promises"
+import consola from "consola"
+
 import { getPackageJsonPath } from "./getPackageJsonPath"
 
 /**

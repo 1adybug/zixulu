@@ -1,6 +1,7 @@
-import consola from "consola"
 import { mkdir, readdir, writeFile } from "fs/promises"
 import { join } from "path"
+import consola from "consola"
+
 import { addDependency } from "./addDependency"
 import { readPackageJson } from "./readPackageJson"
 

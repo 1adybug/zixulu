@@ -1,5 +1,6 @@
-import consola from "consola"
 import { rm, writeFile } from "fs/promises"
+import consola from "consola"
+
 import { addDependency } from "./addDependency"
 import { checkTailwind } from "./checkTailwind"
 import { createIndexHtml } from "./createIndexHtml"

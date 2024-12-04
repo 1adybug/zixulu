@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { resolve } from "path"
+import { Command } from "commander"
 
 import { CommitType } from "@constant/index"
 import { addAntd } from "@utils/addAntd"
@@ -33,8 +35,6 @@ import { syncVscode } from "@utils/syncVscode"
 import { tailwind } from "@utils/tailwind"
 import { upgradeDependency } from "@utils/upgradeDependency"
 import { vite } from "@utils/vite"
-import { Command } from "commander"
-import { resolve } from "path"
 import { actionWithBackup } from "./utils/actionWithBackup"
 import { addStartScript } from "./utils/addStartScript"
 import { addZipDist } from "./utils/addZipDist"

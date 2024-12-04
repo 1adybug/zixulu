@@ -1,5 +1,5 @@
-import consola from "consola"
 import { mkdir, readdir, stat, writeFile } from "fs/promises"
+import consola from "consola"
 
 export type CreateIndexHtmlConfig = {
     title: string

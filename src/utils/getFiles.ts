@@ -1,6 +1,6 @@
 import { Stats } from "fs"
 import { readdir, stat } from "fs/promises"
-import { join, parse, ParsedPath } from "path"
+import { ParsedPath, join, parse } from "path"
 
 export interface GetFilesOptions {
     /**

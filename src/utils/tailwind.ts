@@ -1,4 +1,5 @@
 import consola from "consola"
+
 import { addDependency } from "./addDependency"
 import { addPostCSSConfig } from "./addPostCSSConfig"
 import { addPrettier } from "./addPrettier"

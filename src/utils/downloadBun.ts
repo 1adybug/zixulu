@@ -1,7 +1,8 @@
 import { rename, rm } from "fs/promises"
 import { join } from "path"
-import { unzip } from "soda-nodejs"
 import { download } from "."
+import { unzip } from "soda-nodejs"
+
 import { getLatestRelease } from "./getLatestRelease"
 
 export async function downloadBun(dir: string) {
