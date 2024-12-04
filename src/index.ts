@@ -142,10 +142,7 @@ program
     .description("将 interface 转换为 type")
     .action(actionWithBackup(interfaceToType, getCommitMessage(CommitType.feature, "将 interface 转换为 type")))
 
-program
-    .command("gitignore")
-    .description("添加 .gitignore 配置")
-    .action(actionWithBackup(addGitignore, getCommitMessage(CommitType.feature, "添加 .gitignore 配置")))
+program.command("gitignore").description("添加 .gitignore 配置").action(actionWithBackup(addGitignore))
 
 program.command("git-proxy").alias("gp").description("设置 git 代理").action(setGitProxy)
 

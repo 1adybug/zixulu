@@ -66,14 +66,14 @@ export const agent = new HttpsProxyAgent("http://localhost:7890")
 export const addedRules = [
     "package-lock.json",
     "yarn.lock",
+    "pnpm-lock.yaml",
     "node_modules",
+    "bun.lockb",
     "dist",
     "build",
-    "pnpm-lock.yaml",
     "yarn-error.log",
     "test.js",
     "test.mjs",
     "test.ts",
     "test",
-    "bun.lockb",
 ]
