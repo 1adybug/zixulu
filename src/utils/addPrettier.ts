@@ -88,15 +88,12 @@ const config = {
     plugins: ["prettier-plugin-tailwindcss", "@ianvs/prettier-plugin-sort-imports"],
     importOrder: [
         "<BUILTIN_MODULES>",
-        "",
         "<THIRD_PARTY_MODULES>",
         "",
         \`^@.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
-        "",
         \`^\\\\.{1,2}/.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
         "",
         \`^@.+?\${assetExtsRegStr}\${assetQueryRegStr}$\`,
-        "",
         \`^\\\\.{1,2}/.+?\${assetExtsRegStr}\${assetQueryRegStr}$\`,
     ],
     importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
@@ -115,7 +112,7 @@ export async function addPrettier() {
         Object.keys(packageJson.dependencies ?? {}).includes("tailwindcss") || Object.keys(packageJson.devDependencies ?? {}).includes("tailwindcss")
     await writeFile("./prettier.config.mjs", tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
     const config: AddDependenciesConfig = {
-        package: ["prettier", "@ianvs/prettier-plugin-sort-imports"],
+        package: ["prettier", "@ianvs/prettier-plugin-sort-imports", "glob"],
         type: "devDependencies",
     }
     if (tailwind) (config.package as string[]).push("prettier-plugin-tailwindcss")
