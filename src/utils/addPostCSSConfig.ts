@@ -1,5 +1,5 @@
-import consola from "consola"
 import { rm, writeFile } from "fs/promises"
+import consola from "consola"
 
 const postcssConfig = `/** @type {import("postcss-load-config").Config} */
 const config = {

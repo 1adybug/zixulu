@@ -1,4 +1,5 @@
 import consola from "consola"
+
 import { getPackageJsonPath } from "./getPackageJsonPath"
 import { writeJson } from "./writeJson"
 

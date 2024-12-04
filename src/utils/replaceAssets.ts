@@ -1,11 +1,12 @@
-import consola from "consola"
 import { createWriteStream } from "fs"
-import { mkdir, readdir, readFile, stat, writeFile } from "fs/promises"
+import { mkdir, readFile, readdir, stat, writeFile } from "fs/promises"
+import { join, parse } from "path"
+import { Readable } from "stream"
+import consola from "consola"
 import { HttpsProxyAgent } from "https-proxy-agent"
 import md5 from "md5"
 import { Response } from "node-fetch"
-import { join, parse } from "path"
-import { Readable } from "stream"
+
 import { isAsset } from "./isAsset"
 import { retry } from "./retry"
 

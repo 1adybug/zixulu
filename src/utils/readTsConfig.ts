@@ -1,6 +1,7 @@
-import consola from "consola"
 import { readFile } from "fs/promises"
+import consola from "consola"
 import JSON5 from "json5"
+
 import { getTsConfigJsonPath } from "./getTsConfigPath"
 
 /** 读取 tsconfig.json */

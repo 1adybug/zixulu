@@ -1,4 +1,5 @@
 import consola from "consola"
+
 import { getPackageLatestVersion } from "./getPackageLatestVersion"
 import { readPackageJson } from "./readPackageJson"
 import { retry } from "./retry"

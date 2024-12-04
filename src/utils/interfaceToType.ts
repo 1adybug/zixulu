@@ -1,5 +1,6 @@
-import consola from "consola"
 import { readFile, writeFile } from "fs/promises"
+import consola from "consola"
+
 import { checkType } from "./checkType"
 import { getFiles } from "./getFiles"
 import { splitExtendsType } from "./splitExtendsType"

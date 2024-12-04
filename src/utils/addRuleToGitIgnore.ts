@@ -1,5 +1,6 @@
+import { readFile, readdir, writeFile } from "fs/promises"
+
 import { CommitType } from "@src/constant"
-import { readdir, readFile, writeFile } from "fs/promises"
 import { getCommitMessage } from "./getCommitMessage"
 
 export async function addRuleToGitIgnore(...rules: string[]) {

@@ -1,4 +1,5 @@
 import { spawnAsync } from "soda-nodejs"
+
 import { isShellProxy } from "./isShellProxy"
 
 export async function setShellProxy() {

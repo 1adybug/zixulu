@@ -1,5 +1,6 @@
-import consola from "consola"
 import { rm } from "fs/promises"
+import consola from "consola"
+
 import { getFiles } from "./getFiles"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"

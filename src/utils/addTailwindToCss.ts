@@ -1,6 +1,7 @@
-import consola from "consola"
 import { readFile, writeFile } from "fs/promises"
 import { parse } from "path"
+import consola from "consola"
+
 import { createEntryCss } from "./createEntryCss"
 import { getFiles } from "./getFiles"
 

@@ -1,5 +1,5 @@
-import consola from "consola"
 import { readFile, writeFile } from "fs/promises"
+import consola from "consola"
 
 export async function removeComment(path: string) {
     consola.start("开始删除注释")
