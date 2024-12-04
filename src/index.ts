@@ -42,6 +42,7 @@ import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
+import { removeLock } from "./utils/removeLock"
 import { replaceAssets } from "./utils/replaceAssets"
 import { setBun } from "./utils/setBun"
 import { setGlobal } from "./utils/setGlobal"
@@ -256,5 +257,11 @@ program
 program.command("bun").description("设置 bun").action(setBun)
 
 program.command("tailwind-patch").alias("tp").description("tailwind 补丁").action(tailwindPatch)
+
+program
+    .command("remove-lock")
+    .alias("rl")
+    .description("删除 lock 文件")
+    .action(actionWithBackup(() => removeLock()))
 
 program.parse()
