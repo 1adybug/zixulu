@@ -8,7 +8,6 @@ import { writePackageJson } from "./writePackageJson"
 export const prettierConfigText = `// @ts-check
 
 import { parse } from "path"
-
 import { globSync } from "glob"
 
 const jsExts = [".js", ".jsx", ".ts", ".tsx", ".cjs", ".mjs", ".cts", ".mts", ".vue"]
@@ -59,7 +58,6 @@ export default config
 export const prettierConfigTextWithTailwind = `// @ts-check
 
 import { parse } from "path"
-
 import { globSync } from "glob"
 
 const jsExts = [".js", ".jsx", ".ts", ".tsx", ".cjs", ".mjs", ".cts", ".mts", ".vue"]
