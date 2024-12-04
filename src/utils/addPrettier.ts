@@ -5,7 +5,28 @@ import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
 
-export const prettierConfigText = `/**
+export const prettierConfigText = `// @ts-check
+
+import { parse } from "path"
+
+import { globSync } from "glob"
+
+const jsExts = [".js", ".jsx", ".ts", ".tsx", ".cjs", ".mjs", ".cts", ".mts", ".vue"]
+
+const assetExts = Array.from(
+    new Set(
+        globSync("**/*", { ignore: ["node_modules/**"], withFileTypes: true })
+            .filter(path => path.isFile() && !jsExts.some(ext => path.name.toLowerCase().endsWith(ext)))
+            .map(path => parse(path.name).ext.slice(1))
+            .filter(ext => ext !== ""),
+    ),
+)
+
+const assetExtsRegStr = \`\\\\.(\${assetExts.join("|")}|\${assetExts.join("|").toUpperCase()})\`
+
+const assetQueryRegStr = "(\\\\?[a-zA-Z0-9]+)?"
+
+/**
  * @type {import("prettier").Options}
  */
 const config = {
@@ -13,13 +34,50 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
-    plugins: ["prettier-plugin-organize-imports"],
+    plugins: ["@ianvs/prettier-plugin-sort-imports"],
+    importOrder: [
+        "<BUILTIN_MODULES>",
+        "",
+        "<THIRD_PARTY_MODULES>",
+        "",
+        \`^@.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
+        "",
+        \`^\\\\.{1,2}/.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
+        "",
+        \`^@.+?\${assetExtsRegStr}\${assetQueryRegStr}$\`,
+        "",
+        \`^\\\\.{1,2}/.+?\${assetExtsRegStr}\${assetQueryRegStr}$\`,
+    ],
+    importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
+    importOrderTypeScriptVersion: "5.0.0",
+    importOrderCaseSensitive: true,
 }
 
 export default config
 `
 
-export const prettierConfigTextWithTailwind = `/**
+export const prettierConfigTextWithTailwind = `// @ts-check
+
+import { parse } from "path"
+
+import { globSync } from "glob"
+
+const jsExts = [".js", ".jsx", ".ts", ".tsx", ".cjs", ".mjs", ".cts", ".mts", ".vue"]
+
+const assetExts = Array.from(
+    new Set(
+        globSync("**/*", { ignore: ["node_modules/**"], withFileTypes: true })
+            .filter(path => path.isFile() && !jsExts.some(ext => path.name.toLowerCase().endsWith(ext)))
+            .map(path => parse(path.name).ext.slice(1))
+            .filter(ext => ext !== ""),
+    ),
+)
+
+const assetExtsRegStr = \`\\\\.(\${assetExts.join("|")}|\${assetExts.join("|").toUpperCase()})\`
+
+const assetQueryRegStr = "(\\\\?[a-zA-Z0-9]+)?"
+
+/**
  * @type {import("prettier").Options}
  */
 const config = {
@@ -27,7 +85,23 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
-    plugins: ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"],
+    plugins: ["prettier-plugin-tailwindcss", "@ianvs/prettier-plugin-sort-imports"],
+    importOrder: [
+        "<BUILTIN_MODULES>",
+        "",
+        "<THIRD_PARTY_MODULES>",
+        "",
+        \`^@.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
+        "",
+        \`^\\\\.{1,2}/.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
+        "",
+        \`^@.+?\${assetExtsRegStr}\${assetQueryRegStr}$\`,
+        "",
+        \`^\\\\.{1,2}/.+?\${assetExtsRegStr}\${assetQueryRegStr}$\`,
+    ],
+    importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
+    importOrderTypeScriptVersion: "5.0.0",
+    importOrderCaseSensitive: true,
 }
 
 export default config
@@ -41,7 +115,7 @@ export async function addPrettier() {
         Object.keys(packageJson.dependencies ?? {}).includes("tailwindcss") || Object.keys(packageJson.devDependencies ?? {}).includes("tailwindcss")
     await writeFile("./prettier.config.mjs", tailwind ? prettierConfigTextWithTailwind : prettierConfigText)
     const config: AddDependenciesConfig = {
-        package: ["prettier", "prettier-plugin-organize-imports"],
+        package: ["prettier", "@ianvs/prettier-plugin-sort-imports"],
         type: "devDependencies",
     }
     if (tailwind) (config.package as string[]).push("prettier-plugin-tailwindcss")
