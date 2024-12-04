@@ -179,5 +179,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
 
     await replace(input)
 
+    consola.success(errors.size > 0 ? "替换完成，以下文件下载失败：" : "替换完成")
+
     errors.forEach(url => consola.error(url))
 }
