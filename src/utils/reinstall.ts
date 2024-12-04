@@ -1,4 +1,5 @@
 import { rm } from "fs/promises"
+
 import { getPackageManager } from "./getPackageManager"
 import { installDependceny } from "./installDependceny"
 

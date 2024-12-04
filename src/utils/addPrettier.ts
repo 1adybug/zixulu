@@ -1,5 +1,6 @@
-import consola from "consola"
 import { writeFile } from "fs/promises"
+import consola from "consola"
+
 import { AddDependenciesConfig, addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
@@ -36,15 +37,12 @@ const config = {
     plugins: ["@ianvs/prettier-plugin-sort-imports"],
     importOrder: [
         "<BUILTIN_MODULES>",
-        "",
         "<THIRD_PARTY_MODULES>",
         "",
         \`^@.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
-        "",
         \`^\\\\.{1,2}/.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
         "",
         \`^@.+?\${assetExtsRegStr}\${assetQueryRegStr}$\`,
-        "",
         \`^\\\\.{1,2}/.+?\${assetExtsRegStr}\${assetQueryRegStr}$\`,
     ],
     importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],

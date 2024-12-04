@@ -1,7 +1,7 @@
 import { CommitType } from "@constant/index"
 import { getCommitMessage } from "./getCommitMessage"
 import { getPackageUpgradeVersion } from "./getPackageUpgradeVersion"
-import { getUpgradeDependencyConfig, UpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
+import { UpgradeDependencyConfig, getUpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
 import { getVersionFromRequiredVersion } from "./getVersionFromRequiredVersion"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"

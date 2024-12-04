@@ -1,7 +1,8 @@
-import consola from "consola"
 import { mkdir, readdir, rename, rm } from "fs/promises"
 import { join } from "path"
+import consola from "consola"
 import { execAsync, zip } from "soda-nodejs"
+
 import { getPackageVersionInDependcy } from "./getPackageVersionInDependcy"
 
 export async function downloadNpm(name: string) {

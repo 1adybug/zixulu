@@ -1,4 +1,5 @@
 import consola from "consola"
+
 import { getPackageVersions } from "./getPackageVersions"
 import { UpgradeLevel } from "./getUpgradeDependencyConfig"
 import { getVersionNum } from "./getVersionNum"

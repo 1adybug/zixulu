@@ -1,5 +1,6 @@
-import consola from "consola"
 import { readFileSync } from "fs"
+import consola from "consola"
+
 import { getPackageJsonPath } from "./getPackageJsonPath"
 
 /**

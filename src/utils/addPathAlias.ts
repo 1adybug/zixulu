@@ -1,6 +1,7 @@
-import { CommitType } from "@src/constant"
 import { readFile, writeFile } from "fs/promises"
 import { join, parse } from "path"
+
+import { CommitType } from "@src/constant"
 import { getCommitMessage } from "./getCommitMessage"
 import { getFiles } from "./getFiles"
 import { getRelativePath } from "./getRelativePath"

@@ -1,8 +1,9 @@
-import consola from "consola"
 import { rm, writeFile } from "fs/promises"
+import consola from "consola"
+
 import { addGitignore } from "./addGitignore"
 import { readPackageJson } from "./readPackageJson"
-import { Module, ModuleResolution, setTsConfig, Target } from "./setTsConfig"
+import { Module, ModuleResolution, Target, setTsConfig } from "./setTsConfig"
 import { sortArrayOrObject } from "./sortArrayOrObject"
 import { writePackageJson } from "./writePackageJson"
 

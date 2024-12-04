@@ -1,5 +1,6 @@
-import consola from "consola"
 import { readFile, writeFile } from "fs/promises"
+import consola from "consola"
+
 import { getFiles } from "./getFiles"
 import { getTypeInGenerics } from "./getTypeInGenerics"
 

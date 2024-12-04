@@ -1,5 +1,6 @@
-import consola from "consola"
 import { exit } from "process"
+import consola from "consola"
+
 import { readTsConfig } from "./readTsConfig"
 import { writeTsConfig } from "./writeTsConfig"
 

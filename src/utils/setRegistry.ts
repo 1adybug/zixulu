@@ -1,6 +1,7 @@
-import { PackageManager, Registry } from "@constant/index"
 import { getEnumKeys, getEnumValues } from "deepsea-tools"
 import { spawnAsync } from "soda-nodejs"
+
+import { PackageManager, Registry } from "@constant/index"
 import { readBunConfig } from "./readBunConfig"
 import { writeBunConfig } from "./writeBunConfig"
 

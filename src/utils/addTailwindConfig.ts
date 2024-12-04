@@ -1,5 +1,5 @@
-import consola from "consola"
 import { writeFile } from "fs/promises"
+import consola from "consola"
 
 export const tailwindConfig = `import { Config } from "tailwindcss"
 

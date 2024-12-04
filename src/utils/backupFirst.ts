@@ -1,5 +1,6 @@
-import consola from "consola"
 import { exit } from "process"
+import consola from "consola"
+
 import { hasChangeNoCommit } from "./hasChangeNoCommit"
 import { isRepository } from "./isRepository"
 import { shouldContinue } from "./shouldContinue"

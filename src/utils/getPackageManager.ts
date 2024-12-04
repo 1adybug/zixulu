@@ -1,6 +1,7 @@
-import { PackageManager } from "@src/constant"
-import { getEnumValues } from "deepsea-tools"
 import { readdir } from "fs/promises"
+import { getEnumValues } from "deepsea-tools"
+
+import { PackageManager } from "@src/constant"
 
 declare global {
     var __ZIXULU_PACKAGE_MANAGER__: PackageManager | undefined

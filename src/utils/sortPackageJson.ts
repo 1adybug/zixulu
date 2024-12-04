@@ -1,4 +1,5 @@
 import consola from "consola"
+
 import { readPackageJson } from "./readPackageJson"
 import { sortArrayOrObject } from "./sortArrayOrObject"
 import { writePackageJson } from "./writePackageJson"

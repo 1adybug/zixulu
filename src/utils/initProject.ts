@@ -1,5 +1,6 @@
-import { ProjectType } from "@constant/index"
 import consola from "consola"
+
+import { ProjectType } from "@constant/index"
 import { addAntd } from "./addAntd"
 import { addDependency } from "./addDependency"
 import { addGitignore } from "./addGitignore"
