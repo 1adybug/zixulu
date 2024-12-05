@@ -1,5 +1,6 @@
 // @ts-check
 
+import { readFileSync } from "fs"
 import { parse } from "path"
 import { globSync } from "glob"
 
@@ -18,6 +19,17 @@ const assetExtsRegStr = `\\.(${assetExts.join("|")}|${assetExts.join("|").toUppe
 
 const assetQueryRegStr = "(\\?[a-zA-Z0-9]+)?"
 
+const packageJson = JSON.parse(readFileSync("package.json", "utf8"))
+
+const namespaces = Object.keys({
+    ...packageJson.dependencies,
+    ...packageJson.devDependencies,
+    ...packageJson.peerDependencies,
+    ...packageJson.optionalDependencies,
+})
+    .filter(dep => dep.startsWith("@"))
+    .map(dep => dep.split("/")[0].slice(1))
+
 /**
  * @type {import("prettier").Options}
  */
@@ -29,6 +41,7 @@ const config = {
     plugins: ["@ianvs/prettier-plugin-sort-imports"],
     importOrder: [
         "<BUILTIN_MODULES>",
+        `^@(${namespaces.join("|")})/`,
         "<THIRD_PARTY_MODULES>",
         "",
         `^@.+?(?<!${assetExtsRegStr}${assetQueryRegStr})$`,
