@@ -106,7 +106,7 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
-    plugins: ["prettier-plugin-tailwindcss", "@ianvs/prettier-plugin-sort-imports"],
+    plugins: ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
     importOrder: [
         "<BUILTIN_MODULES>",
         \`^@(\${namespaces.join("|")})/\`,
