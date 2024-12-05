@@ -9,14 +9,14 @@ import { writePackageJson } from "./writePackageJson"
 export const prettierConfigText = `// @ts-check
 
 import { readFileSync } from "fs"
-import { parse } from "path"
+import { join, parse } from "path"
 import { globSync } from "glob"
 
 const jsExts = [".js", ".jsx", ".ts", ".tsx", ".cjs", ".mjs", ".cts", ".mts", ".vue"]
 
 const assetExts = Array.from(
     new Set(
-        globSync("**/*", { ignore: ["node_modules/**"], withFileTypes: true })
+        globSync("**/*", { ignore: ["node_modules/**"], withFileTypes: true, cwd: import.meta.dirname })
             .filter(path => path.isFile() && !jsExts.some(ext => path.name.toLowerCase().endsWith(ext)))
             .map(path => parse(path.name).ext.slice(1))
             .filter(ext => ext !== ""),
@@ -27,7 +27,7 @@ const assetExtsRegStr = \`\\\\.(\${assetExts.join("|")}|\${assetExts.join("|").t
 
 const assetQueryRegStr = "(\\\\?[a-zA-Z0-9]+)?"
 
-const packageJson = JSON.parse(readFileSync("package.json", "utf8"))
+const packageJson = JSON.parse(readFileSync(join(import.meta.dirname, "package.json"), "utf8"))
 
 const namespaces = Object.keys({
     ...packageJson.dependencies,
@@ -69,14 +69,14 @@ export default config
 export const prettierConfigTextWithTailwind = `// @ts-check
 
 import { readFileSync } from "fs"
-import { parse } from "path"
+import { join, parse } from "path"
 import { globSync } from "glob"
 
 const jsExts = [".js", ".jsx", ".ts", ".tsx", ".cjs", ".mjs", ".cts", ".mts", ".vue"]
 
 const assetExts = Array.from(
     new Set(
-        globSync("**/*", { ignore: ["node_modules/**"], withFileTypes: true })
+        globSync("**/*", { ignore: ["node_modules/**"], withFileTypes: true, cwd: import.meta.dirname })
             .filter(path => path.isFile() && !jsExts.some(ext => path.name.toLowerCase().endsWith(ext)))
             .map(path => parse(path.name).ext.slice(1))
             .filter(ext => ext !== ""),
@@ -87,7 +87,7 @@ const assetExtsRegStr = \`\\\\.(\${assetExts.join("|")}|\${assetExts.join("|").t
 
 const assetQueryRegStr = "(\\\\?[a-zA-Z0-9]+)?"
 
-const packageJson = JSON.parse(readFileSync("package.json", "utf8"))
+const packageJson = JSON.parse(readFileSync(join(import.meta.dirname, "package.json"), "utf8"))
 
 const namespaces = Object.keys({
     ...packageJson.dependencies,
