@@ -55,6 +55,12 @@ const namespaces = unique(
         .map(dep => dep.split("/")[0].slice(1)),
 )
 
+const folders = unique(
+    globSync("**/*", { withFileTypes: true, cwd: import.meta.dirname, ignore: ["node_modules/**"] })
+        .filter(path => path.isDirectory())
+        .map(path => path.name),
+).sort()
+
 /**
  * @type {import("prettier").Options}
  */
@@ -68,6 +74,7 @@ const config = {
         "<BUILTIN_MODULES>",
         \`^@(\${namespaces.join("|")})/\`,
         "<THIRD_PARTY_MODULES>",
+        ...folders.map(folder => ["", \`^@/?\${folder}.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`]).flat(),
         "",
         \`^@.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
         \`^\\\\.{1,2}/.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
@@ -132,6 +139,12 @@ const namespaces = unique(
         .map(dep => dep.split("/")[0].slice(1)),
 )
 
+const folders = unique(
+    globSync("**/*", { withFileTypes: true, cwd: import.meta.dirname, ignore: ["node_modules/**"] })
+        .filter(path => path.isDirectory())
+        .map(path => path.name),
+).sort()
+
 /**
  * @type {import("prettier").Options}
  */
@@ -145,6 +158,7 @@ const config = {
         "<BUILTIN_MODULES>",
         \`^@(\${namespaces.join("|")})/\`,
         "<THIRD_PARTY_MODULES>",
+        ...folders.map(folder => ["", \`^@/?\${folder}.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`]).flat(),
         "",
         \`^@.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
         \`^\\\\.{1,2}/.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
