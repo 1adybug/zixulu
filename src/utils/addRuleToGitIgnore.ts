@@ -12,13 +12,10 @@ export async function addRuleToGitIgnore(...rules: string[]) {
     }
     const gitignore = await readFile(".gitignore", "utf-8")
     const rules2 = gitignore.split("\n").map(v => v.trim())
-    let added = false
     for (const rule of rules) {
         if (rules2.includes(rule)) continue
-        added = true
         rules2.push(rule)
     }
-    if (!added) throw new Error("规则已存在")
     await writeFile(".gitignore", rules2.join("\n"), "utf-8")
     return message
 }
