@@ -8,6 +8,7 @@ import { execAsync, unzip } from "soda-nodejs"
 import YAML from "yaml"
 
 import { agent } from "@constant/index"
+
 import { getZixuluSetting } from "./getZixuluSetting"
 import { retry } from "./retry"
 import { setZixuluSetting } from "./setZixuluSetting"
@@ -331,52 +332,12 @@ export async function downloadVscodeExts(dir: string) {
     })
     setting.vscodeDownloadHistory = exts2.exts
     await setZixuluSetting(setting)
-    for (const ext of exts) {
-        if (!exts2.exts.includes(ext.id)) continue
-        consola.start(`正在下载 ${ext.name}`)
-        await retry(() => download(ext.url, dir, `${ext.id}-${ext.version}.vsix`), 4)
-    }
-}
-
-export async function writeSyncVscodeScript(dir: string) {
-    const script = `// @ts-check
-import { spawn } from "child_process"
-import { readdir, copyFile, rm } from "fs/promises"
-import { homedir } from "os"
-import { join } from "path"
-
-/** 
- * @param {string} command
- */
-function spawnAsync(command) {
-    return new Promise((resolve, reject) => {
-        const child = spawn(command, { shell: true, stdio: "inherit" })
-        child.on("exit", code => {
-            if (code !== 0) return reject(new Error(\`Command failed with code \${code}\`))
-            resolve(0)
-        })
-    })
-}
-
-async function main() {
-    const dir = await readdir("./extensions")
-    for (const ext of dir) {
-        await spawnAsync(\`code --install-extension "./extensions/\${ext}"\`)
-    }
-    const userDir = homedir()
-    const setting = join(userDir, "AppData/Roaming/Code/User/settings.json")
-    await rm(setting, { force: true })
-    await copyFile("./settings.json", setting)
-    const snippetTarget = join(userDir, "AppData/Roaming/Code/User/snippets")
-    const dir2 = await readdir("./snippets")
-    for (const file of dir2) {
-        await rm(join(snippetTarget, file), { force: true })
-        await copyFile(join("./snippets", file), join(snippetTarget, file))
-    }
-}
-
-main()`
-    await writeFile(join(dir, "syncVscode.mjs"), script, "utf-8")
+    // for (const ext of exts) {
+    //     if (!exts2.exts.includes(ext.id)) continue
+    //     consola.start(`正在下载 ${ext.name}`)
+    //     await retry(() => download(ext.url, dir, `${ext.id}-${ext.version}.vsix`), 4)
+    // }
+    await Promise.all(exts.filter(ext => exts2.exts.includes(ext.id)).map(ext => retry(() => download(ext.url, dir, `${ext.id}-${ext.version}.vsix`), 4)))
 }
 
 export async function getProcessInfoFromPid(pid: number) {
