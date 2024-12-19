@@ -1,6 +1,7 @@
 import { spawnAsync } from "soda-nodejs"
 
 import { PackageManager } from "@src/constant"
+
 import { getPackageManager } from "@utils/getPackageManager"
 
 export type InstallDependcenyConfig = {

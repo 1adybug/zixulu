@@ -1,4 +1,5 @@
 import { CommitType } from "@constant/index"
+
 import { getCommitMessage } from "./getCommitMessage"
 import { getPackageUpgradeVersion } from "./getPackageUpgradeVersion"
 import { UpgradeDependencyConfig, getUpgradeDependencyConfig } from "./getUpgradeDependencyConfig"

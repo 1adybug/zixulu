@@ -1,6 +1,7 @@
 import { execAsync } from "soda-nodejs"
 
 import { PackageManager } from "@src/constant"
+
 import { getPackageManager } from "./getPackageManager"
 import { readBunConfig } from "./readBunConfig"
 

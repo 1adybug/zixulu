@@ -3,6 +3,7 @@ import { resolve } from "path"
 import { Command } from "commander"
 
 import { CommitType } from "@constant/index"
+
 import { addAntd } from "@utils/addAntd"
 import { addGitignore } from "@utils/addGitignore"
 import { addFolderPathAlias, replacePathAlias } from "@utils/addPathAlias"
@@ -35,6 +36,7 @@ import { syncVscode } from "@utils/syncVscode"
 import { tailwind } from "@utils/tailwind"
 import { upgradeDependency } from "@utils/upgradeDependency"
 import { vite } from "@utils/vite"
+
 import { actionWithBackup } from "./utils/actionWithBackup"
 import { addStartScript } from "./utils/addStartScript"
 import { addZipDist } from "./utils/addZipDist"

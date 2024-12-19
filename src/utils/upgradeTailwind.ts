@@ -2,6 +2,7 @@ import { rename } from "fs/promises"
 import consola from "consola"
 
 import { CommitType } from "@src/constant"
+
 import { getCommitMessage } from "./getCommitMessage"
 import { getPackageUpgradeVersion } from "./getPackageUpgradeVersion"
 import { getPackageVersionInDependcy } from "./getPackageVersionInDependcy"
