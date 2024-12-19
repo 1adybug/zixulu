@@ -1,6 +1,7 @@
 import consola from "consola"
 
 import { CommitType } from "@src/constant"
+
 import { getCommitMessage } from "./getCommitMessage"
 import { getPackageLatestVersion } from "./getPackageLatestVersion"
 import { installDependceny } from "./installDependceny"

@@ -63,6 +63,8 @@ const config = {
     printWidth: 160,
     plugins: ["@ianvs/prettier-plugin-sort-imports"],
     importOrder: [
+        "^react\\/?.*$",
+        "^react-dom\\/?.*$",
         "<BUILTIN_MODULES>",
         `^@(${namespaces.join("|")})/`,
         "<THIRD_PARTY_MODULES>",
