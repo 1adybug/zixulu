@@ -1,6 +1,7 @@
 import { rm } from "fs/promises"
 
 import { CommitType } from "@src/constant"
+
 import { addRuleToGitIgnore } from "./addRuleToGitIgnore"
 import { getCommitMessage } from "./getCommitMessage"
 

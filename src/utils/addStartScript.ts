@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "fs/promises"
 import consola from "consola"
 
 import { CommitType } from "@src/constant"
+
 import { addDependency } from "./addDependency"
 import { getCommitMessage } from "./getCommitMessage"
 import { installDependceny } from "./installDependceny"
