@@ -82,6 +82,7 @@ const config = {
     importOrder: [
         "^react(\\\\/.+)?$",
         "^react-dom(\\\\/.+)?$",
+        "^react-native(\\\\/.+)?$",
         "<BUILTIN_MODULES>",
         \`^@(\${namespaces.join("|")})/\`,
         "<THIRD_PARTY_MODULES>",
