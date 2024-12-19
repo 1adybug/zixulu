@@ -80,8 +80,8 @@ const config = {
     printWidth: 160,
     plugins: [${plugins.map(plugin => `"${plugin}"`).join(", ")}],
     importOrder: [
-        "^react\\\\/?.*$",
-        "^react-dom\\\\/?.*$",
+        "^react(\\\\/.+)?$",
+        "^react-dom(\\\\/.+)?$",
         "<BUILTIN_MODULES>",
         \`^@(\${namespaces.join("|")})/\`,
         "<THIRD_PARTY_MODULES>",
