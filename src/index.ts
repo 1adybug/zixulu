@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { resolve } from "path"
 import { Command } from "commander"
+import { emailReg } from "deepsea-tools"
 
 import { CommitType } from "@constant/index"
 
@@ -46,6 +47,7 @@ import { getHeaders } from "./utils/getHeaders"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { removeLock } from "./utils/removeLock"
 import { replaceAssets } from "./utils/replaceAssets"
+import { CommitAuthor, replaceCommitAuthor } from "./utils/replaceCommitAuthor"
 import { setBun } from "./utils/setBun"
 import { setGlobal } from "./utils/setGlobal"
 import { tailwindPatch } from "./utils/tailwindPatch"
@@ -262,5 +264,34 @@ program
     .alias("rl")
     .description("删除 lock 文件")
     .action(actionWithBackup(() => removeLock()))
+
+program
+    .command("rename-commit-author")
+    .alias("rca")
+    .description("重写 Git 提交历史的作者信息")
+    .arguments("[infos...]")
+    .action(async (infos: string[]) => {
+        let prev: CommitAuthor | undefined
+        let next: CommitAuthor | undefined
+        infos = infos.slice(0, 2)
+        function getUsernameAndEmail(info: string): CommitAuthor {
+            const index = info.indexOf(":")
+            if (index === -1) {
+                if (emailReg.test(info)) return { email: info }
+                return { name: info }
+            }
+            return {
+                name: info.slice(0, index),
+                email: info.slice(index + 1),
+            }
+        }
+        if (infos.length === 0) throw new Error("请输入作者信息！")
+        else if (infos.length === 1) next = getUsernameAndEmail(infos[0])
+        else {
+            prev = getUsernameAndEmail(infos[0])
+            next = getUsernameAndEmail(infos[1])
+        }
+        await replaceCommitAuthor({ prev, next })
+    })
 
 program.parse()
