@@ -1,4 +1,4 @@
-import { downloadFromWinget } from "."
+import { downloadFromWinget } from "./downloadFromWinget"
 
 export async function downloadAnydesk(dir: string) {
     await downloadFromWinget({

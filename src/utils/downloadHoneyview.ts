@@ -1,4 +1,4 @@
-import { downloadFromWinget } from "."
+import { downloadFromWinget } from "./downloadFromWinget"
 
 export async function downloadHoneyview(dir: string) {
     await downloadFromWinget({

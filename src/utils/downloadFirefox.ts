@@ -1,4 +1,4 @@
-import { downloadFromWinget } from "."
+import { downloadFromWinget } from "./downloadFromWinget"
 
 export async function downloadFirefox(dir: string) {
     await downloadFromWinget({

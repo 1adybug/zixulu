@@ -1,16 +1,22 @@
 import { mkdir } from "fs/promises"
-import { download7Zip, downloadChrome, downloadDeskGo, downloadGeekUninstaller, downloadGit, downloadNodeJS, downloadVscode } from "."
 import consola from "consola"
 import dayjs from "dayjs"
 
 import { Software } from "@constant/index"
 
+import { download7Zip } from "./download7Zip"
 import { downloadAnydesk } from "./downloadAnydesk"
 import { downloadBun } from "./downloadBun"
+import { downloadChrome } from "./downloadChrome"
+import { downloadDeskGo } from "./downloadDeskGo"
 import { downloadFirefox } from "./downloadFirefox"
+import { downloadGeekUninstaller } from "./downloadGeekUninstaller"
+import { downloadGit } from "./downloadGit"
 import { downloadHoneyview } from "./downloadHoneyview"
+import { downloadNodeJS } from "./downloadNodeJS"
 import { downloadPotPlayer } from "./downloadPotPlayer"
 import { downloadPowerToys } from "./downloadPowerToys"
+import { downloadVscode } from "./downloadVscode"
 import { getZixuluSetting } from "./getZixuluSetting"
 import { setZixuluSetting } from "./setZixuluSetting"
 
