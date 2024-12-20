@@ -1,9 +1,9 @@
 import { downloadFromWinget } from "./downloadFromWinget"
 
-export async function downloadPotPlayer(dir: string) {
+export async function downloadChrome(dir: string) {
     await downloadFromWinget({
-        name: "PotPlayer",
-        id: "Daum.PotPlayer",
+        name: "Chrome",
+        id: "Google.Chrome",
         dir,
         filter: item => item.Architecture === "x64",
     })

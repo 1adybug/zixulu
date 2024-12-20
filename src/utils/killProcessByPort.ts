@@ -1,6 +1,7 @@
 import { exec } from "child_process"
-import { getPidInfoFromPort, getProcessInfoFromPid } from "."
 import consola from "consola"
+
+import { getPidInfoFromPort, getProcessInfoFromPid } from "./processInfo"
 
 export async function killProcessByPort(port: string | number) {
     port = typeof port === "string" ? parseInt(port) : port
