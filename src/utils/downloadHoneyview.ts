@@ -1,10 +1,5 @@
-import { downloadFromWinget } from "./downloadFromWinget"
+import { download } from "./download"
 
 export async function downloadHoneyview(dir: string) {
-    await downloadFromWinget({
-        name: "Honeyview",
-        id: "Bandisoft.Honeyview",
-        dir,
-        filter: item => item.InstallerLocale === "en-US",
-    })
+    await download("https://www.bandisoft.com/honeyview/dl.php?web", dir, "Honeyview-5.53-neutral.exe")
 }
