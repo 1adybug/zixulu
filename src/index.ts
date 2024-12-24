@@ -120,10 +120,9 @@ program
     .description("升级工作区项目依赖")
     .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
     .option("-p, --proxy", "是否使用代理")
-    .argument("[dir]", "项目目录", "packages")
-    .action(async (dir, options) => {
+    .action(async options => {
         setGlobal(options)
-        await upgradeWorkspaceDependceny(dir)
+        await upgradeWorkspaceDependceny()
     })
 
 program.command("registry").description("设置 npm registry").action(setRegistry)
