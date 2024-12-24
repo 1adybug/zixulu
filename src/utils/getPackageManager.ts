@@ -18,7 +18,12 @@ export async function getPackageManager(dir = "."): Promise<PackageManager> {
     if (dir2.includes("pnpm-lock.yaml")) return PackageManager.pnpm
     if (dir2.includes("bun.lockb")) return PackageManager.bun
     const { default: inquirer } = await import("inquirer")
-    const { manager } = await inquirer.prompt<{ manager: PackageManager }>({
+
+    type PromptResult = {
+        manager: PackageManager
+    }
+
+    const { manager } = await inquirer.prompt<PromptResult>({
         type: "list",
         name: "manager",
         message: "请选择包管理器",

@@ -16,7 +16,7 @@ export type UpgradeInfo = {
 }
 
 export async function upgradeDependency(config?: UpgradeDependencyConfig): Promise<string> {
-    const { dir, types, level } = config ?? (await getUpgradeDependencyConfig())
+    const { dir, types, level } = config ?? (await getUpgradeDependencyConfig("types", "level"))
     const { default: inquirer } = await import("inquirer")
     const packageJson = await readPackageJson(dir)
 

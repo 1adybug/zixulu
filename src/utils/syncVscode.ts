@@ -104,7 +104,12 @@ main()`
             consola.success("下载最新 VSCode 完成")
         }
     } catch (error) {
-        const { clear } = await inquirer.prompt<{ clear: boolean }>({
+
+        type PromptResult = {
+            clear: boolean
+        }
+
+        const { clear } = await inquirer.prompt<PromptResult>({
             type: "confirm",
             name: "clear",
             message: "检测到错误，是否清理下载的文件",

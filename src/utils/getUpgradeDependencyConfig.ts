@@ -14,7 +14,7 @@ export type UpgradeDependencyConfig = {
  */
 export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependencyConfig = keyof UpgradeDependencyConfig>(
     ...keys: T[]
-): Promise<Pick<UpgradeDependencyConfig, T>> {
+): Promise<Pick<UpgradeDependencyConfig, T> & Partial<Pick<UpgradeDependencyConfig, Exclude<keyof UpgradeDependencyConfig, T>>>> {
     const ks = keys.length === 0 ? ["dir", "types", "level"] : keys
     const { default: inquirer } = await import("inquirer")
 
@@ -23,7 +23,7 @@ export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependen
     if (ks.includes("dir"))
         questions.push({
             type: "input",
-            name: "dir2",
+            name: "dir",
             message: "请输入升级的目录",
             default: ".",
         })
