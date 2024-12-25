@@ -57,6 +57,7 @@ import { tailwindPatch } from "./utils/tailwindPatch"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
+import { test } from "./utils/test"
 
 const program = new Command()
 
@@ -306,5 +307,7 @@ program
     .option("-m, --monorepo", "是否是 monorepo")
     .description("添加同步包脚本")
     .action(actionWithBackup(addSyncPackageScript))
+
+program.command("test").action(test)
 
 program.parse()

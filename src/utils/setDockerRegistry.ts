@@ -32,6 +32,6 @@ export async function setDockerRegistry() {
     ])
     daemon["registry-mirrors"].push(...mirrors.split(/[,，]/))
     await writeFile("/etc/docker/daemon.json", JSON.stringify(daemon, undefined, 4), "utf-8")
-    await execAsync("sudo systemctl daemon-reload")
-    await execAsync("sudo systemctl restart docker")
+    await execAsync("systemctl daemon-reload")
+    await execAsync("systemctl restart docker")
 }
