@@ -5,9 +5,9 @@ import { execAsync } from "soda-nodejs"
 import { agent } from "@constant/index"
 
 import { download } from "./download"
-import { getZixuluSetting } from "./getZixuluSetting"
+import { readZixuluSetting } from "./readZixuluSetting"
 import { retry } from "./retry"
-import { setZixuluSetting } from "./setZixuluSetting"
+import { writeZixuluSetting } from "./writeZixuluSetting"
 
 // 定义 VscodeExt 接口
 export interface VscodeExt {
@@ -60,7 +60,7 @@ export async function downloadVscodeExts(dir: string) {
             .filter(Boolean)
             .map(ext => getVscodeExtInfo(ext)),
     )
-    const setting = await getZixuluSetting()
+    const setting = await readZixuluSetting()
     const vscodeDownloadHistory = setting?.vscodeDownloadHistory as string[] | undefined
     const exts2 = await inquirer.prompt({
         type: "checkbox",
@@ -70,6 +70,6 @@ export async function downloadVscodeExts(dir: string) {
         default: vscodeDownloadHistory?.filter(ext => exts.some(item => item.id === ext)) || exts.map(ext => ext.id),
     })
     setting.vscodeDownloadHistory = exts2.exts
-    await setZixuluSetting(setting)
+    await writeZixuluSetting(setting)
     await Promise.all(exts.filter(ext => exts2.exts.includes(ext.id)).map(ext => retry(() => download(ext.url, dir, `${ext.id}-${ext.version}.vsix`), 4)))
 }

@@ -11,7 +11,7 @@
         "build": "father build",
         "build:deps": "father prebundle",
         "prepublishOnly": "father doctor && npm run build",
-        "postpublishOnly": "npm run sync",
+        "postpublish": "npm run sync",
         "lint": "prettier --write .",
         "sync": "node scripts/syncPackage.mjs"
     },

@@ -5,8 +5,8 @@ import consola from "consola"
 
 import { actionWithBackup } from "./actionWithBackup"
 import { getUpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
-import { getZixuluSetting } from "./getZixuluSetting"
-import { setZixuluSetting } from "./setZixuluSetting"
+import { readZixuluSetting } from "./readZixuluSetting"
+import { writeZixuluSetting } from "./writeZixuluSetting"
 import { upgradeDependency } from "./upgradeDependency"
 
 export async function upgradeWorkspaceDependceny() {
@@ -22,7 +22,7 @@ export async function upgradeWorkspaceDependceny() {
         if (dir3.includes("package.json")) packages2.push(pkg)
     }
 
-    const setting = await getZixuluSetting()
+    const setting = await readZixuluSetting()
 
     const { default: inquirer } = await import("inquirer")
     type PromptResult = {
@@ -41,7 +41,7 @@ export async function upgradeWorkspaceDependceny() {
     setting.upgradeWorkspaceDependcenyHistory ??= {}
     setting.upgradeWorkspaceDependcenyHistory[dir2] = packages3
 
-    await setZixuluSetting(setting)
+    await writeZixuluSetting(setting)
 
     for (const pkg of packages3) {
         consola.start(`开始升级 ${pkg} 的依赖`)

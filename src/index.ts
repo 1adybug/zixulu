@@ -43,14 +43,15 @@ import { addStartScript } from "./utils/addStartScript"
 import { addSyncPackageScript } from "./utils/addSyncPackageScript"
 import { addZipDist } from "./utils/addZipDist"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
-import { docker } from "./utils/docker"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
+import { installDocker } from "./utils/installDocker"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { removeLock } from "./utils/removeLock"
 import { replaceAssets } from "./utils/replaceAssets"
 import { CommitAuthor, replaceCommitAuthor } from "./utils/replaceCommitAuthor"
 import { setBun } from "./utils/setBun"
+import { setDockerRegistry } from "./utils/setDockerRegistry"
 import { setGlobal } from "./utils/setGlobal"
 import { tailwindPatch } from "./utils/tailwindPatch"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
@@ -295,10 +296,12 @@ program
         await replaceCommitAuthor({ prev, next })
     })
 
-program.command("docker").description("安装 Docker").action(docker)
+program.command("install-docker").alias("id").description("安装 Docker").action(installDocker)
+
+program.command("set-docker-registry").alias("sdr").description("设置 Docker 镜像地址").action(setDockerRegistry)
 
 program
-    .command("addSyncPackageScript")
+    .command("add-sync")
     .alias("asp")
     .option("-m, --monorepo", "是否是 monorepo")
     .description("添加同步包脚本")

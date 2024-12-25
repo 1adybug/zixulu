@@ -1,10 +1,14 @@
-import { mkdir, readdir, writeFile } from "fs/promises"
+import { readdir, rm } from "fs/promises"
 import { JSDOM } from "jsdom"
 import { execAsync } from "soda-nodejs"
 
-export async function docker() {
-    const isRoot = !!process.env.SUDO_USER
-    if (!isRoot) throw new Error("请使用 root 用户执行命令")
+import { isSudo } from "@src/constant"
+
+import { setDockerRegistry } from "./setDockerRegistry"
+import { sudoCommand } from "./sudoCommand"
+
+export async function installDocker() {
+    if (!isSudo) return sudoCommand()
     const info = await execAsync("lsb_release -a")
     const distributorId = info.match(/Distributor ID:\s+(.+)/)?.[1]
     if (distributorId !== "Ubuntu") throw new Error("暂不支持 Ubuntu 以外的系统")
@@ -27,24 +31,19 @@ export async function docker() {
             .map(deb => execAsync(`wget -q https://download.docker.com/linux/ubuntu/dists/${codename}/pool/stable/amd64/${deb}`)),
     )
     await execAsync(`dpkg -i ${debs.join(" ")}`)
-    await mkdir("/etc/docker", { recursive: true })
-    const daemon = {
-        "registry-mirrors": ["https://docker.sunzishaokao.com", "https://hub.hxui.site", "https://docker.1ms.run"],
-        "exec-opts": ["native.cgroupdriver=systemd"],
-    }
+    for (const deb of debs) await rm(deb, { force: true, recursive: true })
     const { default: inquirer } = await import("inquirer")
     type Answer = {
-        mirrors: string
+        addMirrors?: boolean
     }
-    const { mirrors } = await inquirer.prompt<Answer>([
+    const { addMirrors } = await inquirer.prompt<Answer>([
         {
-            type: "input",
-            name: "mirrors",
-            message: "请输入镜像地址，多个用逗号分隔，留空则跳过",
+            type: "confirm",
+            name: "addMirrors",
+            message: "是否添加镜像地址",
+            default: true,
         },
     ])
-    daemon["registry-mirrors"].push(...mirrors.split(/,，/))
-    await writeFile("/etc/docker/daemon.json", JSON.stringify(daemon, null, 4))
-    await execAsync("systemctl daemon-reload")
-    await execAsync("systemctl restart docker")
+    if (!addMirrors) return
+    setDockerRegistry()
 }
