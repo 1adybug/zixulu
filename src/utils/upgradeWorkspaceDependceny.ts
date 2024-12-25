@@ -1,7 +1,9 @@
 import { readdir, stat } from "fs/promises"
 import { join, resolve } from "path"
+import { chdir } from "process"
 import consola from "consola"
 
+import { actionWithBackup } from "./actionWithBackup"
 import { getUpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
 import { getZixuluSetting } from "./getZixuluSetting"
 import { setZixuluSetting } from "./setZixuluSetting"
@@ -43,9 +45,12 @@ export async function upgradeWorkspaceDependceny() {
 
     for (const pkg of packages3) {
         consola.start(`开始升级 ${pkg} 的依赖`)
-        await upgradeDependency({
-            dir: join(dir2, pkg),
-            ...rest,
-        })
+        chdir(join(dir2, pkg))
+        await actionWithBackup(() =>
+            upgradeDependency({
+                dir: ".",
+                ...rest,
+            }),
+        )()
     }
 }
