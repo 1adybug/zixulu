@@ -104,7 +104,6 @@ main()`
             consola.success("下载最新 VSCode 完成")
         }
     } catch (error) {
-
         type PromptResult = {
             clear: boolean
         }

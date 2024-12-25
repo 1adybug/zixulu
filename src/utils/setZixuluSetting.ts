@@ -1,6 +1,7 @@
 import { writeFile } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
+
 import { ZixuluSetting } from "./getZixuluSetting"
 
 export async function setZixuluSetting(setting: ZixuluSetting) {

@@ -8,4 +8,3 @@ export async function downloadNodeJS(dir: string) {
         filter: item => item.Architecture === "x64",
     })
 }
-

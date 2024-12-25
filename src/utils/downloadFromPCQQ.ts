@@ -1,4 +1,3 @@
-
 import { download } from "./download"
 
 export namespace PCQQ {

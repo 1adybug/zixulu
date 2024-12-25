@@ -1,6 +1,7 @@
-import { rm, rename } from "fs/promises"
+import { rename, rm } from "fs/promises"
 import { join } from "path"
 import { unzip } from "soda-nodejs"
+
 import { download } from "./download"
 
 export async function downloadGeekUninstaller(dir: string) {

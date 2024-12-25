@@ -40,6 +40,7 @@ import { vite } from "@utils/vite"
 
 import { actionWithBackup } from "./utils/actionWithBackup"
 import { addStartScript } from "./utils/addStartScript"
+import { addSyncPackageScript } from "./utils/addSyncPackageScript"
 import { addZipDist } from "./utils/addZipDist"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { docker } from "./utils/docker"
@@ -295,5 +296,12 @@ program
     })
 
 program.command("docker").description("安装 Docker").action(docker)
+
+program
+    .command("addSyncPackageScript")
+    .alias("asp")
+    .option("-m, --monorepo", "是否是 monorepo")
+    .description("添加同步包脚本")
+    .action(actionWithBackup(addSyncPackageScript))
 
 program.parse()
