@@ -9,7 +9,7 @@ export type ZixuluSetting = {
     upgradeWorkspaceDependcenyHistory?: Record<string, string[]>
 }
 
-export async function getZixuluSetting(): Promise<ZixuluSetting> {
+export async function readZixuluSetting(): Promise<ZixuluSetting> {
     const userDir = homedir()
     const settingPath = join(userDir, ".zixulu.json")
     if (existsSync(settingPath)) {

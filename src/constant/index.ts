@@ -77,3 +77,5 @@ export const addedRules = [
     "test.ts",
     "test",
 ]
+
+export const isSudo = !!process.env.SUDO_USER
