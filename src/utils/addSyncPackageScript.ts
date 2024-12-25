@@ -106,8 +106,8 @@ main()
         }
     }
     packageJson.scripts[name] = "node scripts/syncPackage.mjs"
-    if (packageJson.scripts.postpublishOnly) packageJson.scripts.postpublishOnly += ` && npm run ${name}`
-    else packageJson.scripts.postpublishOnly = `npm run ${name}`
+    if (packageJson.scripts.postpublish) packageJson.scripts.postpublish += ` && npm run ${name}`
+    else packageJson.scripts.postpublish = `npm run ${name}`
     await writePackageJson({ data: packageJson })
     return getCommitMessage(CommitType.feature, "添加同步包脚本")
 }
