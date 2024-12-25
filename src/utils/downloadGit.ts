@@ -8,4 +8,3 @@ export async function downloadGit(dir: string) {
         filter: item => item.Architecture === "x64" && item.Scope === "machine",
     })
 }
-

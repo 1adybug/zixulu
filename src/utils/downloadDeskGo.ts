@@ -1,5 +1,6 @@
 import { readdir, rename } from "fs/promises"
 import { join } from "path"
+
 import { downloadFromPCQQ } from "./downloadFromPCQQ"
 
 export async function downloadDeskGo(dir: string) {
@@ -14,4 +15,3 @@ export async function downloadDeskGo(dir: string) {
         ),
     )
 }
-
