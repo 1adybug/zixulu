@@ -4,6 +4,7 @@ import { execAsync } from "soda-nodejs"
 import { isSudo } from "@src/constant"
 
 import { sudoCommand } from "./sudoCommand"
+import { unique } from "./unique"
 
 export async function setDockerRegistry() {
     if (!isSudo) return sudoCommand()
@@ -14,8 +15,10 @@ export async function setDockerRegistry() {
     } catch {}
     daemon["registry-mirrors"] ??= []
     daemon["registry-mirrors"].push("https://docker.sunzishaokao.com", "https://hub.hxui.site", "https://docker.1ms.run")
+    daemon["registry-mirrors"] = unique(daemon["registry-mirrors"])
     daemon["exec-opts"] ??= []
     daemon["exec-opts"].push("native.cgroupdriver=systemd")
+    daemon["exec-opts"] = unique(daemon["exec-opts"])
     const { default: inquirer } = await import("inquirer")
     type Answer = {
         mirrors: string
