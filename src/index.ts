@@ -42,6 +42,7 @@ import { actionWithBackup } from "./utils/actionWithBackup"
 import { addStartScript } from "./utils/addStartScript"
 import { addZipDist } from "./utils/addZipDist"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
+import { docker } from "./utils/docker"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
@@ -292,5 +293,7 @@ program
         }
         await replaceCommitAuthor({ prev, next })
     })
+
+program.command("docker").description("安装 Docker").action(docker)
 
 program.parse()
