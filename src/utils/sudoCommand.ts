@@ -10,7 +10,7 @@ export async function sudoCommand() {
         if (cache.sudoRequested) throw new Error("请在 sudo 下运行")
         cache.sudoRequested = true
         await writeZixuluCache(cache)
-        await execAsync(`sudo ${process.argv.join(" ")}`)
+        await execAsync(`sudo env "PATH=$PATH" npx zixulu ${process.argv.slice(2).join(" ")}`)
     } finally {
         await removeZixuluCache()
     }
