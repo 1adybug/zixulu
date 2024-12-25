@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { resolve } from "path"
 import { Command } from "commander"
+import consola from "consola"
 import { emailReg } from "deepsea-tools"
 
 import { CommitType } from "@constant/index"
@@ -54,10 +55,10 @@ import { setBun } from "./utils/setBun"
 import { setDockerRegistry } from "./utils/setDockerRegistry"
 import { setGlobal } from "./utils/setGlobal"
 import { tailwindPatch } from "./utils/tailwindPatch"
+import { test } from "./utils/test"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
-import { test } from "./utils/test"
 
 const program = new Command()
 
@@ -308,6 +309,14 @@ program
     .description("添加同步包脚本")
     .action(actionWithBackup(addSyncPackageScript))
 
-program.command("test").action(test)
+program
+    .command("test")
+    .description("这是一个测试命令，生产环境中使用，非开发人员请勿使用！")
+    .action(async () => {
+        consola.warn("这是一个测试命令，生产环境中使用，非开发人员请勿使用！")
+        consola.warn("这是一个测试命令，生产环境中使用，非开发人员请勿使用！")
+        consola.warn("这是一个测试命令，生产环境中使用，非开发人员请勿使用！")
+        await test()
+    })
 
 program.parse()
