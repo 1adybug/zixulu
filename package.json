@@ -37,7 +37,7 @@
         "commander": "^12.1.0",
         "consola": "^3.3.1",
         "dayjs": "^1.11.13",
-        "deepsea-tools": "^5.15.3",
+        "deepsea-tools": "^5.15.4",
         "https-proxy-agent": "^7.0.6",
         "inquirer": "^9.3.7",
         "jsdom": "^25.0.1",
@@ -45,7 +45,7 @@
         "md5": "^2.3.0",
         "node-fetch": "^3.3.2",
         "simple-git": "^3.27.0",
-        "soda-nodejs": "^0.5.1",
+        "soda-nodejs": "^0.5.3",
         "yaml": "^2.6.1"
     },
     "devDependencies": {
