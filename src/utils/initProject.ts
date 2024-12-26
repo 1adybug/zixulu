@@ -58,8 +58,8 @@ export async function initProject() {
     }
     const isFullStack = type === ProjectType.next || type === ProjectType.remix
     const choices = isFullStack
-        ? ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod", "stable-hash"]
-        : ["antd", "ahooks", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "react-router-dom", "stable-hash"]
+        ? ["antd", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod"]
+        : ["antd", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "react-router-dom"]
 
     const { modules } = await inquirer.prompt({
         type: "checkbox",
@@ -73,7 +73,7 @@ export async function initProject() {
     if (modules.includes("antd")) await addAntd()
     if (modules.includes("tailwind")) await tailwind()
     else await addPrettier()
-    if (modules.includes("ahooks")) added.push("ahooks")
+    if (modules.includes("@tanstack/react-query")) added.push("@tanstack/react-query")
     if (modules.includes("dayjs")) added.push("dayjs")
     if (modules.includes("deepsea-components")) added.push("deepsea-components")
     if (modules.includes("deepsea-tools")) added.push("deepsea-tools")
