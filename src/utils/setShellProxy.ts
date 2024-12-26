@@ -21,7 +21,10 @@ export async function setShellProxy() {
                 },
             ],
         })
-        if (!open) return await spawnAsync(`netsh winhttp reset proxy`, { shell: true, stdio: "inherit" })
+        if (!open) {
+            await spawnAsync(`netsh winhttp reset proxy`, { shell: true, stdio: "inherit" })
+            return
+        }
     }
     const { proxy } = await inquirer.prompt({
         type: "input",
