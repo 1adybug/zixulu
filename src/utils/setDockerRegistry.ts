@@ -1,4 +1,5 @@
 import { readFile, writeFile } from "fs/promises"
+import consola from "consola"
 import { execAsync } from "soda-nodejs"
 
 import { isSudo } from "@src/constant"
@@ -32,6 +33,8 @@ export async function setDockerRegistry() {
     ])
     daemon["registry-mirrors"].push(...mirrors.split(/[,，]/))
     await writeFile("/etc/docker/daemon.json", JSON.stringify(daemon, undefined, 4), "utf-8")
-    await execAsync("systemctl daemon-reload")
-    await execAsync("systemctl restart docker")
+    consola.success("镜像地址设置成功")
+    consola.info("建议重启docker服务：")
+    consola.info("sudo systemctl daemon-reload")
+    consola.info("sudo systemctl restart docker")
 }

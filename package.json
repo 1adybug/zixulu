@@ -45,7 +45,7 @@
         "md5": "^2.3.0",
         "node-fetch": "^3.3.2",
         "simple-git": "^3.27.0",
-        "soda-nodejs": "^0.5.3",
+        "soda-nodejs": "^0.5.4",
         "yaml": "^2.6.1"
     },
     "devDependencies": {
