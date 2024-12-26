@@ -3,6 +3,7 @@ import { resolve } from "path"
 import { Command } from "commander"
 import consola from "consola"
 import { emailReg } from "deepsea-tools"
+import { setDefaultOptions } from "soda-nodejs"
 
 import { CommitType } from "@constant/index"
 
@@ -59,6 +60,11 @@ import { test } from "./utils/test"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
+
+setDefaultOptions({
+    shell: true,
+    stdio: "inherit",
+})
 
 const program = new Command()
 
