@@ -142,14 +142,31 @@ const scripts = {
     next: nextScript,
 }
 
+/**
+ * 添加启动脚本配置选项
+ */
 export type AddStartScriptOptions = {
+    /** 服务器类型：express 或 next */
     type: keyof typeof scripts
+    /** SSL 证书路径 */
     pemPath?: string
+    /** 服务器端口 */
     port?: string
+    /** PM2 实例数量 */
     core?: string
+    /** 服务器主机名 */
     hostname?: string
 }
 
+/**
+ * 添加生产环境启动脚本
+ * 支持 Express 和 Next.js 服务器
+ * 配置 PM2 多进程管理
+ * 支持 HTTPS
+ * 
+ * @param options 配置选项
+ * @returns commit message
+ */
 export async function addStartScript({ type, pemPath, port, core, hostname }: AddStartScriptOptions) {
     await addDependency({
         package: ["@types/compression", "@types/cors", "@types/express", "@types/morgan", "@types/node", "compression", "cors", "dotenv", "express", "morgan"],

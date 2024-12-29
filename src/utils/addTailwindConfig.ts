@@ -1,6 +1,7 @@
 import { writeFile } from "fs/promises"
 import consola from "consola"
 
+/** Tailwind 默认配置内容 */
 export const tailwindConfig = `import { Config } from "tailwindcss"
 
 const config: Config = {
@@ -19,7 +20,11 @@ const config: Config = {
 
 export default config
 `
-/** 添加 tailwind.config.js 配置成功 */
+
+/** 
+ * 添加 Tailwind 配置文件
+ * 创建 tailwind.config.ts 文件并写入默认配置
+ */
 export async function addTailwindConfig() {
     try {
         await writeFile("tailwind.config.ts", tailwindConfig, "utf-8")

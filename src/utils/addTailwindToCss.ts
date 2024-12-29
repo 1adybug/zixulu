@@ -5,7 +5,11 @@ import consola from "consola"
 import { createEntryCss } from "./createEntryCss"
 import { getFiles } from "./getFiles"
 
-/** 添加 tailwind 至 index.css 成功 */
+/** 
+ * 向项目中添加 Tailwind CSS 配置
+ * 会在 index.css/app.css/globals.css 中添加 Tailwind 引用
+ * 如果没有找到这些文件，会创建一个新的 index.css
+ */
 export async function addTailwindToCss() {
     try {
         const files = await getFiles({
