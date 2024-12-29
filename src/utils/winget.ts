@@ -1,11 +1,7 @@
 import { spawnAsync } from "soda-nodejs"
 
-export type WingetParams = {
-    proxy?: string
-}
-
-export async function winget({ proxy }: WingetParams) {
-    const args = ["install", "--source", "https://winget.azureedge.net/cache", "--accept-package-agreements", "--accept-source-agreements"]
-    if (proxy) args.push("--proxy", "http://127.0.0.1:7890")
+export async function winget() {
+    const args = ["update", "--accept-package-agreements", "--accept-source-agreements", "--all"]
+    if (global.__ZIXULU_PROXY__) args.push("--proxy", "http://127.0.0.1:7890")
     spawnAsync("winget", args)
 }
