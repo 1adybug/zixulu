@@ -20,6 +20,10 @@ import { downloadVscode } from "./downloadVscode"
 import { readZixuluSetting } from "./readZixuluSetting"
 import { writeZixuluSetting } from "./writeZixuluSetting"
 
+/**
+ * 软件下载函数映射表
+ * 键为软件名称，值为对应的下载函数
+ */
 export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void>> = {
     [Software.Chrome]: downloadChrome,
     [Software.NodeJS]: downloadNodeJS,
@@ -36,6 +40,12 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
     [Software.Bun]: downloadBun,
 }
 
+/**
+ * 交互式下载最新版本的软件
+ * 1. 提示用户选择要下载的软件
+ * 2. 创建下载目录
+ * 3. 依次下载选中的软件
+ */
 export async function downloadLatestSoftware() {
     consola.start("开始下载软件")
     const { default: inquirer } = await import("inquirer")
