@@ -8,7 +8,13 @@ declare global {
 }
 
 /**
- * 获取包管理器
+ * 获取项目使用的包管理器
+ * @param dir 项目目录，默认为当前目录
+ * @returns 包管理器类型
+ * @description
+ * 1. 优先使用缓存的包管理器
+ * 2. 通过锁文件判断使用的包管理器类型
+ * 3. 如果无法判断，则提示用户选择
  */
 export async function getPackageManager(dir = "."): Promise<PackageManager> {
     if (globalThis.__ZIXULU_PACKAGE_MANAGER__) return globalThis.__ZIXULU_PACKAGE_MANAGER__
