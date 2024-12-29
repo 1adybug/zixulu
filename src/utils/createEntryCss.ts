@@ -4,9 +4,10 @@ import { join, parse } from "path"
 import { getEntryCssDir } from "./getEntryCssDir"
 
 /**
- * 创建入口 CSS
- * @param dir 目录
- * @returns 入口 CSS 路径
+ * 创建项目的入口 CSS 文件
+ * 根据目录中是否存在 index/main 或 app 文件来决定 CSS 文件名
+ * @param dir 目标目录
+ * @returns CSS 文件的完整路径
  */
 export async function createEntryCss(dir = ".") {
     const path = await getEntryCssDir(dir)
