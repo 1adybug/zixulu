@@ -1,3 +1,8 @@
+/**
+ * 将代码文件转换为 VS Code 代码片段格式
+ * 支持自定义占位符替换
+ * @param path 源代码文件路径
+ */
 import { readFile } from "fs/promises"
 import { parse } from "path"
 

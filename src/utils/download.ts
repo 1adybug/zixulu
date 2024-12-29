@@ -6,6 +6,13 @@ import { agent } from "@constant/index"
 
 import { getFilename } from "./getFilename"
 
+/**
+ * 通用文件下载函数
+ * @param url 下载地址
+ * @param dir 下载目标目录
+ * @param filename 可选的文件名
+ * @returns 实际保存的文件名
+ */
 export async function download(url: string, dir: string, filename?: string) {
     const { default: fetch } = await import("node-fetch")
     const response = await fetch(url, { agent })

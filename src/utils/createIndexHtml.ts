@@ -7,6 +7,10 @@ export type CreateIndexHtmlConfig = {
     entryId: string
 }
 
+/**
+ * 创建项目的 index.html 文件
+ * @param config 配置对象，包含标题、描述和入口节点ID
+ */
 export async function createIndexHtml(config: CreateIndexHtmlConfig) {
     const { title, description, entryId } = config
     const indexHtml = `<!doctype html>

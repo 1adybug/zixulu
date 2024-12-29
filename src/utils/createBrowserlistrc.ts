@@ -1,5 +1,9 @@
 import { writeFile } from "fs/promises"
 
+/**
+ * 创建 .browserslistrc 配置文件
+ * 用于指定项目支持的浏览器版本范围
+ */
 export async function createBrowserlistrc() {
     await writeFile(
         ".browserslistrc",

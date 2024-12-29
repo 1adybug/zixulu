@@ -5,6 +5,11 @@ import { unzip } from "soda-nodejs"
 import { download } from "./download"
 import { getLatestRelease } from "./getLatestRelease"
 
+/**
+ * 从 GitHub 下载 Bun 运行时并解压安装
+ * @param dir 下载目标目录
+ * @throws 如果找不到对应的下载文件
+ */
 export async function downloadBun(dir: string) {
     const release = await getLatestRelease("oven-sh", "bun")
     const url = release.assets.find(asset => asset.name === "bun-windows-x64.zip")?.browser_download_url
