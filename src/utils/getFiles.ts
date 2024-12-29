@@ -25,10 +25,21 @@ export interface GetFilesOptions {
     exclude?: (path: ParsedPath, stats: Stats) => boolean
 }
 
+/**
+ * 递归获取指定目录下的文件
+ * @param options 配置选项
+ * @returns 符合条件的文件路径数组
+ */
 export async function getFiles(options: GetFilesOptions) {
     const { dir = ".", match, count, depth, exclude } = options
     const result: string[] = []
-    const e = Symbol()
+    const e = Symbol() // 用于控制递归终止的特殊标记
+
+    /**
+     * 递归遍历目录的内部函数
+     * @param path 当前处理的路径
+     * @param depth 剩余遍历深度
+     */
     async function _getFiles(path: string, depth: number | undefined) {
         const files = await readdir(path)
         for (const file of files) {

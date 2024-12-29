@@ -9,15 +9,21 @@ import { readZixuluSetting } from "./readZixuluSetting"
 import { retry } from "./retry"
 import { writeZixuluSetting } from "./writeZixuluSetting"
 
-// 定义 VscodeExt 接口
+/**
+ * VSCode扩展信息接口
+ */
 export interface VscodeExt {
-    id: string
-    name: string
-    version: string
-    url: string
+    id: string      // 扩展ID
+    name: string    // 扩展显示名称
+    version: string // 扩展版本
+    url: string     // 下载URL
 }
 
-// 获取 VSCode 扩展信息的函数
+/**
+ * 获取指定VSCode扩展的详细信息
+ * @param ext 扩展ID
+ * @returns Promise<VscodeExt> 扩展详细信息
+ */
 export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
     const { default: fetch } = await import("node-fetch")
     const response = await fetch(`https://marketplace.visualstudio.com/items?itemName=${ext}`, { agent })
@@ -48,7 +54,10 @@ export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
     return { id: ext, name: displayName, version, url }
 }
 
-// 下载 VSCode 扩展的函数
+/**
+ * 下载选定的VSCode扩展
+ * @param dir 下载目标目录
+ */
 export async function downloadVscodeExts(dir: string) {
     await mkdir(dir, { recursive: true })
     const { default: inquirer } = await import("inquirer")
