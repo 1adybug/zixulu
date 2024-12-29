@@ -1,5 +1,8 @@
 import { download } from "./download"
 
+/**
+ * PCQQ 下载接口返回数据类型
+ */
 export namespace PCQQ {
     export interface Result {
         resp: Resp
@@ -25,6 +28,12 @@ export namespace PCQQ {
     }
 }
 
+/**
+ * 从腾讯电脑管家下载软件
+ * @param dir 下载目录
+ * @param cmdid 命令ID
+ * @param soft_id_list 软件ID列表
+ */
 export async function downloadFromPCQQ(dir: string, cmdid: number, soft_id_list: number) {
     const data = new URLSearchParams()
     data.set("cmdid", cmdid.toString())

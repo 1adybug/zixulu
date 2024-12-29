@@ -5,6 +5,11 @@ import { execAsync, zip } from "soda-nodejs"
 
 import { getPackageVersionInDependcy } from "./getPackageVersionInDependcy"
 
+/**
+ * 下载 NPM 包并打包成 zip
+ * @param name NPM 包名
+ * @throws {Error} 如果目标文件夹已存在
+ */
 export async function downloadNpm(name: string) {
     consola.start(`开始下载 ${name}`)
     const folder = `${name}-cache`

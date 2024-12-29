@@ -8,6 +8,9 @@ import { agent } from "@constant/index"
 import { download } from "./download"
 import { sleep } from "./sleep"
 
+/**
+ * Winget 包管理器相关类型定义
+ */
 export namespace Winget {
     export interface Package {
         PackageIdentifier: string
@@ -72,6 +75,17 @@ export interface Links {
     html: string
 }
 
+/**
+ * 从 Winget 仓库下载软件
+ * 1. 获取软件最新版本信息
+ * 2. 解析安装包配置
+ * 3. 下载并重命名安装包
+ * @param param0 下载配置
+ * @param param0.name 软件名称
+ * @param param0.id Winget ID
+ * @param param0.dir 下载目录
+ * @param param0.filter 安装包筛选函数
+ */
 export async function downloadFromWinget({ name, id, dir, filter }: WingetDownloadInfo) {
     const { default: fetch } = await import("node-fetch")
     const firstLetter = id[0].toLowerCase()
