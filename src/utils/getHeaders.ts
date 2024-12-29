@@ -1,7 +1,8 @@
 /**
  * 将浏览器中直接复制的 headers 转换为对象
- * @param str 复制的 headers
- * @returns headers 对象
+ * 此函数从剪贴板读取 headers 文本，并转换为 Headers 对象的初始化代码
+ * @returns void - 将生成的代码写入剪贴板
+ * @throws Error 当 headers 格式不正确时抛出错误
  */
 export async function getHeaders() {
     const { default: clipboard } = await import("clipboardy")
