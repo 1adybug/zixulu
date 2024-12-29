@@ -4,6 +4,11 @@ import { CommitType } from "@src/constant"
 
 import { getCommitMessage } from "./getCommitMessage"
 
+/**
+ * 向 .gitignore 文件添加规则
+ * @param rules 要添加的规则列表
+ * @returns commit message
+ */
 export async function addRuleToGitIgnore(...rules: string[]) {
     const dir = await readdir(".")
     const message = getCommitMessage(CommitType.feature, `添加 .gitignore 规则 ${rules.join(", ")}`)

@@ -5,6 +5,10 @@ import consola from "consola"
 import { addDependency } from "./addDependency"
 import { readPackageJson } from "./readPackageJson"
 
+/**
+ * 添加 antd 相关配置
+ * 包括安装依赖、创建必要组件等
+ */
 export async function addAntd() {
     consola.start("开始添加 antd 配置")
     await addDependency({ package: ["@ant-design/cssinjs", "@ant-design/icons", "antd"] })

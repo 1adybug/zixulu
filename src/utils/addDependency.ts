@@ -5,16 +5,23 @@ import { readPackageJson } from "./readPackageJson"
 import { retry } from "./retry"
 import { writePackageJson } from "./writePackageJson"
 
+/** 依赖类型 */
 export type DependencyType = "dependencies" | "devDependencies" | "peerDependencies" | "optionalDependencies"
 
+/** 添加依赖配置 */
 export type AddDependenciesConfig = {
+    /** 包名或包名列表 */
     package: string | string[]
+    /** 依赖类型 */
     type?: DependencyType
+    /** 项目目录 */
     dir?: string
 }
 
 /**
- * 写入依赖
+ * 写入依赖到 package.json
+ * @param config 配置项
+ * @returns 添加的包及其版本号
  */
 export async function addDependency(config: AddDependenciesConfig): Promise<Record<string, string>> {
     try {
