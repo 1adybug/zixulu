@@ -1,5 +1,8 @@
 import { agent } from "@src/constant"
 
+/**
+ * GitHub Release 信息接口
+ */
 export interface Release {
     url: string
     assets_url: string
@@ -73,6 +76,13 @@ export interface Author {
     site_admin: boolean
 }
 
+/**
+ * 获取 GitHub 仓库的最新发布版本信息
+ * @param owner 仓库所有者
+ * @param repo 仓库名称
+ * @returns Release 信息
+ * @description 通过 GitHub API 获取仓库的最新发布信息
+ */
 export async function getLatestRelease(owner: string, repo: string): Promise<Release> {
     const { default: fetch } = await import("node-fetch")
     const url = `https://api.github.com/repos/${owner}/${repo}/releases/latest`

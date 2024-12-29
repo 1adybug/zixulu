@@ -1,11 +1,13 @@
 import { agent } from "@src/constant"
-
 import { getRegistry } from "./getRegistry"
 
 /**
- * 获取包的最新版本
+ * 获取 npm 包的最新版本号
  * @param packageName 包名
- * @returns 版本号
+ * @returns 最新版本号
+ * @description
+ * 通过 registry API 获取指定包的最新版本信息
+ * 支持通过代理访问
  */
 export async function getPackageLatestVersion(packageName: string) {
     try {
