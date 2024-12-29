@@ -7,6 +7,12 @@ import { isRepository } from "./isRepository"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
 
+/**
+ * 获取新的测试版本号
+ * 如果当前是测试版本，则生成新的测试版本号
+ * 如果当前是正式版本，则提示选择升级级别后生成测试版本号
+ * @returns 新的测试版本号
+ */
 export async function getBetaVersion() {
     const packageJson = await readPackageJson()
     const { version } = packageJson
@@ -49,6 +55,13 @@ export async function getBetaVersion() {
     return newVersion
 }
 
+/**
+ * 发布测试版本
+ * 1. 备份当前代码
+ * 2. 更新版本号
+ * 3. 提交代码并打标签
+ * 4. 可选发布到 npm
+ */
 export async function betaVersion() {
     await backupFirst()
     const version = await getBetaVersion()

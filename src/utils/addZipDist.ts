@@ -23,10 +23,23 @@ async function main() {
 main()
 `
 
+/**
+ * 压缩脚本的配置选项
+ */
 type AddZipDistConfig = {
+    /** 是否自动安装依赖 */
     install?: boolean
 }
 
+/**
+ * 添加构建产物压缩脚本
+ * 1. 添加必要的依赖
+ * 2. 创建压缩脚本
+ * 3. 修改构建命令
+ * 
+ * @param config 配置选项
+ * @returns commit message
+ */
 export async function addZipDist({ install }: AddZipDistConfig = {}) {
     await addDependency({
         package: ["soda-nodejs"],

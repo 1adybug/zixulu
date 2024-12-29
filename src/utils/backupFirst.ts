@@ -6,8 +6,12 @@ import { isRepository } from "./isRepository"
 import { shouldContinue } from "./shouldContinue"
 
 /**
- * @param [forceRepo=false] 是否强制认为是 git 目录
- * @returns 如果是 git 目录且检测到未提交的更改，选择继续，则返回 true，否则返回 undefined
+ * 检查当前项目是否需要备份
+ * 如果是 git 仓库且有未提交的更改，提示用户是否继续
+ * 如果不是 git 仓库，建议用户备份代码
+ * 
+ * @param forceRepo 是否强制要求是 git 仓库
+ * @returns 如果是 git 仓库且检测到未提交的更改，选择继续则返回 true
  */
 export async function backupFirst(forceRepo = false): Promise<true | void> {
     if (!(await isRepository())) {

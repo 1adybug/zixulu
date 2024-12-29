@@ -4,15 +4,24 @@ import consola from "consola"
 import { getFiles } from "./getFiles"
 import { getTypeInGenerics } from "./getTypeInGenerics"
 
+/**
+ * 表示箭头函数转换选项的类型
+ */
 export type ArrowToFunctionChoice = {
+    /** 选项值 */
     value: string
+    /** 简短显示名 */
     short: string
+    /** 完整显示名 */
     name: string
+    /** 是否默认选中 */
     checked: boolean
 }
 
 /**
- * 将箭头函数组件转换为函数组件
+ * 将 React 箭头函数组件转换为普通函数组件
+ * 支持自动模式和手动选择模式
+ * 自动跳过包含 memo 和 forwardRef 的组件
  */
 export async function arrowToFunction() {
     consola.start("开始将转换箭头函数组件为函数组件")
