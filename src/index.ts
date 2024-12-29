@@ -54,7 +54,7 @@ import { replaceAssets } from "./utils/replaceAssets"
 import { CommitAuthor, replaceCommitAuthor } from "./utils/replaceCommitAuthor"
 import { setBun } from "./utils/setBun"
 import { setDockerRegistry } from "./utils/setDockerRegistry"
-import { setGlobal } from "./utils/setGlobal"
+import { setGlobalConfig } from "./utils/setGlobalConfig"
 import { tailwindPatch } from "./utils/tailwindPatch"
 import { test } from "./utils/test"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
@@ -122,7 +122,7 @@ program
     .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
     .option("-p, --proxy", "是否使用代理")
     .action(async optios => {
-        setGlobal(optios)
+        setGlobalConfig(optios)
         await actionWithBackup(() => upgradeDependency())()
     })
 
@@ -133,7 +133,7 @@ program
     .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
     .option("-p, --proxy", "是否使用代理")
     .action(async options => {
-        setGlobal(options)
+        setGlobalConfig(options)
         await upgradeWorkspaceDependceny()
     })
 
@@ -200,7 +200,7 @@ program
     .description("重新安装依赖")
     .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
     .action(async options => {
-        setGlobal(options)
+        setGlobalConfig(options)
         reinstall()
     })
 
@@ -232,7 +232,7 @@ program
     .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
     .option("-p, --proxy", "是否使用代理")
     .action(async options => {
-        setGlobal(options)
+        setGlobalConfig(options)
         await actionWithBackup(() => upgradeRsbuild())()
     })
 
@@ -262,7 +262,7 @@ program
     .option("-r, --registry <registry>", "npm 源地址，可以是 npm、taobao、tencent 或者自定义地址")
     .option("-p, --proxy", "是否使用代理")
     .action(async options => {
-        setGlobal(options)
+        setGlobalConfig(options)
         await actionWithBackup(() => upgradeTailwind())()
     })
 
@@ -316,7 +316,14 @@ program
     .description("添加同步包脚本")
     .action(actionWithBackup(addSyncPackageScript))
 
-program.command("winget").description("使用 winget 更新软件").action(winget)
+program
+    .command("winget")
+    .option("-p, --proxy", "是否使用代理")
+    .description("使用 winget 更新软件")
+    .action(async options => {
+        setGlobalConfig(options)
+        await winget()
+    })
 
 program
     .command("test")
