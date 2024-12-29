@@ -60,6 +60,7 @@ import { test } from "./utils/test"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
+import { winget } from "./utils/winget"
 
 setDefaultOptions({
     shell: true,
@@ -314,6 +315,8 @@ program
     .option("-m, --monorepo", "是否是 monorepo")
     .description("添加同步包脚本")
     .action(actionWithBackup(addSyncPackageScript))
+
+program.command("winget").description("使用 winget 更新软件").action(winget)
 
 program
     .command("test")
