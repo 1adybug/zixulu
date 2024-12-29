@@ -10,6 +10,10 @@ import { getTsFile } from "./getTsFile"
 import { readTsConfig } from "./readTsConfig"
 import { writeTsConfig } from "./writeTsConfig"
 
+/**
+ * 获取路径别名配置
+ * @param name 别名名称
+ */
 export async function getPathAlias(name: string) {
     const { default: inquirer } = await import("inquirer")
     const folder = await getFiles({
@@ -34,11 +38,15 @@ export async function getPathAlias(name: string) {
     return path
 }
 
+/** 路径别名配置项 */
 export type PathAlias = {
     name: string
     path: string
 }
 
+/**
+ * 添加路径别名配置到 tsconfig.json
+ */
 export async function addPathAlias(name: string, path: string): Promise<void>
 export async function addPathAlias(alias: PathAlias[]): Promise<void>
 export async function addPathAlias(nameOrAlias: string | PathAlias[], path?: string) {
@@ -54,6 +62,9 @@ export async function addPathAlias(nameOrAlias: string | PathAlias[], path?: str
     await writeTsConfig(tsConfig)
 }
 
+/**
+ * 替换所有文件中的相对路径为路径别名
+ */
 export async function replacePathAlias() {
     const tsConfig = await readTsConfig()
     const oldPaths: Record<string, string[]> = tsConfig.compilerOptions?.paths ?? {}
@@ -123,6 +134,9 @@ export async function replacePathAlias() {
     return getCommitMessage(CommitType.feature, "replace path alias")
 }
 
+/**
+ * 为文件夹添加路径别名
+ */
 export async function addFolderPathAlias() {
     const { default: inquirer } = await import("inquirer")
     const { folder } = await inquirer.prompt({

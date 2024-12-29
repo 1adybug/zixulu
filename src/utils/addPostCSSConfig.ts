@@ -1,6 +1,7 @@
 import { rm, writeFile } from "fs/promises"
 import consola from "consola"
 
+/** PostCSS 配置文件内容 */
 const postcssConfig = `/** @type {import("postcss-load-config").Config} */
 const config = {
     plugins: {
@@ -14,6 +15,7 @@ export default config
 
 /**
  * 添加 postcss.config.js 配置
+ * 会先删除已存在的配置文件，然后创建新的
  */
 export async function addPostCSSConfig() {
     try {

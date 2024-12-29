@@ -5,6 +5,12 @@ import { backupFirst } from "./backupFirst"
 import { hasChangeNoCommit } from "./hasChangeNoCommit"
 import { isRepository } from "./isRepository"
 
+/**
+ * 包装一个操作，在执行前进行备份
+ * @param action 要执行的操作
+ * @param message 提交信息
+ * @returns 包装后的函数
+ */
 export function actionWithBackup<T extends (...args: any[]) => Promise<string>>(action: T, message?: string): (...args: Parameters<T>) => Promise<void>
 export function actionWithBackup<T extends (...args: any[]) => Promise<void>>(action: T, message: string): (...args: Parameters<T>) => Promise<void>
 export function actionWithBackup(action: (...args: any[]) => Promise<string | void>, message?: string) {

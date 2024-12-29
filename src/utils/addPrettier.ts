@@ -6,10 +6,18 @@ import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
 
+/**
+ * prettier 配置生成器参数
+ */
 export type GetPrettierConfigParams = {
+    /** 是否使用 tailwind */
     tailwind: boolean
 }
 
+/**
+ * 生成 prettier 配置文件内容
+ * @param params 配置参数
+ */
 export function getPrettierConfig({ tailwind }: GetPrettierConfigParams) {
     const plugins = ["@ianvs/prettier-plugin-sort-imports"]
 
@@ -104,7 +112,10 @@ export default config
     return prettierConfigText
 }
 
-/** 添加 prettier */
+/**
+ * 添加 prettier 相关配置
+ * 包括安装依赖、创建配置文件等
+ */
 export async function addPrettier() {
     consola.start("开始添加 prettier 配置")
     const packageJson = await readPackageJson()

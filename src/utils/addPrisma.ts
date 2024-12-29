@@ -6,6 +6,11 @@ import { PackageManager } from "src/constant"
 import { addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"
 
+/**
+ * 添加 Prisma 相关配置
+ * 包括安装依赖、初始化配置等
+ * @param manager 包管理器类型
+ */
 export async function addPrisma(manager?: PackageManager) {
     consola.start("开始添加 Prisma 配置")
     await addDependency({
