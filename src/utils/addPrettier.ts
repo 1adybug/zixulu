@@ -114,7 +114,7 @@ const config = {
         "<BUILTIN_MODULES>",
         ${atAlias ? `\`^@(\${namespaces.join("|")})/\`,` : `"^@[^/]",`}
         "<THIRD_PARTY_MODULES>",
-        ...folders.map(folder => ["", \`^@/?\${folder}.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`]).flat(),
+        ...folders.map(folder => ["", \`^@/?\${folder}(.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr}))?$\`]).flat(),
         "",
         \`^@/.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
         \`^\\\\.{1,2}/.+?(?<!\${assetExtsRegStr}\${assetQueryRegStr})$\`,
