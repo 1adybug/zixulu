@@ -18,13 +18,15 @@ export type GetPrettierConfigParams = {
     atAlias: boolean
     /** 是否是 next 项目 */
     next: boolean
+    /** 是否是 react 项目 */
+    react: boolean
 }
 
 /**
  * 生成 prettier 配置文件内容
  * @param params 配置参数
  */
-export function getPrettierConfig({ tailwind, atAlias, next }: GetPrettierConfigParams) {
+export function getPrettierConfig({ tailwind, atAlias, next, react }: GetPrettierConfigParams) {
     const plugins = ["@ianvs/prettier-plugin-sort-imports"]
 
     if (tailwind) plugins.push("prettier-plugin-tailwindcss")
@@ -101,10 +103,14 @@ const config = {
     arrowParens: "avoid",
     printWidth: 160,
     plugins: [${plugins.map(plugin => `"${plugin}"`).join(", ")}],
-    importOrder: [
+    importOrder: [${
+        react
+            ? `
         "^react(/.+)?$",
         "^react-dom(/.+)?$",
-        "^react-native(/.+)?$",
+        "^react-native(/.+)?$",`
+            : ""
+    }
         "<BUILTIN_MODULES>",
         ${atAlias ? `\`^@(\${namespaces.join("|")})/\`,` : `"^@[^/]",`}
         "<THIRD_PARTY_MODULES>",
@@ -138,7 +144,8 @@ export async function addPrettier() {
     const config = await readTsConfig()
     const atAlias = Object.keys(config.compilerOptions?.paths ?? {}).some(path => /^@[a-zA-Z]/.test(path))
     const next = !!(await getDependcy("next"))
-    await writeFile("./prettier.config.mjs", getPrettierConfig({ tailwind, atAlias, next }), "utf-8")
+    const react = !!(await getDependcy("react"))
+    await writeFile("./prettier.config.mjs", getPrettierConfig({ tailwind, atAlias, next, react }), "utf-8")
     const config2: AddDependenciesConfig = {
         package: ["prettier", "@ianvs/prettier-plugin-sort-imports", "glob"],
         type: "devDependencies",
