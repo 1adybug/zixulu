@@ -82,7 +82,8 @@ const namespaces = unique(
         .flat()
         .filter(dep => dep.startsWith("@"))
         .map(dep => dep.split("/")[0].slice(1)),
-)`
+)
+`
         : ""
 }
 const folders = unique(
