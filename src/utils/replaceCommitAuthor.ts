@@ -1,4 +1,3 @@
-import { execSync } from "child_process"
 import consola from "consola"
 import simpleGit from "simple-git"
 import { spawnAsync } from "soda-nodejs"
@@ -27,39 +26,32 @@ export async function replaceCommitAuthor({
     if (status.files.length) throw new Error("当前 Git 仓库存在未提交的文件。请提交或暂存这些文件后再试。")
     consola.start("开始修改 Git 提交历史...")
     console.log()
-    const committerName = nextName ? ` export GIT_COMMITTER_NAME="${nextName}"` : ""
-    const committerEmail = nextEmail ? ` export GIT_COMMITTER_EMAIL="${nextEmail}"` : ""
-    const authorName = nextName ? ` export GIT_AUTHOR_NAME="${nextName}"` : ""
-    const authorEmail = nextEmail ? ` export GIT_AUTHOR_EMAIL="${nextEmail}"` : ""
+    const committerName = nextName ? ` export GIT_COMMITTER_NAME=\\"${nextName}\\"` : ""
+    const committerEmail = nextEmail ? ` export GIT_COMMITTER_EMAIL=\\"${nextEmail}\\"` : ""
+    const authorName = nextName ? ` export GIT_AUTHOR_NAME=\\"${nextName}\\"` : ""
+    const authorEmail = nextEmail ? ` export GIT_AUTHOR_EMAIL=\\"${nextEmail}\\"` : ""
     const committerCondition =
         prevName && prevEmail
-            ? `[ "$GIT_COMMITTER_NAME" = "${prevName}" ] && [ "$GIT_COMMITTER_EMAIL" = "${prevEmail}" ]`
+            ? `[ \\"$GIT_COMMITTER_NAME\\" = \\"${prevName}\\" ] && [ \\"$GIT_COMMITTER_EMAIL\\" = \\"${prevEmail}\\" ]`
             : prevName
-              ? `[ "$GIT_COMMITTER_NAME" = "${prevName}" ]`
+              ? `[ \\"$GIT_COMMITTER_NAME\\" = \\"${prevName}\\" ]`
               : prevEmail
-                ? `[ "$GIT_COMMITTER_EMAIL" = "${prevEmail}" ]`
-                : "[ true ]"
+                ? `[ \\"$GIT_COMMITTER_EMAIL\\" = \\"${prevEmail}\\" ]`
+                : `[ \\"true\\" = \\"true\\" ]`
     const authorCondition =
         prevName && prevEmail
-            ? `[ "$GIT_AUTHOR_NAME" = "${prevName}" ] && [ "$GIT_AUTHOR_EMAIL" = "${prevEmail}" ]`
+            ? `[ \\"$GIT_AUTHOR_NAME\\" = \\"${prevName}\\" ] && [ \\"$GIT_AUTHOR_EMAIL\\" = \\"${prevEmail}\\" ]`
             : prevName
-              ? `[ "$GIT_AUTHOR_NAME" = "${prevName}" ]`
+              ? `[ \\"$GIT_AUTHOR_NAME\\" = \\"${prevName}\\" ]`
               : prevEmail
-                ? `[ "$GIT_AUTHOR_EMAIL" = "${prevEmail}" ]`
-                : "[ true ]"
+                ? `[ \\"$GIT_AUTHOR_EMAIL\\" = \\"${prevEmail}\\" ]`
+                : `[ \\"true\\" = \\"true\\" ]`
 
-    const filterScript = `
-    if ${committerCondition}; then
-        ${committerName}${committerEmail}
-    fi
-    if ${authorCondition}; then
-        ${authorName}${authorEmail}
-    fi
-`
-    await spawnAsync("git", ["filter-branch", "-f", "--env-filter", filterScript, "--tag-name-filter", "cat", "--", "--branches", "--tags"], {
-        stdio: "inherit",
-    })
+    await spawnAsync(
+        `git filter-branch -f --env-filter "if ${committerCondition}; then export ${[committerName, committerEmail].filter(Boolean).join(" && ")}; fi && if ${authorCondition}; then ${[authorName, authorEmail].filter(Boolean).join(" && ")}; fi" --tag-name-filter cat -- --branches --tags`,
+    )
+
     console.log()
     consola.success("Git 提交历史修改完成！")
-    consola.warn("请强制推送以覆盖远程仓库：git push --force")
+    consola.warn("请强制推送以覆盖远程仓库：git push -f")
 }
