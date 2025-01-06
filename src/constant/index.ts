@@ -17,6 +17,7 @@ export enum Software {
     "VS Code" = "VS Code",
     "Chrome" = "Chrome",
     "7zip" = "7zip",
+    "PeaZip" = "PeaZip",
     "Git" = "Git",
     "NodeJS" = "NodeJS",
     "Geek Uninstaller" = "Geek Uninstaller",

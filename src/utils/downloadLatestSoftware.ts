@@ -14,6 +14,7 @@ import { downloadGeekUninstaller } from "./downloadGeekUninstaller"
 import { downloadGit } from "./downloadGit"
 import { downloadHoneyview } from "./downloadHoneyview"
 import { downloadNodeJS } from "./downloadNodeJS"
+import { downloadPeaZip } from "./downloadPeazip"
 import { downloadPotPlayer } from "./downloadPotPlayer"
 import { downloadPowerToys } from "./downloadPowerToys"
 import { downloadVscode } from "./downloadVscode"
@@ -28,6 +29,7 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
     [Software.Chrome]: downloadChrome,
     [Software.NodeJS]: downloadNodeJS,
     [Software["7zip"]]: download7Zip,
+    [Software["PeaZip"]]: downloadPeaZip,
     [Software.Git]: downloadGit,
     [Software.DeskGo]: downloadDeskGo,
     [Software["Geek Uninstaller"]]: downloadGeekUninstaller,
