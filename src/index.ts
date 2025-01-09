@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { resolve } from "path"
 import { Command } from "commander"
 import consola from "consola"
 import { emailReg } from "deepsea-tools"
+import { resolve } from "path"
 import { setDefaultOptions } from "soda-nodejs"
 
 import { CommitType } from "@constant/index"
@@ -55,6 +55,7 @@ import { CommitAuthor, replaceCommitAuthor } from "./utils/replaceCommitAuthor"
 import { setBun } from "./utils/setBun"
 import { setDockerRegistry } from "./utils/setDockerRegistry"
 import { setGlobalConfig } from "./utils/setGlobalConfig"
+import { syncSnippets } from "./utils/syncSnippets"
 import { tailwindPatch } from "./utils/tailwindPatch"
 import { test } from "./utils/test"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
@@ -334,5 +335,7 @@ program
         consola.warn("这是一个测试命令，生产环境中使用，非开发人员请勿使用！")
         await test()
     })
+
+program.command("sync-snippets").alias("ss").description("同步 vscode snippets").action(syncSnippets)
 
 program.parse()
