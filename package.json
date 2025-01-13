@@ -1,6 +1,6 @@
 {
     "name": "zixulu",
-    "version": "1.56.2",
+    "version": "1.56.3",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "bin": {
