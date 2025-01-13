@@ -141,8 +141,11 @@ export async function addPrettier() {
     const packageJson = await readPackageJson()
     const tailwind =
         Object.keys(packageJson.dependencies ?? {}).includes("tailwindcss") || Object.keys(packageJson.devDependencies ?? {}).includes("tailwindcss")
-    const config = await readTsConfig()
-    const atAlias = Object.keys(config.compilerOptions?.paths ?? {}).some(path => /^@[a-zA-Z]/.test(path))
+    let atAlias = false
+    try {
+        const config = await readTsConfig()
+        atAlias = Object.keys(config.compilerOptions?.paths ?? {}).some(path => /^@[a-zA-Z]/.test(path))
+    } catch (error) {}
     const next = !!(await getDependcy("next"))
     const react = !!(await getDependcy("react"))
     await writeFile("./prettier.config.mjs", getPrettierConfig({ tailwind, atAlias, next, react }), "utf-8")
