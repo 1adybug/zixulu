@@ -35,9 +35,9 @@
         "@iarna/toml": "^3.0.0",
         "clipboardy": "^4.0.0",
         "commander": "^12.1.0",
-        "consola": "^3.3.1",
+        "consola": "^3.4.0",
         "dayjs": "^1.11.13",
-        "deepsea-tools": "^5.15.4",
+        "deepsea-tools": "^5.16.7",
         "https-proxy-agent": "^7.0.6",
         "inquirer": "^9.3.7",
         "jsdom": "^25.0.1",
@@ -45,19 +45,19 @@
         "md5": "^2.3.0",
         "node-fetch": "^3.3.2",
         "simple-git": "^3.27.0",
-        "soda-nodejs": "^0.5.4",
-        "yaml": "^2.6.1"
+        "soda-nodejs": "^0.6.0",
+        "yaml": "^2.7.0"
     },
     "devDependencies": {
-        "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
+        "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
         "@types/inquirer": "^9.0.7",
         "@types/jsdom": "^21.1.7",
         "@types/md5": "^2.3.5",
-        "@types/node": "^22.10.2",
-        "father": "^4.5.1",
-        "glob": "^11.0.0",
+        "@types/node": "^22.10.7",
+        "father": "^4.5.2",
+        "glob": "^11.0.1",
         "prettier": "^3.4.2",
-        "typescript": "^5.7.2"
+        "typescript": "^5.7.3"
     },
     "resolutions": {
         "string-width": "^4",
