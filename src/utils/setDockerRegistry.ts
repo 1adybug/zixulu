@@ -4,6 +4,7 @@ import { execAsync } from "soda-nodejs"
 
 import { isSudo } from "@src/constant"
 
+import { isUrl } from "./isUrl"
 import { sudoCommand } from "./sudoCommand"
 import { unique } from "./unique"
 
@@ -31,7 +32,7 @@ export async function setDockerRegistry() {
             message: "请输入镜像地址，多个用逗号分隔，留空则跳过",
         },
     ])
-    daemon["registry-mirrors"].push(...mirrors.split(/[,，]/))
+    daemon["registry-mirrors"].push(...mirrors.split(/[,，]/).filter(isUrl))
     await writeFile("/etc/docker/daemon.json", JSON.stringify(daemon, undefined, 4), "utf-8")
     consola.success("镜像地址设置成功")
     consola.info("建议重启docker服务：")
