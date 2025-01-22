@@ -1,8 +1,8 @@
 #!/usr/bin/env node
+import { resolve } from "path"
 import { Command } from "commander"
 import consola from "consola"
 import { emailReg } from "deepsea-tools"
-import { resolve } from "path"
 import { setDefaultOptions } from "soda-nodejs"
 
 import { CommitType } from "@constant/index"
@@ -52,6 +52,7 @@ import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { removeLock } from "./utils/removeLock"
 import { replaceAssets } from "./utils/replaceAssets"
 import { CommitAuthor, replaceCommitAuthor } from "./utils/replaceCommitAuthor"
+import { serverToAction } from "./utils/serverToAction"
 import { setBun } from "./utils/setBun"
 import { setDockerRegistry } from "./utils/setDockerRegistry"
 import { setGlobalConfig } from "./utils/setGlobalConfig"
@@ -337,5 +338,7 @@ program
     })
 
 program.command("sync-snippets").alias("ss").description("同步 vscode snippets").action(syncSnippets)
+
+program.command("server-to-action").alias("sta").description("将 server 文件夹下的文件转换为 action").action(serverToAction)
 
 program.parse()
