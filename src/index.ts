@@ -58,6 +58,7 @@ import { setDockerRegistry } from "./utils/setDockerRegistry"
 import { setGlobalConfig } from "./utils/setGlobalConfig"
 import { syncSnippets } from "./utils/syncSnippets"
 import { tailwindPatch } from "./utils/tailwindPatch"
+import { tar } from "./utils/tar"
 import { test } from "./utils/test"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
@@ -340,5 +341,12 @@ program
 program.command("sync-snippets").alias("ss").description("同步 vscode snippets").action(syncSnippets)
 
 program.command("server-to-action").alias("sta").description("将 server 文件夹下的文件转换为 action").action(serverToAction)
+
+program
+    .command("tar")
+    .description("压缩文件")
+    .argument("input", "输入文件夹")
+    .option("-o, --output <output>", "输出文件")
+    .action(async (input, { output }) => tar({ input, output }))
 
 program.parse()
