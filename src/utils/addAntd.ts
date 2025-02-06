@@ -22,13 +22,12 @@ export async function addAntd() {
             join(componentDir, "AntdNextRegistry.tsx"),
             `"use client"
 
-import { StyleProvider } from "@ant-design/cssinjs"
+import { FC, ReactNode } from "react"
 import { AntdRegistry } from "@ant-design/nextjs-registry"
 import { ConfigProvider } from "antd"
 import zhCN from "antd/locale/zh_CN"
-import { FC, ReactNode } from "react"
 
-export type AntdNextRegistryProps = {
+export interface AntdNextRegistryProps {
     children?: ReactNode
 }
 
@@ -36,10 +35,8 @@ const AntdNextRegistry: FC<AntdNextRegistryProps> = props => {
     const { children } = props
 
     return (
-        <AntdRegistry>
-            <ConfigProvider locale={zhCN}>
-                <StyleProvider hashPriority="high">{children}</StyleProvider>
-            </ConfigProvider>
+        <AntdRegistry hashPriority="high">
+            <ConfigProvider locale={zhCN}>{children}</ConfigProvider>
         </AntdRegistry>
     )
 }
@@ -63,9 +60,9 @@ const AntdRegistry: FC<AntdRegistryProps> = props => {
     const { children } = props
 
     return (
-        <ConfigProvider locale={zhCN}>
-            <StyleProvider hashPriority="high">{children}</StyleProvider>
-        </ConfigProvider>
+        <StyleProvider hashPriority="high">
+            <ConfigProvider locale={zhCN}>{children}</ConfigProvider>
+        </StyleProvider>
     )
 }
 
