@@ -1,10 +1,21 @@
-import { readdir } from "fs/promises"
 import consola from "consola"
+import { readdir, writeFile } from "fs/promises"
 import { spawnAsync } from "soda-nodejs"
 import { PackageManager } from "src/constant"
 
 import { addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"
+
+const prismaFile = `import { PrismaClient } from "@prisma/client"
+
+declare global {
+    var __PRISMA__: PrismaClient
+}
+
+globalThis.__PRISMA__ ??= new PrismaClient()
+
+export const prisma = globalThis.__PRISMA__
+`
 
 /**
  * 添加 Prisma 相关配置
@@ -24,5 +35,6 @@ export async function addPrisma(manager?: PackageManager) {
     await installDependceny({ silent: true, manager })
     if (!dir.includes("tsconfig.json")) await spawnAsync("npx tsc --init", { shell: true, stdio: "inherit" })
     await spawnAsync("npx prisma init --datasource-provider sqlite", { shell: true, stdio: "inherit" })
+    await writeFile("prisma/index.ts", prismaFile, "utf-8")
     consola.success("添加 Prisma 配置成功")
 }
