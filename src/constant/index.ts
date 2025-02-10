@@ -70,6 +70,7 @@ export const addedRules = [
     "pnpm-lock.yaml",
     "node_modules",
     "bun.lockb",
+    "bun.lock",
     "dist",
     "build",
     "yarn-error.log",
