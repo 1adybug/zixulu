@@ -15,7 +15,7 @@ import { readPackageJson } from "./readPackageJson"
 import { removeESLint } from "./removeESLint"
 import { rsbuild } from "./rsbuild"
 import { setTsConfig } from "./setTsConfig"
-import { tailwind } from "./tailwind"
+import { addTailwind } from "./addTailwind"
 import { vite } from "./vite"
 
 export async function initProject() {
@@ -71,7 +71,7 @@ export async function initProject() {
 
     const added: string[] = []
     if (modules.includes("antd")) await addAntd()
-    if (modules.includes("tailwind")) await tailwind()
+    if (modules.includes("tailwind")) await addTailwind()
     else await addPrettier()
     if (modules.includes("@tanstack/react-query")) added.push("@tanstack/react-query")
     if (modules.includes("dayjs")) added.push("dayjs")

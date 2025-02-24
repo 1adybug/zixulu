@@ -36,7 +36,7 @@ import { setRegistry } from "@utils/setRegistry"
 import { setShellProxy } from "@utils/setShellProxy"
 import { sortPackageJson } from "@utils/sortPackageJson"
 import { syncVscode } from "@utils/syncVscode"
-import { tailwind } from "@utils/tailwind"
+import { addTailwind } from "@src/utils/addTailwind"
 import { upgradeDependency } from "@utils/upgradeDependency"
 import { vite } from "@utils/vite"
 
@@ -55,6 +55,7 @@ import { CommitAuthor, replaceCommitAuthor } from "./utils/replaceCommitAuthor"
 import { serverToAction } from "./utils/serverToAction"
 import { setBun } from "./utils/setBun"
 import { setDockerRegistry } from "./utils/setDockerRegistry"
+import { setEnv } from "./utils/setEnv"
 import { setGlobalConfig } from "./utils/setGlobalConfig"
 import { syncSnippets } from "./utils/syncSnippets"
 import { tailwindPatch } from "./utils/tailwindPatch"
@@ -104,7 +105,7 @@ program
 program
     .command("tailwind")
     .description("添加 tailwind 配置")
-    .action(actionWithBackup(tailwind, getCommitMessage(CommitType.feature, "添加 tailwind 配置")))
+    .action(actionWithBackup(addTailwind, getCommitMessage(CommitType.feature, "添加 tailwind 配置")))
 
 program
     .command("remove-comment")
@@ -348,5 +349,15 @@ program
     .argument("input", "输入文件夹")
     .option("-o, --output <output>", "输出文件")
     .action(async (input, { output }) => tar({ input, output }))
+
+program
+    .command("set-env")
+    .description("设置环境变量")
+    .argument("key", "环境变量 key")
+    .argument("[value]", "环境变量 value")
+    .action(async (key, value) => {
+        await setEnv(key, value)
+        consola.success("设置环境变量成功")
+    })
 
 program.parse()
