@@ -9,8 +9,23 @@ import { backupFirst } from "./backupFirst"
  * @param input 文件或文件夹路径
  */
 export async function removeFileOrFolderFromGit(input: string) {
-    const stats = await stat(input)
-    const recursive = stats.isDirectory()
+    let recursive = false
+    try {
+        const stats = await stat(input)
+        recursive = stats.isDirectory()
+    } catch (error) {
+        const { default: inquirer } = await import("inquirer")
+        type Answer = {
+            recursive: boolean
+        }
+        const answer = await inquirer.prompt<Answer>({
+            type: "confirm",
+            name: "recursive",
+            message: "是否是文件夹",
+            default: false,
+        })
+        recursive = answer.recursive
+    }
     await backupFirst(true)
     consola.start(`开始从 git 中删除 ${input}`)
     await execAsync(
