@@ -3,6 +3,6 @@
  * @param requiredVersion - 版本号
  * @returns 版本号
  */
-export function getVersionFromRequiredVersion(requiredVersion: string) {
+export function getPackageVersionFromRange(requiredVersion: string) {
     return requiredVersion.replace(/^\D*/, "")
 }

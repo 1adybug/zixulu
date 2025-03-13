@@ -12,11 +12,13 @@ const zipDistContent = `// @ts-check
 import { rm } from "fs/promises"
 import { zip } from "soda-nodejs"
 
+const filename = process.env.FILENAME || "dist.zip"
+
 async function main() {
-    await rm("dist.zip", { force: true })
+    await rm(filename, { force: true })
     await zip({
         input: "dist",
-        output: "dist.zip"
+        output: filename,
     })
 }
 
