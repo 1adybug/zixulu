@@ -86,7 +86,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
                     headers,
                 })
                 const file = createWriteStream(join(output, filename))
-                await new Promise((resolve, reject) => Readable.from(response.body!).pipe(file).on("finish", resolve).on("error", reject))
+                await new Promise<0>((resolve, reject) => Readable.from(response.body!).pipe(file).on("finish", () => resolve(0)).on("error", reject))
             }
             const url2 = `${base ? (base.endsWith("/") ? base.slice(0, -1) : base) : ""}/${filename}`
             // consola.success(`${url} -> ${url2}`)
