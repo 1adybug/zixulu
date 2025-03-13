@@ -3,7 +3,7 @@ import { CommitType } from "@constant/index"
 import { getCommitMessage } from "./getCommitMessage"
 import { getPackageUpgradeVersion } from "./getPackageUpgradeVersion"
 import { UpgradeDependencyConfig, getUpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
-import { getVersionFromRequiredVersion } from "./getVersionFromRequiredVersion"
+import { getPackageVersionFromRange } from "./getPackageVersionFromRange"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
@@ -35,7 +35,7 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
                 const pkg = allPkgs[i]
                 const rv = packageJson[type][pkg]
                 const s = rv.match(/^\D*/)![0]
-                const cv = getVersionFromRequiredVersion(rv)
+                const cv = getPackageVersionFromRange(rv)
 
                 const version = await getPackageUpgradeVersion({
                     packageName: pkg,
@@ -43,7 +43,7 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
                     level,
                 })
 
-                if (!version) continue
+                if (!version || version === cv) continue
                 upgrades.push({
                     package: pkg,
                     oldVersion: cv,
