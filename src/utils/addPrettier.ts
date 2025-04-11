@@ -3,10 +3,33 @@ import consola from "consola"
 
 import { AddDependenciesConfig, addDependency } from "./addDependency"
 import { getDependcy } from "./getDependcy"
+import { hasDependency } from "./hasDependency"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { readTsConfig } from "./readTsConfig"
 import { writePackageJson } from "./writePackageJson"
+
+const originalConfig = `// @ts-check
+
+/**
+ * @type {import("prettier").Options}
+ */
+const config = {
+    semi: false,
+    tabWidth: 4,
+    arrowParens: "avoid",
+    printWidth: 160,
+    plugins: ["prettier-plugin-organize-imports"],
+}
+
+export default config
+`
+
+const ignoreConfig = `node_modules
+public
+dist
+build
+`
 
 /**
  * prettier 配置生成器参数
@@ -146,18 +169,20 @@ export async function addPrettier() {
         const config = await readTsConfig()
         atAlias = Object.keys(config.compilerOptions?.paths ?? {}).some(path => /^@[a-zA-Z]/.test(path))
     } catch (error) {}
-    const next = !!(await getDependcy("next"))
-    const react = !!(await getDependcy("react"))
-    await writeFile("./prettier.config.mjs", getPrettierConfig({ tailwind, atAlias, next, react }), "utf-8")
+    const next = await hasDependency("next")
+    const react = await hasDependency("react")
+    await writeFile("prettier.config.mjs", originalConfig, "utf-8")
+    await writeFile(".prettierrc.mjs", getPrettierConfig({ tailwind, atAlias, next, react }), "utf-8")
+    await writeFile(".prettierignore", ignoreConfig, "utf-8")
     const config2: AddDependenciesConfig = {
-        package: ["prettier", "@ianvs/prettier-plugin-sort-imports", "glob"],
+        package: ["prettier", "@ianvs/prettier-plugin-sort-imports", "glob", "prettier-plugin-organize-imports"],
         type: "devDependencies",
     }
     if (tailwind) (config2.package as string[]).push("prettier-plugin-tailwindcss")
     await addDependency(config2)
     const packageJson2 = await readPackageJson()
     packageJson2.scripts ??= {}
-    packageJson2.scripts.lint = "prettier --write ."
+    packageJson2.scripts.format = "prettier --config prettier.config.mjs --write . && prettier --config .prettierrc.mjs --write ."
     await writePackageJson({ data: packageJson2 })
     await installDependceny()
     consola.success("添加 prettier 配置成功")
