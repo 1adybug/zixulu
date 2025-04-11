@@ -6,7 +6,7 @@ import { getCommitMessage } from "./getCommitMessage"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
 
-/** 
+/**
  * 同步包脚本配置选项
  */
 export type AddSyncPackageScriptParams = {
@@ -18,7 +18,7 @@ export type AddSyncPackageScriptParams = {
  * 添加同步包脚本
  * 用于同步 npm 包到国内镜像源
  * 支持单包项目和 monorepo 项目
- * 
+ *
  * @param params 配置选项
  * @returns commit message
  */

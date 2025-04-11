@@ -18,6 +18,11 @@ export async function download(url: string, dir: string, filename?: string) {
     const response = await fetch(url, { agent })
     filename = getFilename(response.headers) || filename || new URL(url).pathname.split("/").at(-1)!
     const writeable = createWriteStream(join(dir, filename))
-    await new Promise<0>((resolve, reject) => Readable.from(response.body!).pipe(writeable).on("finish", () => resolve(0)).on("error", reject))
+    await new Promise<0>((resolve, reject) =>
+        Readable.from(response.body!)
+            .pipe(writeable)
+            .on("finish", () => resolve(0))
+            .on("error", reject),
+    )
     return filename
 }

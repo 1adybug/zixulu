@@ -40,7 +40,10 @@ export async function syncSnippets() {
             message: "请输入新的文件名（不带.code-snippets）",
             default: setting.syncVscodeSnippets?.filename?.replace(/\.code-snippets$/, ""),
         })
-        setting = { ...setting, syncVscodeSnippets: { ...setting.syncVscodeSnippets, filename: `${newFilename.replace(/\.code-snippets$/, "")}.code-snippets` } }
+        setting = {
+            ...setting,
+            syncVscodeSnippets: { ...setting.syncVscodeSnippets, filename: `${newFilename.replace(/\.code-snippets$/, "")}.code-snippets` },
+        }
         filename = `${newFilename.replace(/\.code-snippets$/, "")}.code-snippets`
     }
     if (existsSync(join(snippetSource, filename))) {

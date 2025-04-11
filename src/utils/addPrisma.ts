@@ -1,5 +1,5 @@
-import consola from "consola"
 import { readdir, writeFile } from "fs/promises"
+import consola from "consola"
 import { spawnAsync } from "soda-nodejs"
 import { PackageManager } from "src/constant"
 

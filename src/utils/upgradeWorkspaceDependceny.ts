@@ -6,8 +6,8 @@ import consola from "consola"
 import { actionWithBackup } from "./actionWithBackup"
 import { getUpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
 import { readZixuluSetting } from "./readZixuluSetting"
-import { writeZixuluSetting } from "./writeZixuluSetting"
 import { upgradeDependency } from "./upgradeDependency"
+import { writeZixuluSetting } from "./writeZixuluSetting"
 
 export async function upgradeWorkspaceDependceny() {
     const { dir, ...rest } = await getUpgradeDependencyConfig()
