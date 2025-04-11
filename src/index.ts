@@ -7,6 +7,8 @@ import { setDefaultOptions } from "soda-nodejs"
 
 import { CommitType } from "@constant/index"
 
+import { addTailwind } from "@src/utils/addTailwind"
+
 import { addAntd } from "@utils/addAntd"
 import { addGitignore } from "@utils/addGitignore"
 import { addFolderPathAlias, replacePathAlias } from "@utils/addPathAlias"
@@ -36,11 +38,11 @@ import { setRegistry } from "@utils/setRegistry"
 import { setShellProxy } from "@utils/setShellProxy"
 import { sortPackageJson } from "@utils/sortPackageJson"
 import { syncVscode } from "@utils/syncVscode"
-import { addTailwind } from "@src/utils/addTailwind"
 import { upgradeDependency } from "@utils/upgradeDependency"
 import { vite } from "@utils/vite"
 
 import { actionWithBackup } from "./utils/actionWithBackup"
+import { addApi } from "./utils/addApi"
 import { addStartScript } from "./utils/addStartScript"
 import { addSyncPackageScript } from "./utils/addSyncPackageScript"
 import { addZipDist } from "./utils/addZipDist"
@@ -359,5 +361,12 @@ program
         await setEnv(key, value)
         consola.success("设置环境变量成功")
     })
+
+program
+    .command("add-api")
+    .description("添加 api 文件")
+    .argument("type", "api 类型")
+    .argument("[path]", "api 文件夹路径")
+    .action(async (type, path) => addApi({ type, path }))
 
 program.parse()

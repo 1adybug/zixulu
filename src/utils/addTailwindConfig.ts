@@ -21,7 +21,7 @@ const config: Config = {
 export default config
 `
 
-/** 
+/**
  * 添加 Tailwind 配置文件
  * 创建 tailwind.config.ts 文件并写入默认配置
  */

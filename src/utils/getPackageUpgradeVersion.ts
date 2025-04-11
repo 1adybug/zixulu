@@ -1,8 +1,8 @@
 import consola from "consola"
 
 import { getPackageRequiredVersion } from "./getPackageRequiredVersion"
-import { UpgradeLevel } from "./getUpgradeDependencyConfig"
 import { getPackageVersionFromRange } from "./getPackageVersionFromRange"
+import { UpgradeLevel } from "./getUpgradeDependencyConfig"
 import { retry } from "./retry"
 
 /**
@@ -28,7 +28,8 @@ export type GetPackageUpgradeVersionConfig = {
  */
 export async function getPackageUpgradeVersion({ packageName, version, level }: GetPackageUpgradeVersionConfig) {
     const result = await retry({
-        action: () => getPackageRequiredVersion(packageName, `${level === "patch" ? "~" : level === "minor" ? "^" : ">="}${getPackageVersionFromRange(version)}`),
+        action: () =>
+            getPackageRequiredVersion(packageName, `${level === "patch" ? "~" : level === "minor" ? "^" : ">="}${getPackageVersionFromRange(version)}`),
         count: 4,
         callback: (error, current) => consola.error(`获取 ${packageName} 版本失败，第 ${current} 次重试`),
     })

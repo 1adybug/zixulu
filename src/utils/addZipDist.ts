@@ -38,7 +38,7 @@ type AddZipDistConfig = {
  * 1. 添加必要的依赖
  * 2. 创建压缩脚本
  * 3. 修改构建命令
- * 
+ *
  * @param config 配置选项
  * @returns commit message
  */

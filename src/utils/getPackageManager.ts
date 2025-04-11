@@ -22,7 +22,7 @@ export async function getPackageManager(dir = "."): Promise<PackageManager> {
     if (dir2.includes("yarn.lock")) return PackageManager.yarn
     if (dir2.includes("package-lock.json")) return PackageManager.npm
     if (dir2.includes("pnpm-lock.yaml")) return PackageManager.pnpm
-    if (dir2.includes("bun.lockb") || dir2.includes("bun.lock") ) return PackageManager.bun
+    if (dir2.includes("bun.lockb") || dir2.includes("bun.lock")) return PackageManager.bun
     const { default: inquirer } = await import("inquirer")
 
     type PromptResult = {

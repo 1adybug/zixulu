@@ -13,10 +13,10 @@ import { writeZixuluSetting } from "./writeZixuluSetting"
  * VSCode扩展信息接口
  */
 export interface VscodeExt {
-    id: string      // 扩展ID
-    name: string    // 扩展显示名称
+    id: string // 扩展ID
+    name: string // 扩展显示名称
     version: string // 扩展版本
-    url: string     // 下载URL
+    url: string // 下载URL
 }
 
 /**
