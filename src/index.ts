@@ -67,6 +67,7 @@ import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
+import { rslib } from "./utils/rslib"
 
 setDefaultOptions({
     shell: true,
@@ -368,5 +369,7 @@ program
     .argument("type", "api 类型")
     .argument("[path]", "api 文件夹路径")
     .action(async (type, path) => addApi({ type, path }))
+
+program.command("rslib").description("rslib 配置").action(rslib)
 
 program.parse()
