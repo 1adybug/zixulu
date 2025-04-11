@@ -1,6 +1,7 @@
 import { writeFile } from "fs/promises"
 import consola from "consola"
 
+import { hasDependency } from "./hasDependency"
 import { readPackageJson } from "./readPackageJson"
 
 /** Tailwind 默认配置内容 */
@@ -55,9 +56,8 @@ export default config
  */
 export async function addTailwindConfig() {
     try {
-        const packageJson = await readPackageJson()
-        const dependencies = packageJson.dependencies
-        const config = dependencies?.["@heroui/react"] ? tailwindConfigWithHeroUi : tailwindConfig
+        const hasHeroUi = await hasDependency(/^@heroui\//)
+        const config = hasHeroUi ? tailwindConfigWithHeroUi : tailwindConfig
         await writeFile("tailwind.config.ts", config, "utf-8")
         consola.success("添加 tailwind.config.ts 配置成功")
     } catch (error) {
