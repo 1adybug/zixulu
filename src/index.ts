@@ -49,11 +49,13 @@ import { addZipDist } from "./utils/addZipDist"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
+import { initNode } from "./utils/initNode"
 import { installDocker } from "./utils/installDocker"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { removeLock } from "./utils/removeLock"
 import { replaceAssets } from "./utils/replaceAssets"
 import { CommitAuthor, replaceCommitAuthor } from "./utils/replaceCommitAuthor"
+import { rslib } from "./utils/rslib"
 import { serverToAction } from "./utils/serverToAction"
 import { setBun } from "./utils/setBun"
 import { setDockerRegistry } from "./utils/setDockerRegistry"
@@ -67,8 +69,6 @@ import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
-import { rslib } from "./utils/rslib"
-import { initTsc } from "./utils/initTsc"
 
 setDefaultOptions({
     shell: true,
@@ -368,11 +368,12 @@ program
     .command("add-api")
     .description("添加 api 文件")
     .argument("type", "api 类型")
-    .argument("[path]", "api 文件夹路径")
-    .action(async (type, path) => addApi({ type, path }))
+    .option("-a, --api <api>", "api 文件夹路径")
+    .option("-h, --hook <hook>", "hook 文件夹路径")
+    .action(async (type, { api, hook }) => addApi({ type, api, hook }))
 
 program.command("rslib").description("rslib 配置").action(rslib)
 
-program.command("init-tsc").description("初始化 tsconfig.json").action(initTsc)
+program.command("init-node").description("初始化 node 项目").action(initNode)
 
 program.parse()
