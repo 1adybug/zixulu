@@ -68,6 +68,7 @@ import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
 import { rslib } from "./utils/rslib"
+import { initTsc } from "./utils/initTsc"
 
 setDefaultOptions({
     shell: true,
@@ -371,5 +372,7 @@ program
     .action(async (type, path) => addApi({ type, path }))
 
 program.command("rslib").description("rslib 配置").action(rslib)
+
+program.command("init-tsc").description("初始化 tsconfig.json").action(initTsc)
 
 program.parse()
