@@ -3,17 +3,24 @@ import { readFile } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
 
-export type SyncVscodeSnippets = {
-    replace?: boolean
-    filename?: string
+import { Editor, FileType, SyncEditorSettingSource } from "./syncEditorSetting"
+
+export interface SyncEditorFileConfig {
     backup?: boolean
 }
 
-export type ZixuluSetting = {
+export interface SyncEditorConfig {
+    fileConfigs?: Record<string, SyncEditorFileConfig>
+    fileTypes?: FileType[]
+    source?: SyncEditorSettingSource
+    targets?: Editor[]
+}
+
+export interface ZixuluSetting {
     vscodeDownloadHistory?: string[]
     softwareDownloadHistory?: string[]
     upgradeWorkspaceDependcenyHistory?: Record<string, string[]>
-    syncVscodeSnippets?: SyncVscodeSnippets
+    syncEditor?: SyncEditorConfig
 }
 
 export async function readZixuluSetting(): Promise<ZixuluSetting> {

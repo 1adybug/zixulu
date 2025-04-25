@@ -61,7 +61,7 @@ import { setBun } from "./utils/setBun"
 import { setDockerRegistry } from "./utils/setDockerRegistry"
 import { setEnv } from "./utils/setEnv"
 import { setGlobalConfig } from "./utils/setGlobalConfig"
-import { syncSnippets } from "./utils/syncSnippets"
+import { syncEditorSetting } from "./utils/syncEditorSetting"
 import { tailwindPatch } from "./utils/tailwindPatch"
 import { tar } from "./utils/tar"
 import { test } from "./utils/test"
@@ -343,7 +343,7 @@ program
         await test()
     })
 
-program.command("sync-snippets").alias("ss").description("同步 vscode snippets").action(syncSnippets)
+program.command("sync-editor").alias("se").description("同步编辑器配置").action(syncEditorSetting)
 
 program.command("server-to-action").alias("sta").description("将 server 文件夹下的文件转换为 action").action(serverToAction)
 
