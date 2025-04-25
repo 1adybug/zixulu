@@ -11,7 +11,7 @@ export async function syncSnippets() {
     let setting = await readZixuluSetting()
     const { default: inquirer } = await import("inquirer")
     const userDir = homedir()
-    const snippetSource = join(userDir, "AppData/Roaming/Code/User/snippets")
+    const snippetSource = join(userDir, "AppData/Roaming/Cursor/User/snippets")
     const response = await fetch("https://luzixu.geskj.com/global.code-snippets")
     const code = await response.text()
     let filename = setting.syncVscodeSnippets?.filename || "global.code-snippets"
