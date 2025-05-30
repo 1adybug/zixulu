@@ -43,9 +43,11 @@ import { vite } from "@utils/vite"
 
 import { actionWithBackup } from "./utils/actionWithBackup"
 import { addApi } from "./utils/addApi"
+import { addBuildDocker } from "./utils/addBuildDocker"
 import { addStartScript } from "./utils/addStartScript"
 import { addSyncPackageScript } from "./utils/addSyncPackageScript"
 import { addZipDist } from "./utils/addZipDist"
+import { backupFirst } from "./utils/backupFirst"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
@@ -375,5 +377,7 @@ program
 program.command("rslib").description("rslib 配置").action(rslib)
 
 program.command("init-node").description("初始化 node 项目").action(initNode)
+
+program.command("add-build-docker").alias("abd").description("添加构建 docker 镜像的脚本").action(addBuildDocker)
 
 program.parse()
