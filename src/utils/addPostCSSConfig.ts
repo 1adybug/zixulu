@@ -2,15 +2,17 @@ import { rm, writeFile } from "fs/promises"
 import consola from "consola"
 
 /** PostCSS 配置文件内容 */
-const postcssConfig = `/** @type {import("postcss-load-config").Config} */
+const postcssConfig = `// @ts-check
+
+/** @type {import("postcss-load-config").Config} */
 const config = {
     plugins: {
         tailwindcss: {},
-        autoprefixer: {}
-    }
+        autoprefixer: {},
+    },
 }
 
-export default config            
+export default config
 `
 
 /**
