@@ -67,6 +67,7 @@ export async function downloadVscodeExts(dir: string) {
         extList
             .split(/[\n\r]/)
             .filter(Boolean)
+            .filter(item => !item.startsWith("anysphere."))
             .map(ext => getVscodeExtInfo(ext)),
     )
     const setting = await readZixuluSetting()
