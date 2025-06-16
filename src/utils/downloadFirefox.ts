@@ -7,8 +7,8 @@ import { downloadFromWinget } from "./downloadFromWinget"
 export async function downloadFirefox(dir: string) {
     await downloadFromWinget({
         name: "Firefox",
-        id: "Mozilla.Firefox",
+        id: "Mozilla.Firefox.zh-CN",
         dir,
-        filter: item => item.Architecture === "x64" && item.InstallerType === "exe" && item.InstallerLocale === "zh-CN",
+        filter: item => item.Architecture === "x64",
     })
 }
