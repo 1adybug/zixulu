@@ -71,6 +71,7 @@ import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
+import { json2type } from "./utils/json2type"
 
 setDefaultOptions({
     shell: true,
@@ -379,5 +380,7 @@ program.command("rslib").description("rslib 配置").action(rslib)
 program.command("init-node").description("初始化 node 项目").action(initNode)
 
 program.command("add-build-docker").alias("abd").description("添加构建 docker 镜像的脚本").action(addBuildDocker)
+
+program.command("json2type").alias("j2t").argument("[path]", "json 文件路径").description("将 json 转换为 type").action(json2type)
 
 program.parse()
