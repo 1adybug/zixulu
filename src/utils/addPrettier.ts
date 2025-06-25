@@ -19,7 +19,7 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
-    plugins: ["prettier-plugin-organize-imports"],
+    plugins: ["@prettier/plugin-oxc", "prettier-plugin-organize-imports"],
 }
 
 export default config
@@ -29,6 +29,9 @@ const ignoreConfig = `node_modules
 public
 dist
 build
+.next
+.vscode
+.generated
 `
 
 /**
@@ -50,7 +53,7 @@ export type GetPrettierConfigParams = {
  * @param params 配置参数
  */
 export function getPrettierConfig({ tailwind, atAlias, next, react }: GetPrettierConfigParams) {
-    const plugins = ["@ianvs/prettier-plugin-sort-imports"]
+    const plugins = ["@prettier/plugin-oxc", "@ianvs/prettier-plugin-sort-imports"]
 
     if (tailwind) plugins.push("prettier-plugin-tailwindcss")
 
@@ -175,14 +178,14 @@ export async function addPrettier() {
     await writeFile(".prettierrc.mjs", getPrettierConfig({ tailwind, atAlias, next, react }), "utf-8")
     await writeFile(".prettierignore", ignoreConfig, "utf-8")
     const config2: AddDependenciesConfig = {
-        package: ["prettier", "@ianvs/prettier-plugin-sort-imports", "glob", "prettier-plugin-organize-imports"],
+        package: ["prettier", "@prettier/plugin-oxc", "@ianvs/prettier-plugin-sort-imports", "glob", "prettier-plugin-organize-imports"],
         type: "devDependencies",
     }
     if (tailwind) (config2.package as string[]).push("prettier-plugin-tailwindcss")
     await addDependency(config2)
     const packageJson2 = await readPackageJson()
     packageJson2.scripts ??= {}
-    packageJson2.scripts.format = "prettier --config prettier.config.mjs --write . && prettier --config .prettierrc.mjs --write ."
+    packageJson2.scripts.format = "prettier --config-path prettier.config.mjs --write . && prettier --config-path .prettierrc.mjs --write ."
     await writePackageJson({ data: packageJson2 })
     await installDependceny()
     consola.success("添加 prettier 配置成功")
