@@ -186,7 +186,7 @@ export async function addPrettier() {
     await addDependency(config2)
     const packageJson2 = await readPackageJson()
     packageJson2.scripts ??= {}
-    packageJson2.scripts.format = "prettier --config-path prettier.config.mjs --write . --experimental-cli && prettier --config-path .prettierrc.mjs --write . --experimental-cli"
+    packageJson2.scripts.format = "prettier --config prettier.config.mjs --write . && prettier --config .prettierrc.mjs --write ."
     await writePackageJson({ data: packageJson2 })
     await installDependceny()
     consola.success("添加 prettier 配置成功")
