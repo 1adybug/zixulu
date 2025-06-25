@@ -29,6 +29,7 @@ const ignoreConfig = `node_modules
 public
 dist
 build
+generated
 .next
 .vscode
 .generated
