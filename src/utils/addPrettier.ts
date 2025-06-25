@@ -187,6 +187,7 @@ export async function addPrettier() {
     const packageJson2 = await readPackageJson()
     packageJson2.scripts ??= {}
     packageJson2.scripts.format = "prettier --config prettier.config.mjs --write . && prettier --config .prettierrc.mjs --write ."
+    packageJson2.scripts.fg = "npm run format && git add . && git commit -m \"✨feature: format\""
     await writePackageJson({ data: packageJson2 })
     await installDependceny()
     consola.success("添加 prettier 配置成功")
