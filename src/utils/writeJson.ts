@@ -6,5 +6,5 @@ export type WriteJsonConfig = {
 }
 
 export async function writeJson({ data, output }: WriteJsonConfig): Promise<void> {
-    await writeFile(output, JSON.stringify(data, undefined, 4), "utf-8")
+    await writeFile(output, JSON.stringify(data, undefined, 4) + "\n", "utf-8")
 }
