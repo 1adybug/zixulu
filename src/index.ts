@@ -53,6 +53,7 @@ import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
 import { initNode } from "./utils/initNode"
 import { installDocker } from "./utils/installDocker"
+import { json2type } from "./utils/json2type"
 import { readPackageJsonSync } from "./utils/readPackageJsonSync"
 import { removeLock } from "./utils/removeLock"
 import { replaceAssets } from "./utils/replaceAssets"
@@ -71,7 +72,6 @@ import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
-import { json2type } from "./utils/json2type"
 
 setDefaultOptions({
     shell: true,
