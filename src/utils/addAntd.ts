@@ -19,7 +19,7 @@ export async function addAntd() {
     if (packageJson.dependencies.next) {
         await addDependency({ package: "@ant-design/nextjs-registry" })
         await writeFile(
-            join(componentDir, "AntdNextRegistry.tsx"),
+            join(componentDir, "Registry.tsx"),
             `"use client"
 
 import { FC, ReactNode } from "react"
@@ -27,12 +27,11 @@ import { AntdRegistry } from "@ant-design/nextjs-registry"
 import { ConfigProvider } from "antd"
 import zhCN from "antd/locale/zh_CN"
 
-export interface AntdNextRegistryProps {
+export interface RegistryProps {
     children?: ReactNode
 }
 
-const AntdNextRegistry: FC<AntdNextRegistryProps> = props => {
-    const { children } = props
+const Registry: FC<RegistryProps> = ({ children }) => {
 
     return (
         <AntdRegistry hashPriority="high">
@@ -41,23 +40,22 @@ const AntdNextRegistry: FC<AntdNextRegistryProps> = props => {
     )
 }
 
-export default AntdNextRegistry
+export default Registry
 `,
         )
     } else {
         await writeFile(
-            join(componentDir, "AntdRegistry.tsx"),
+            join(componentDir, "Registry.tsx"),
             `import { StyleProvider } from "@ant-design/cssinjs"
 import { ConfigProvider } from "antd"
 import zhCN from "antd/locale/zh_CN"
 import { FC, ReactNode } from "react"
 
-export type AntdRegistryProps = {
+export interface RegistryProps {
     children?: ReactNode
 }
 
-const AntdRegistry: FC<AntdRegistryProps> = props => {
-    const { children } = props
+const Registry: FC<RegistryProps> = ({ children }) => {
 
     return (
         <StyleProvider hashPriority="high">
@@ -66,7 +64,7 @@ const AntdRegistry: FC<AntdRegistryProps> = props => {
     )
 }
 
-export default AntdRegistry
+export default Registry
 `,
         )
     }
