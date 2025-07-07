@@ -5,8 +5,8 @@ export default defineConfig({
         output: "dist",
     },
     targets: {
-        node: 18,
-        chrome: 100,
+        node: 22,
+        chrome: 109,
     },
     sourcemap: true,
 })
