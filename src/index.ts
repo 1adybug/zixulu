@@ -73,6 +73,7 @@ import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
 import { clearDockerImage } from "./utils/clearDockerImage"
+import { clearDockerLog } from "./utils/clearDockerLog"
 
 setDefaultOptions({
     shell: true,
@@ -384,6 +385,10 @@ program.command("add-build-docker").alias("abd").description("添加构建 docke
 
 program.command("json2type").alias("j2t").argument("[path]", "json 文件路径").description("将 json 转换为 type").action(json2type)
 
-program.command("clear-docker-image").alias("cdi").description("清除 docker 镜像").argument("[name]", "镜像名称").action(clearDockerImage)
+program.command("clear-docker-image").alias("cdi").description("清除 docker 悬挂镜像").argument("[name]", "镜像名称").action(clearDockerImage)
+
+program.command("clear-docker-log").alias("cdl").description("清除 docker 容器日志").argument("name", "容器名称或者 ID").action(clearDockerLog)
+
+program.command("update-docker-image").alias("udi").description("更新 docker 镜像").arguments("<images...>").action(console.log)
 
 program.parse()
