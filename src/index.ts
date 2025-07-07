@@ -74,6 +74,7 @@ import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
 import { clearDockerImage } from "./utils/clearDockerImage"
 import { clearDockerLog } from "./utils/clearDockerLog"
+import { updateDockerImage } from "./utils/updateDockerImage"
 
 setDefaultOptions({
     shell: true,
@@ -389,6 +390,6 @@ program.command("clear-docker-image").alias("cdi").description("清除 docker �
 
 program.command("clear-docker-log").alias("cdl").description("清除 docker 容器日志").argument("name", "容器名称或者 ID").action(clearDockerLog)
 
-program.command("update-docker-image").alias("udi").description("更新 docker 镜像").arguments("<images...>").action(console.log)
+program.command("update-docker-image").alias("udi").description("更新 docker 镜像").arguments("<images...>").action(updateDockerImage)
 
 program.parse()
