@@ -72,6 +72,7 @@ import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
+import { clearDockerImage } from "./utils/clearDockerImage"
 
 setDefaultOptions({
     shell: true,
@@ -382,5 +383,7 @@ program.command("init-node").description("初始化 node 项目").action(initNod
 program.command("add-build-docker").alias("abd").description("添加构建 docker 镜像的脚本").action(addBuildDocker)
 
 program.command("json2type").alias("j2t").argument("[path]", "json 文件路径").description("将 json 转换为 type").action(json2type)
+
+program.command("clear-docker-image").alias("cdi").description("清除 docker 镜像").argument("[name]", "镜像名称").action(clearDockerImage)
 
 program.parse()
