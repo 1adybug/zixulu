@@ -1,4 +1,5 @@
 import { HttpsProxyAgent } from "https-proxy-agent"
+import { Agent } from "http"
 
 export enum PackageManager {
     npm = "npm",
@@ -62,7 +63,7 @@ export const SpawnOptions = {
     stdio: "inherit",
 }
 
-export const agent = new HttpsProxyAgent("http://localhost:7890")
+export const agent = new HttpsProxyAgent("http://localhost:7890") as Agent
 
 export const addedRules = [
     "package-lock.json",

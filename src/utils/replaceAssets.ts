@@ -9,6 +9,7 @@ import { Response } from "node-fetch"
 
 import { isAsset } from "./isAsset"
 import { retry } from "./retry"
+import { agent } from "@src/constant"
 
 function getReg() {
     return /(https?:|href=")\/\/[a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+/gm
@@ -33,8 +34,6 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
     const { base, input, output = "assets", proxy } = options
 
     await mkdir(output, { recursive: true })
-
-    const agent = new HttpsProxyAgent("http://localhost:7890")
 
     const { default: fetch, Headers } = await import("node-fetch")
 
