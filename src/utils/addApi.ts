@@ -1,5 +1,8 @@
-import { writeFile } from "fs/promises"
+import { capitalize } from "deepsea-tools"
+import { existsSync } from "fs"
+import { writeFile as _writeFile, mkdir } from "fs/promises"
 import { join } from "path"
+import { isPathLike } from "soda-nodejs"
 
 export interface AddApiParams {
     type: string
@@ -7,10 +10,33 @@ export interface AddApiParams {
     hook?: string
 }
 
+async function writeFile(...args: Parameters<typeof _writeFile>) {
+    const [path] = args
+    if (isPathLike(path) && existsSync(path)) {
+        const { default: inquirer } = await import("inquirer")
+
+        interface Answer {
+            override: boolean
+        }
+
+        const { override } = await inquirer.prompt<Answer>({
+            type: "confirm",
+            name: "override",
+            message: `文件 ${path} 已存在，是否覆盖？`,
+        })
+
+        if (!override) return
+    }
+    return await _writeFile(...args)
+}
+
 export async function addApi({ type, api, hook }: AddApiParams) {
-    type = type.replace(/^\w/, c => c.toUpperCase())
+    type = capitalize(type)
     api ??= "apis"
     hook ??= "hooks"
+
+    await mkdir(api, { recursive: true })
+    await mkdir(hook, { recursive: true })
 
     const type2 = type.replace(/([A-Z])/g, (_, c) => `-${c.toLowerCase()}`).replace(/^-/, "")
 
@@ -27,6 +53,8 @@ export interface ${type} {
     id: string
     name: string
 }
+
+export const ${type}Name = "${type}"
 
 export async function query${type}(params: Query${type}Params) {
     const response = await request<Page<${type}>>("/${type2}/query", {
@@ -136,4 +164,115 @@ export function useGet${type}(idOrParams?: UseGet${type}Params | string | undefi
 }
 `
     await writeFile(join(hook, `useGet${type}.ts`), useGet)
+
+    const useAdd = `import { useMutation } from "@tanstack/react-query"
+import { nanoid } from "deepsea-tools"
+
+import { add${type} } from "@/apis/add${type}"
+import { ${type}Name } from "@/apis/query${type}"
+
+export function useAdd${type}() {
+    return useMutation({
+        mutationFn: addPoliceIncident,
+        onMutate() {
+            const key = nanoid()
+            message.open({
+                key,
+                type: "loading",
+                content: \`新增\${PoliceIncidentName}中...\`,
+            })
+            return key
+        },
+        onSuccess(data, variables, key) {
+            message.open({
+                key,
+                type: "success",
+                content: \`新增\${PoliceIncidentName}成功\`,
+            })
+        },
+        onError(error, variables, key) {
+            message.open({
+                key,
+                type: "error",
+                content: \`新增\${PoliceIncidentName}失败\`,
+            })
+        },
+    })
+}
+`
+    await writeFile(join(hook, `useAdd${type}.ts`), useAdd)
+
+    const useUpdate = `import { useMutation } from "@tanstack/react-query"
+import { nanoid } from "deepsea-tools"
+
+import { ${type}Name } from "@/apis/query${type}"
+import { update${type} } from "@/apis/update${type}"
+
+export function useUpdate${type}() {
+    return useMutation({
+        mutationFn: update${type},
+        onMutate() {
+            const key = nanoid()
+            message.open({
+                key,
+                type: "loading",
+                content: \`更新\${${type}Name}中...\`,
+            })
+            return key
+        },
+        onSuccess(data, variables, key) {
+            message.open({
+                key,
+                type: "success",
+                content: \`更新\${${type}Name}成功\`,
+            })
+        },
+        onError(error, variables, key) {
+            message.open({
+                key,
+                type: "error",
+                content: \`更新\${${type}Name}失败\`,
+            })
+        },
+    })
+}
+`
+    await writeFile(join(hook, `useUpdate${type}.ts`), useUpdate)
+
+    const useDelete = `import { useMutation } from "@tanstack/react-query"
+import { nanoid } from "deepsea-tools"
+
+import { delete${type} } from "@/apis/delete${type}"
+import { ${type}Name } from "@/apis/query${type}"
+
+export function useDelete${type}() {
+    return useMutation({
+        mutationFn: delete${type},
+        onMutate() {
+            const key = nanoid()
+            message.open({
+                key,
+                type: "loading",
+                content: \`删除\${${type}Name}中...\`,
+            })
+            return key
+        },
+        onSuccess(data, variables, key) {
+            message.open({
+                key,
+                type: "success",
+                content: \`删除\${${type}Name}成功\`,
+            })
+        },
+        onError(error, variables, key) {
+            message.open({
+                key,
+                type: "error",
+                content: \`删除\${${type}Name}失败\`,
+            })
+        },
+    })
+}
+`
+    await writeFile(join(hook, `useDelete${type}.ts`), useDelete)
 }
