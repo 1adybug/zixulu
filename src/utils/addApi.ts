@@ -54,6 +54,8 @@ export interface ${type} {
     name: string
 }
 
+export type ${type}Id = ${type}["id"]
+
 export const ${type}Name = "${type}"
 
 export async function query${type}(params: Query${type}Params) {
@@ -103,9 +105,11 @@ export async function update${type}(params: Update${type}Params) {
 
     const _delete = `import { request } from "@/utils/request"
 
-import { ${type} } from "./query${type}"
+import { ${type}, ${type}Id } from "./query${type}"
 
-export async function delete${type}(id: string) {
+export type Delete${type}Params = ${type}Id
+
+export async function delete${type}(id: Delete${type}Params) {
     const response = await request<${type}>(\`/${type2}/delete/\${id}\`, {
         method: "DELETE",
     })
@@ -117,9 +121,11 @@ export async function delete${type}(id: string) {
 
     const get = `import { request } from "@/utils/request"
 
-import { ${type} } from "./query${type}"
+import { ${type}, ${type}Id } from "./query${type}"
 
-export async function get${type}(id: string) {
+export type Get${type}Params = ${type}Id
+
+export async function get${type}(id: Get${type}Params) {
     const response = await request<${type}>(\`/${type2}/get/\${id}\`, {
         method: "POST",
     })
@@ -146,14 +152,14 @@ export function use${type}(params: Query${type}Params) {
     const useGet = `import { useQuery } from "@tanstack/react-query"
 import { isNonNullable } from "deepsea-tools"
 
-import { get${type} } from "@/apis/get${type}"
+import { Get${type}Params, get${type} } from "@/apis/get${type}"
 
-export interface UseGet${type}Params {
-    id?: string | undefined
+export interface Use${type}Params {
+    id?: Get${type}Params | undefined
     enabled?: boolean
 }
 
-export function useGet${type}(idOrParams?: UseGet${type}Params | string | undefined) {
+export function use${type}(idOrParams?: Use${type}Params | Get${type}Params | undefined) {
     const { id, enabled = true } = typeof idOrParams === "object" ? idOrParams : { id: idOrParams, enabled: true }
 
     return useQuery({
@@ -163,116 +169,158 @@ export function useGet${type}(idOrParams?: UseGet${type}Params | string | undefi
     })
 }
 `
-    await writeFile(join(hook, `useGet${type}.ts`), useGet)
+    await writeFile(join(hook, `use${type}.ts`), useGet)
 
-    const useAdd = `import { useMutation } from "@tanstack/react-query"
-import { nanoid } from "deepsea-tools"
+    const useAdd = `import { useId } from "react"
+import { UseMutationOptions, useMutation, useQueryClient } from "@tanstack/react-query"
 
-import { add${type} } from "@/apis/add${type}"
-import { ${type}Name } from "@/apis/query${type}"
+import { Add${type}Params, add${type} } from "@/apis/add${type}"
+import { ${type}, ${type}Name } from "@/apis/query${type}"
 
-export function useAdd${type}() {
+export interface UseAdd${type}Params<TContext = never>
+    extends Omit<UseMutationOptions<${type}, Error, Add${type}Params, TContext>, "mutationFn"> {}
+
+export function useAdd${type}<TContext = never>({ onMutate, onSuccess, onError, onSettled, ...rest }: UseAdd${type}Params<TContext> = {}) {
+    const key = useId()
+    const queryClient = useQueryClient()
+
     return useMutation({
-        mutationFn: addPoliceIncident,
-        onMutate() {
-            const key = nanoid()
+        mutationFn: add${type},
+        onMutate(variables) {
             message.open({
                 key,
                 type: "loading",
-                content: \`新增\${PoliceIncidentName}中...\`,
+                content: \`新增\${${type}Name}中...\`,
+                duration: 0,
             })
-            return key
+            return onMutate?.(variables)
         },
-        onSuccess(data, variables, key) {
+        onSuccess(data, variables, context) {
             message.open({
                 key,
                 type: "success",
-                content: \`新增\${PoliceIncidentName}成功\`,
+                content: \`新增\${${type}Name}成功\`,
             })
+            return onSuccess?.(data, variables, context)
         },
-        onError(error, variables, key) {
+        onError(error, variables, context) {
             message.open({
                 key,
                 type: "error",
-                content: \`新增\${PoliceIncidentName}失败\`,
+                content: \`新增\${${type}Name}失败\`,
             })
+            return onError?.(error, variables, context)
         },
+        onSettled(data, error, variables, context) {
+            queryClient.invalidateQueries({ queryKey: ["query-${type2}"] })
+            return onSettled?.(data, error, variables, context)
+        },
+        ...rest,
     })
 }
 `
     await writeFile(join(hook, `useAdd${type}.ts`), useAdd)
 
-    const useUpdate = `import { useMutation } from "@tanstack/react-query"
-import { nanoid } from "deepsea-tools"
+    const useUpdate = `import { useId } from "react"
+import { UseMutationOptions, useMutation, useQueryClient } from "@tanstack/react-query"
 
-import { ${type}Name } from "@/apis/query${type}"
-import { update${type} } from "@/apis/update${type}"
+import { ${type}, ${type}Name } from "@/apis/query${type}"
+import { Update${type}Params, update${type} } from "@/apis/update${type}"
 
-export function useUpdate${type}() {
+export interface UseUpdate${type}Params<TContext = never>
+    extends Omit<UseMutationOptions<${type}, Error, Update${type}Params, TContext>, "mutationFn"> {}
+
+export function useUpdate${type}<TContext = never>({ onMutate, onSuccess, onError, onSettled, ...rest }: UseUpdate${type}Params<TContext> = {}) {
+    const key = useId()
+    const queryClient = useQueryClient()
+
     return useMutation({
         mutationFn: update${type},
-        onMutate() {
-            const key = nanoid()
+        onMutate(variables) {
             message.open({
                 key,
                 type: "loading",
                 content: \`更新\${${type}Name}中...\`,
+                duration: 0,
             })
-            return key
+            return onMutate?.(variables)
         },
-        onSuccess(data, variables, key) {
+        onSuccess(data, variables, context) {
             message.open({
                 key,
                 type: "success",
                 content: \`更新\${${type}Name}成功\`,
             })
+            return onSuccess?.(data, variables, context)
         },
-        onError(error, variables, key) {
+        onError(error, variables, context) {
             message.open({
                 key,
                 type: "error",
                 content: \`更新\${${type}Name}失败\`,
             })
+            return onError?.(error, variables, context)
         },
+        onSettled(data, error, variables, context) {
+            queryClient.invalidateQueries({ queryKey: ["get-${type2}", variables.id] })
+            queryClient.invalidateQueries({ queryKey: ["query-${type2}"] })
+            return onSettled?.(data, error, variables, context)
+        },
+        ...rest,
     })
 }
 `
+
     await writeFile(join(hook, `useUpdate${type}.ts`), useUpdate)
 
-    const useDelete = `import { useMutation } from "@tanstack/react-query"
-import { nanoid } from "deepsea-tools"
+    const useDelete = `import { useId } from "react"
+import { UseMutationOptions, useMutation, useQueryClient } from "@tanstack/react-query"
 
-import { delete${type} } from "@/apis/delete${type}"
-import { ${type}Name } from "@/apis/query${type}"
+import { Delete${type}Params, delete${type} } from "@/apis/delete${type}"
+import { ${type}, ${type}Name } from "@/apis/query${type}"
 
-export function useDelete${type}() {
+export interface UseDelete${type}Params<TContext = never>
+    extends Omit<UseMutationOptions<${type}, Error, Delete${type}Params, TContext>, "mutationFn"> {}
+
+export function useDelete${type}<TContext = never>({ onMutate, onSuccess, onError, onSettled, ...rest }: UseDelete${type}Params<TContext> = {}) {
+    const key = useId()
+    const queryClient = useQueryClient()
+
     return useMutation({
         mutationFn: delete${type},
-        onMutate() {
-            const key = nanoid()
+        onMutate(variables) {
             message.open({
                 key,
                 type: "loading",
                 content: \`删除\${${type}Name}中...\`,
+                duration: 0,
             })
-            return key
+            return onMutate?.(variables)
         },
-        onSuccess(data, variables, key) {
+        onSuccess(data, variables, context) {
             message.open({
                 key,
                 type: "success",
                 content: \`删除\${${type}Name}成功\`,
             })
+            return onSuccess?.(data, variables, context)
         },
-        onError(error, variables, key) {
+        onError(error, variables, context) {
             message.open({
                 key,
                 type: "error",
                 content: \`删除\${${type}Name}失败\`,
             })
+            return onError?.(error, variables, context)
         },
+        onSettled(data, error, variables, context) {
+            queryClient.invalidateQueries({ queryKey: ["query-${type2}"] })
+            return onSettled?.(data, error, variables, context)
+        },
+        ...rest,
     })
 }
 `
+
     await writeFile(join(hook, `useDelete${type}.ts`), useDelete)
 }
