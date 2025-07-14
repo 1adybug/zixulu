@@ -139,7 +139,7 @@ export async function get${type}(id: Get${type}Params) {
 
 import { Query${type}Params, query${type} } from "@/apis/query${type}"
 
-export function use${type}(params: Query${type}Params) {
+export function useQuery${type}(params: Query${type}Params) {
     return useQuery({
         queryKey: ["query-${type2}", params],
         queryFn: () => query${type}(params),
