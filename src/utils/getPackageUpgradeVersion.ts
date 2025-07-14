@@ -1,4 +1,5 @@
 import consola from "consola"
+import semver from "semver"
 
 import { getPackageRequiredVersion } from "./getPackageRequiredVersion"
 import { getPackageVersionFromRange } from "./getPackageVersionFromRange"
@@ -27,9 +28,14 @@ export type GetPackageUpgradeVersionConfig = {
  * 3. 按版本号排序并返回最新的符合条件的版本
  */
 export async function getPackageUpgradeVersion({ packageName, version, level }: GetPackageUpgradeVersionConfig) {
+    version = getPackageVersionFromRange(version)
+    const minorVersion = semver.inc(version, "minor")
+    const majorVersion = semver.inc(version, "major")
+
+    const versionRange = level === "patch" ? `>=${version} <${minorVersion}` : level === "minor" ? `>=${version} <${majorVersion}` : `>=${version}`
+
     const result = await retry({
-        action: () =>
-            getPackageRequiredVersion(packageName, `${level === "patch" ? "~" : level === "minor" ? "^" : ">="}${getPackageVersionFromRange(version)}`),
+        action: () => getPackageRequiredVersion(packageName, versionRange),
         count: 4,
         callback: (error, current) => consola.error(`获取 ${packageName} 版本失败，第 ${current} 次重试`),
     })
