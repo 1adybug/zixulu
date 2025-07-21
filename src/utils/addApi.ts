@@ -150,7 +150,7 @@ export function useQuery${type}(params: Query${type}Params) {
     await writeFile(join(hook, `useQuery${type}.ts`), useQuery)
 
     const useGet = `import { useQuery } from "@tanstack/react-query"
-import { isNonNullable } from "deepsea-tools"
+import { isNonNullable, resolveNull } from "deepsea-tools"
 
 import { Get${type}Params, get${type} } from "@/apis/get${type}"
 
@@ -164,7 +164,7 @@ export function use${type}(idOrParams?: Use${type}Params | Get${type}Params | un
 
     return useQuery({
         queryKey: ["get-${type2}", id],
-        queryFn: () => (isNonNullable(id) ? get${type}(id) : Promise.resolve(null)),
+        queryFn: isNonNullable(id) ? () => get${type}(id) : resolveNull,
         enabled,
     })
 }
