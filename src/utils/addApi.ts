@@ -154,12 +154,12 @@ import { isNonNullable, resolveNull } from "deepsea-tools"
 
 import { Get${type}Params, get${type} } from "@/apis/get${type}"
 
-export interface Use${type}Params {
+export interface UseGet${type}Params {
     id?: Get${type}Params | undefined
     enabled?: boolean
 }
 
-export function use${type}(idOrParams?: Use${type}Params | Get${type}Params | undefined) {
+export function useGet${type}(idOrParams?: UseGet${type}Params | Get${type}Params | undefined) {
     const { id, enabled = true } = typeof idOrParams === "object" ? idOrParams : { id: idOrParams, enabled: true }
 
     return useQuery({
@@ -169,7 +169,7 @@ export function use${type}(idOrParams?: Use${type}Params | Get${type}Params | un
     })
 }
 `
-    await writeFile(join(hook, `use${type}.ts`), useGet)
+    await writeFile(join(hook, `useGet${type}.ts`), useGet)
 
     const useAdd = `import { useId } from "react"
 import { UseMutationOptions, useMutation, useQueryClient } from "@tanstack/react-query"
