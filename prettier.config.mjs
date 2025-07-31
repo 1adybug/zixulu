@@ -8,7 +8,7 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
-    plugins: ["@prettier/plugin-oxc", "prettier-plugin-organize-imports"],
+    plugins: ["prettier-plugin-organize-imports"],
 }
 
 export default config

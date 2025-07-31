@@ -11,7 +11,8 @@
         "prepublishOnly": "father doctor && npm run build",
         "postpublish": "npm run sync",
         "sync": "node scripts/syncPackage.mjs",
-        "format": "prettier --config-path prettier.config.mjs --write . --experimental-cli && prettier --config-path .prettierrc.mjs --write . --experimental-cli"
+        "format": "prettier --config prettier.config.mjs --write . && prettier --config .prettierrc.mjs --write .",
+        "fg": "npm run format && git add . && git commit -m \"✨feature: format\""
     },
     "keywords": [],
     "authors": [],
