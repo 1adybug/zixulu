@@ -61,7 +61,7 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
-    plugins: ["@prettier/plugin-oxc", "@ianvs/prettier-plugin-sort-imports"],
+    plugins: ["@ianvs/prettier-plugin-sort-imports"],
     importOrder: [
         "<BUILTIN_MODULES>",
         `^@(${namespaces.join("|")})/`,
