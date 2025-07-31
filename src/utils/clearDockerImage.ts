@@ -1,5 +1,5 @@
-import { execAsync, spawnAsync } from "soda-nodejs"
 import consola from "consola"
+import { execAsync, spawnAsync } from "soda-nodejs"
 
 export async function clearDockerImage(name?: string) {
     name = name?.trim()

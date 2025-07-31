@@ -2,7 +2,6 @@ import { writeFile } from "fs/promises"
 import consola from "consola"
 
 import { AddDependenciesConfig, addDependency } from "./addDependency"
-import { getDependcy } from "./getDependcy"
 import { hasDependency } from "./hasDependency"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
