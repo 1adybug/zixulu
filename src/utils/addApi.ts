@@ -1,7 +1,7 @@
-import { capitalize } from "deepsea-tools"
 import { existsSync } from "fs"
 import { writeFile as _writeFile, mkdir } from "fs/promises"
 import { join } from "path"
+import { capitalize } from "deepsea-tools"
 import { isPathLike } from "soda-nodejs"
 
 export interface AddApiParams {

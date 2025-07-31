@@ -1,5 +1,5 @@
-import { HttpsProxyAgent } from "https-proxy-agent"
 import { Agent } from "http"
+import { HttpsProxyAgent } from "https-proxy-agent"
 
 export enum PackageManager {
     npm = "npm",

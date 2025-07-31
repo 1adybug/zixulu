@@ -3,13 +3,13 @@ import { mkdir, readFile, readdir, stat, writeFile } from "fs/promises"
 import { join, parse } from "path"
 import { Readable } from "stream"
 import consola from "consola"
-import { HttpsProxyAgent } from "https-proxy-agent"
 import md5 from "md5"
 import { Response } from "node-fetch"
 
+import { agent } from "@src/constant"
+
 import { isAsset } from "./isAsset"
 import { retry } from "./retry"
-import { agent } from "@src/constant"
 
 function getReg() {
     return /(https?:|href=")\/\/[a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+/gm
