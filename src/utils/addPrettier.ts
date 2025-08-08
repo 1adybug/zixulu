@@ -18,6 +18,7 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
+    endOfLine: "lf",
     plugins: ["prettier-plugin-organize-imports"],
 }
 
@@ -128,6 +129,7 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
+    endOfLine: "lf",
     plugins: [${plugins.map(plugin => `"${plugin}"`).join(", ")}],
     importOrder: [${
         react
