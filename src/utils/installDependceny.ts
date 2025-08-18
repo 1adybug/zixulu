@@ -21,10 +21,8 @@ export type InstallDependcenyConfig = {
 
 export async function installDependceny(config?: InstallDependcenyConfig): Promise<boolean> {
     let {
-         
         silent,
         manager,
-         
         dir,
     } = config ?? {}
 
