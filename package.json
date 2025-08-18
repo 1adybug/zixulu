@@ -12,7 +12,8 @@
         "postpublish": "npm run sync",
         "sync": "node scripts/syncPackage.mjs",
         "format": "prettier --config prettier.config.mjs --write . && prettier --config .prettierrc.mjs --write .",
-        "fg": "npm run format && git add . && git commit -m \"✨feature: format\""
+        "fg": "npm run format && git add . && git commit -m \"✨feature: format\"",
+        "lint": "eslint ."
     },
     "keywords": [],
     "authors": [],
@@ -49,6 +50,7 @@
         "yaml": "^2.8.0"
     },
     "devDependencies": {
+        "@eslint/js": "^9.33.0",
         "@ianvs/prettier-plugin-sort-imports": "^4.5.1",
         "@prettier/plugin-oxc": "^0.0.4",
         "@types/inquirer": "^9.0.8",
@@ -58,9 +60,11 @@
         "@types/semver": "^7.7.0",
         "father": "^4.6.1",
         "glob": "^11.0.3",
+        "globals": "^16.3.0",
         "prettier": "^3.6.2",
         "prettier-plugin-organize-imports": "^4.2.0",
-        "typescript": "^5.9.2"
+        "typescript": "^5.9.2",
+        "typescript-eslint": "^8.39.1"
     },
     "resolutions": {
         "string-width": "^4",
