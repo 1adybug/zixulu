@@ -9,10 +9,9 @@ export async function retry<T>(action: () => Promise<T>, count?: number): Promis
 export async function retry<T>(actionOrConfig: RetryConfig<T> | (() => Promise<T>), countNumber?: number) {
     let current = 1
     let {
-         
         action,
         count = 2,
-         
+
         callback,
     } = typeof actionOrConfig === "function" ? ({ action: actionOrConfig, count: countNumber } as RetryConfig<T>) : actionOrConfig
     async function _retry() {

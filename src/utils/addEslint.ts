@@ -37,6 +37,12 @@ export default tseslint.config([
         },
         rules: {
             "@typescript-eslint/no-empty-object-type": "off",
+            "prefer-const": [
+                "off",
+                {
+                    destructuring: "any",
+                },
+            ],
         },
     },
 ])
