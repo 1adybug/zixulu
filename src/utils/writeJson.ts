@@ -1,7 +1,7 @@
 import { writeFile } from "fs/promises"
 
 export type WriteJsonConfig = {
-    data: Record<string, any> | any[]
+    data: Record<string, unknown> | unknown[]
     output: string
 }
 

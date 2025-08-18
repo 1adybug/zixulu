@@ -97,7 +97,7 @@ export async function replacePathAlias() {
                 const tsFile = getTsFile(getRelativePath(join(file, "../", arg2)))
                 pathToReplace = tsFile.path
                 depth = tsFile.depth
-            } catch (error) {
+            } catch {
                 return match
             }
 

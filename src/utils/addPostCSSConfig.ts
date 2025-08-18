@@ -26,7 +26,7 @@ export async function addPostCSSConfig() {
         await rm("postcss.config.cjs", { force: true })
         await writeFile("postcss.config.mjs", postcssConfig, "utf-8")
         consola.success("添加 postcss.config.mjs 配置成功")
-    } catch (error) {
+    } catch {
         consola.fail("添加 postcss.config.mjs 配置失败")
     }
 }

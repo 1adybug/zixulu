@@ -50,7 +50,7 @@ async function getFile(source: string) {
 
 export async function syncEditorFile({ source, target }: SyncEditorFileParams) {
     const { dir, base } = parse(target)
-    let setting = await readZixuluSetting()
+    const setting = await readZixuluSetting()
     const code = await getFile(source)
     if (existsSync(target)) {
         const text = await readFile(target, "utf-8")
@@ -79,7 +79,7 @@ export async function syncEditorFile({ source, target }: SyncEditorFileParams) {
 }
 
 export async function syncEditorSetting() {
-    let setting = await readZixuluSetting()
+    const setting = await readZixuluSetting()
     const { default: inquirer } = await import("inquirer")
 
     interface Answer {

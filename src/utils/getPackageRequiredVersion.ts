@@ -20,6 +20,7 @@ export async function getPackageRequiredVersion(packageName: string, versionRang
     const response = await fetch(url, {
         agent: global.__ZIXULU_PROXY__ ? agent : undefined,
     })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = (await response.json()) as any
     const result = Object.keys(data.versions)
         .filter(version => isStableVersion(version) && (!versionRange || semver.satisfies(version, versionRange)))

@@ -11,16 +11,13 @@ import { getRegistry } from "./getRegistry"
  * 支持通过代理访问
  */
 export async function getPackageLatestVersion(packageName: string) {
-    try {
-        const registry = await getRegistry()
-        const url = new URL(`/${packageName}/latest`, registry)
-        const { default: fetch } = await import("node-fetch")
-        const response = await fetch(url, {
-            agent: global.__ZIXULU_PROXY__ ? agent : undefined,
-        })
-        const data = (await response.json()) as any
-        return data.version as string
-    } catch (error) {
-        throw error
-    }
+    const registry = await getRegistry()
+    const url = new URL(`/${packageName}/latest`, registry)
+    const { default: fetch } = await import("node-fetch")
+    const response = await fetch(url, {
+        agent: global.__ZIXULU_PROXY__ ? agent : undefined,
+    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = (await response.json()) as any
+    return data.version as string
 }

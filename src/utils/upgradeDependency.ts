@@ -50,7 +50,7 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
                     newVersion: version,
                     strVersion: `${s}${version}`,
                 })
-            } catch (error) {
+            } catch {
                 continue
             }
         }

@@ -5,6 +5,7 @@ import JSON5 from "json5"
 import { getTsConfigJsonPath } from "./getTsConfigPath"
 
 /** 读取 tsconfig.json */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function readTsConfig(path?: string): Promise<Record<string, any>> {
     try {
         const result = JSON5.parse(await readFile(getTsConfigJsonPath(path), "utf-8"))

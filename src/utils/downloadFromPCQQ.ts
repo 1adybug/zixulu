@@ -3,6 +3,7 @@ import { download } from "./download"
 /**
  * PCQQ 下载接口返回数据类型
  */
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace PCQQ {
     export interface Result {
         resp: Resp

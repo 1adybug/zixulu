@@ -44,13 +44,14 @@ export enum ModuleResolution {
     NodeNext = "NodeNext",
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function setTsConfig(key: string, value?: any) {
     const tsconfig = await readTsConfig()
     if (value === undefined) {
         delete tsconfig.compilerOptions[key]
     } else {
         switch (key) {
-            case "target":
+            case "target": {
                 const t = Object.values(Target).find(t => t.toLowerCase() === value.trim().toLowerCase())
                 if (!t) {
                     consola.fail("无效的 target 选项")
@@ -58,7 +59,8 @@ export async function setTsConfig(key: string, value?: any) {
                 }
                 tsconfig.compilerOptions.target = t
                 break
-            case "module":
+            }
+            case "module": {
                 const m = Object.values(Module).find(m => m.toLowerCase() === value.trim().toLowerCase())
                 if (!m) {
                     consola.fail("无效的 module 选项")
@@ -66,7 +68,8 @@ export async function setTsConfig(key: string, value?: any) {
                 }
                 tsconfig.compilerOptions.module = m
                 break
-            case "moduleResolution":
+            }
+            case "moduleResolution": {
                 const mr = Object.values(ModuleResolution).find(mr => mr.toLowerCase() === value.trim().toLowerCase())
                 if (!mr) {
                     consola.fail("无效的 moduleResolution 选项")
@@ -74,6 +77,7 @@ export async function setTsConfig(key: string, value?: any) {
                 }
                 tsconfig.compilerOptions.moduleResolution = mr
                 break
+            }
             case "noEmit":
                 tsconfig.compilerOptions.noEmit = !!value
                 break

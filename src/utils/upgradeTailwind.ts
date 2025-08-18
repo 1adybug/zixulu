@@ -20,8 +20,8 @@ export async function upgradeTailwind() {
     })
     if (newVersion === version) throw new Error("tailwindcss is already the latest version")
     const packageJson = await readPackageJson()
-    packageJson.dependencies?.tailwindcss && (packageJson.dependencies.tailwindcss = `^${newVersion}`)
-    packageJson.devDependencies?.tailwindcss && (packageJson.devDependencies.tailwindcss = `^${newVersion}`)
+    if (packageJson.dependencies?.tailwindcss) packageJson.dependencies.tailwindcss = `^${newVersion}`
+    if (packageJson.devDependencies?.tailwindcss) packageJson.devDependencies.tailwindcss = `^${newVersion}`
     await rename(`patches/tailwindcss@${version}.patch`, `patches/tailwindcss@${newVersion}.patch`)
     delete packageJson.pnpm.patchedDependencies[`tailwindcss@${version}`]
     packageJson.pnpm.patchedDependencies[`tailwindcss@${newVersion}`] = `patches/tailwindcss@${newVersion}.patch`

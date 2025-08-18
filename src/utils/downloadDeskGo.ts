@@ -15,7 +15,7 @@ export async function downloadDeskGo(dir: string) {
         join(dir, file),
         join(
             dir,
-            file.replace(/^DeskGo_(.+)_full\.exe$/, (match, arg) => `DeskGo-${arg.replace(/\_/g, ".")}-x64.exe`),
+            file.replace(/^DeskGo_(.+)_full\.exe$/, (match, arg) => `DeskGo-${arg.replace(/_/g, ".")}-x64.exe`),
         ),
     )
 }

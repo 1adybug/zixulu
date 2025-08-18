@@ -35,10 +35,14 @@ export async function setGitProxy() {
     if (!open) {
         try {
             await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`, { shell: true, stdio: "inherit" })
-        } catch (error) {}
+        } catch {
+            /* empty */
+        }
         try {
             await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`, { shell: true, stdio: "inherit" })
-        } catch (error) {}
+        } catch {
+            /* empty */
+        }
         return
     }
     const { proxy } = await inquirer.prompt({

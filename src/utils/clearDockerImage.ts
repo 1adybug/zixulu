@@ -40,7 +40,7 @@ export async function clearDockerImage(name?: string) {
                 stdio: "inherit",
             })
             consola.success(`删除 ${image} 成功`)
-        } catch (error) {
+        } catch {
             consola.error(`删除 ${image} 失败`)
             if (i === images2.length - 1) break
             interface Answer2 {

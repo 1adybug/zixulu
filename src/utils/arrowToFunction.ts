@@ -117,7 +117,7 @@ export async function arrowToFunction() {
                 choices,
             })
 
-            let index = 0
+            const index = 0
 
             let exportDefaultReg: RegExp | undefined = undefined
 
