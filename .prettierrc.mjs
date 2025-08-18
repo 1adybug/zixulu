@@ -61,6 +61,7 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
+    endOfLine: "lf",
     plugins: ["@ianvs/prettier-plugin-sort-imports"],
     importOrder: [
         "<BUILTIN_MODULES>",

@@ -8,6 +8,7 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     printWidth: 160,
+    endOfLine: "lf",
     plugins: ["prettier-plugin-organize-imports"],
 }
 
