@@ -7,7 +7,7 @@ export async function json2type(path?: string) {
     const json = isNonNullable(path) ? await readFile(path, "utf-8") : await clipboard.read()
     try {
         JSON.parse(json)
-    } catch (error) {
+    } catch {
         consola.error(`请输入有效的 json 文件路径或复制有效的 json 文本`)
     }
     const type = j2t(json)

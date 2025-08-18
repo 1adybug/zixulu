@@ -4,7 +4,7 @@ import { getPackageJsonPath } from "./getPackageJsonPath"
 import { writeJson } from "./writeJson"
 
 export type WritePackageJsonConfig = {
-    data: Record<string, any>
+    data: Record<string, unknown>
     dir?: string
 }
 

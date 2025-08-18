@@ -173,7 +173,9 @@ export async function addPrettier() {
     try {
         const config = await readTsConfig()
         atAlias = Object.keys(config.compilerOptions?.paths ?? {}).some(path => /^@[a-zA-Z]/.test(path))
-    } catch (error) {}
+    } catch {
+        /* empty */
+    }
     const next = await hasDependency("next")
     const react = await hasDependency("react")
     await writeFile("prettier.config.mjs", originalConfig, "utf-8")

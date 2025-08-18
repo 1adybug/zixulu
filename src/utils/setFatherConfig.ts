@@ -38,7 +38,7 @@ export async function setFatherConfig() {
     packageJson.repository.type ??= "git"
     packageJson.repository.url ??= `git+https://github.com/1adybug/${packageJson.name}.git`
     if (!packageJson.types) {
-        packageJson = Object.entries(packageJson).reduce((prev: Record<string, any>, [key, value]) => {
+        packageJson = Object.entries(packageJson).reduce((prev: Record<string, unknown>, [key, value]) => {
             prev[key] = value
             if (Object.hasOwn(packageJson, "module")) {
                 if (key === "module") prev.types = value.replace(/\.js$/, ".d.ts")

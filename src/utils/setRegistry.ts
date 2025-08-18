@@ -9,7 +9,7 @@ import { writeBunConfig } from "./writeBunConfig"
 export async function setRegistry() {
     const { default: inquirer } = await import("inquirer")
 
-    let { manager } = await inquirer.prompt({
+    const { manager } = await inquirer.prompt({
         type: "list",
         name: "manager",
         message: "请选择包管理器",

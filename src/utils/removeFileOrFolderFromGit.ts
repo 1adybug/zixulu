@@ -13,7 +13,7 @@ export async function removeFileOrFolderFromGit(input: string) {
     try {
         const stats = await stat(input)
         recursive = stats.isDirectory()
-    } catch (error) {
+    } catch {
         const { default: inquirer } = await import("inquirer")
         type Answer = {
             recursive: boolean

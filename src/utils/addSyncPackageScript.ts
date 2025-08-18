@@ -60,7 +60,7 @@ ${
         ? `async function main() {
     const { readdir, readFile, stat } = await import("fs/promises")
     const { join } = await import("path")
-    const dir = "packages"
+    const dir = "${dir}"
     const dir2 = await readdir(dir)
     /** @type {string[]} */
     const packages2 = []

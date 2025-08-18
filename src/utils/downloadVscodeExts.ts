@@ -32,7 +32,7 @@ export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
     const [, author, name] = ext.match(reg)!
     let version: string
     if (ext === "ms-ceintl.vscode-language-pack-zh-hans") {
-        const reg2 = /"Versions"\:(\[\{".+?\])/
+        const reg2 = /"Versions":(\[\{".+?\])/
         const versions = JSON.parse(html.match(reg2)![1]) as { version: string }[]
         const output = await execAsync("code --version")
         const codeVersions = output.split("\n")[0].split(".").map(Number)

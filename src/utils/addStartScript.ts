@@ -180,7 +180,9 @@ export async function addStartScript({ type, pemPath, port, core, hostname }: Ad
     let env = ""
     try {
         env = await readFile(".env", "utf-8")
-    } catch (error) {}
+    } catch {
+        /* empty */
+    }
 
     // 添加证书目录
     if (/^ *PEM_PATH=/m.test(env)) env = env.replace(/^ *PEM_PATH=.*$/m, `PEM_PATH="${pemPath ?? ""}"`)

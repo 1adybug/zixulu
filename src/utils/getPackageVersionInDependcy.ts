@@ -9,7 +9,7 @@ import { readPackageJson } from "./readPackageJson"
  */
 export async function getPackageVersionInDependcy(packageName: string, dir = "."): Promise<string | undefined> {
     const packageJson = await readPackageJson(dir)
-    let version =
+    const version =
         packageJson.dependencies?.[packageName] ??
         packageJson.devDependencies?.[packageName] ??
         packageJson.peerDependencies?.[packageName] ??

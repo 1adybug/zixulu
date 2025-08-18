@@ -62,7 +62,7 @@ export async function addTailwindConfig() {
         const config = hasHeroUi ? tailwindConfigWithHeroUi : tailwindConfig
         await writeFile("tailwind.config.ts", config, "utf-8")
         consola.success("添加 tailwind.config.ts 配置成功")
-    } catch (error) {
+    } catch {
         consola.fail("添加 tailwind.config.ts 配置失败")
     }
 }

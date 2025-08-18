@@ -14,7 +14,7 @@ export async function getProcessInfoFromPid(pid: number) {
             .find(line => reg.test(line))
             ?.replace(reg, "$1$2")
             ?.replace(/ +/g, " ")
-    } catch (error) {
+    } catch {
         return undefined
     }
 }
@@ -40,7 +40,7 @@ export async function getPidInfoFromPort(port: number) {
             result.forEach(item => (item.info = `${item.info.slice(0, i)}${item.info.slice(i + 1)}`))
         }
         return result
-    } catch (error) {
+    } catch {
         return []
     }
 }

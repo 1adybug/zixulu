@@ -13,7 +13,7 @@
         "sync": "node scripts/syncPackage.mjs",
         "format": "prettier --config prettier.config.mjs --write . && prettier --config .prettierrc.mjs --write .",
         "fg": "npm run format && git add . && git commit -m \"✨feature: format\"",
-        "lint": "eslint ."
+        "lint": "eslint . --fix"
     },
     "keywords": [],
     "authors": [],

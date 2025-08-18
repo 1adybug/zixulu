@@ -28,7 +28,7 @@ export async function removeESLint() {
     for (const file of selectedFiles) {
         try {
             await rm(file, { force: true, recursive: true })
-        } catch (error) {
+        } catch {
             consola.fail(`删除 ${file} 失败`)
         }
     }
@@ -38,12 +38,12 @@ export async function removeESLint() {
 
     const pkg = await readPackageJson()
 
-    pkg.dependencies &&
+    if (pkg.dependencies)
         Object.keys(pkg.dependencies).forEach(key => {
             if (key.includes("eslint")) delete pkg.dependencies[key]
         })
 
-    pkg.devDependencies &&
+    if (pkg.devDependencies)
         Object.keys(pkg.devDependencies).forEach(key => {
             if (key.includes("eslint")) delete pkg.devDependencies[key]
         })

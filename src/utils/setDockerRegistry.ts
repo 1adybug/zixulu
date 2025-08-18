@@ -11,10 +11,13 @@ import { unique } from "./unique"
 export async function setDockerRegistry() {
     if (!isSudo) return sudoCommand()
     await execAsync(`mkdir -p /etc/docker`)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let daemon: any = {}
     try {
         daemon = JSON.parse(await readFile("/etc/docker/daemon.json", "utf-8"))
-    } catch {}
+    } catch {
+        /* empty */
+    }
     daemon["registry-mirrors"] ??= []
     daemon["registry-mirrors"].push("https://docker.sunzishaokao.com", "https://hub.hxui.site", "https://docker.1ms.run")
     daemon["registry-mirrors"] = unique(daemon["registry-mirrors"])

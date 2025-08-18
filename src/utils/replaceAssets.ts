@@ -12,14 +12,14 @@ import { isAsset } from "./isAsset"
 import { retry } from "./retry"
 
 function getReg() {
-    return /(https?:|href=")\/\/[a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+/gm
+    return /(https?:|href=")\/\/[a-zA-Z0-9.\-*_/&=:,%@]+/gm
 }
 
 function getReg2() {
-    return /((from|import) *?["'])([a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+\.js)(["'])/gm
+    return /((from|import) *?["'])([a-zA-Z0-9.\-*_/&=:,%@]+\.js)(["'])/gm
 }
 
-const reg3 = /(["'])([a-zA-Z0-9\.\-\*_\/\&\=\:\,\%\@]+\.js)(["'])/
+const reg3 = /(["'])([a-zA-Z0-9.\-*_/&=:,%@]+\.js)(["'])/
 
 const reg4 = /[a-z0-9]{32}\.js/
 
@@ -113,12 +113,16 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
                 const newUrl = url.replace(/^href="/, "http:")
                 const replaceUrl = await retry(() => download(newUrl), 4)
                 return `href="${replaceUrl}`
-            } catch (error) {}
+            } catch {
+                /* empty */
+            }
             try {
                 const newUrl = url.replace(/^href="/, "https:")
                 const replaceUrl = await retry(() => download(newUrl), 4)
                 return `href="${replaceUrl}`
-            } catch (error) {}
+            } catch {
+                /* empty */
+            }
             return url
         }
         if (url.startsWith("from") || url.startsWith("import")) {
@@ -140,7 +144,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
         try {
             const replaceUrl = await retry(() => download(url), 4)
             return replaceUrl
-        } catch (error) {
+        } catch {
             return url
         }
     }

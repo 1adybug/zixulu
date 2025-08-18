@@ -16,10 +16,10 @@ export async function upgradeRsbuild() {
     const upgradeLogs: string[] = []
     for (const [key, value] of rsbuildDependencies) {
         const version = await getPackageLatestVersion(key)
-        const [a, b, c] = Array.from(value.match(/^(\D*)(\d.*)$/)!)
+        const [, b, c] = Array.from(value.match(/^(\D*)(\d.*)$/)!)
         if (c === version) continue
-        packageJson.dependencies?.[key] && (packageJson.dependencies[key] = `${b}${version}`)
-        packageJson.devDependencies?.[key] && (packageJson.devDependencies[key] = `${b}${version}`)
+        if (packageJson.dependencies?.[key]) packageJson.dependencies[key] = `${b}${version}`
+        if (packageJson.devDependencies?.[key]) packageJson.devDependencies[key] = `${b}${version}`
         upgradeLogs.push(`${key} ${c} => ${version}`)
     }
     if (upgradeLogs.length === 0) return ""

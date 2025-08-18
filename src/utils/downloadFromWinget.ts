@@ -11,6 +11,7 @@ import { sleep } from "./sleep"
 /**
  * Winget 包管理器相关类型定义
  */
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Winget {
     export interface Package {
         PackageIdentifier: string
@@ -91,7 +92,9 @@ export async function downloadFromWinget({ name, id, dir, filter }: WingetDownlo
     const firstLetter = id[0].toLowerCase()
     const path = id.replace(/\./g, "/")
     const response = await fetch(`https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${firstLetter}/${path}`, { agent })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: GithubContent[] = (await response.json()) as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!Array.isArray(data)) throw new Error((data as any).message)
     const reg2 = /^\d+(\.\d+?)*$/
     const stables = data.filter(item => reg2.test(item.name))
