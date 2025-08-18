@@ -28,7 +28,6 @@ import { next } from "@utils/next"
 import { pnpm } from "@utils/pnpm"
 import { reinstall } from "@utils/reinstall"
 import { removeComment } from "@utils/removeComment"
-import { removeESLint } from "@utils/removeESLint"
 import { removeFileOrFolderFromGit } from "@utils/removeFileOrFolderFromGit"
 import { rollup } from "@utils/rollup"
 import { rsbuild } from "@utils/rsbuild"
@@ -44,6 +43,7 @@ import { vite } from "@utils/vite"
 import { actionWithBackup } from "./utils/actionWithBackup"
 import { addApi } from "./utils/addApi"
 import { addBuildDocker } from "./utils/addBuildDocker"
+import { addEslint } from "./utils/addEslint"
 import { addStartScript } from "./utils/addStartScript"
 import { addSyncPackageScript } from "./utils/addSyncPackageScript"
 import { addZipDist } from "./utils/addZipDist"
@@ -88,8 +88,8 @@ program.name("格数科技").version(pkg.version)
 
 program
     .command("eslint")
-    .description("删除 ESLint 相关配置")
-    .action(actionWithBackup(removeESLint, getCommitMessage(CommitType.feature, "删除 ESLint 相关配置")))
+    .description("添加 ESLint 相关配置")
+    .action(actionWithBackup(addEslint, getCommitMessage(CommitType.feature, "添加 ESLint 相关配置")))
 
 program
     .command("prettier")
