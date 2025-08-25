@@ -58,8 +58,8 @@ export async function initProject() {
     }
     const isFullStack = type === ProjectType.next || type === ProjectType.remix
     const choices = isFullStack
-        ? ["antd", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod"]
-        : ["antd", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "react-router-dom"]
+        ? ["antd", "@heroui/react", "@tanstack/react-form", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod"]
+        : ["antd", "@heroui/react", "@tanstack/react-form", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "react-router"]
 
     const { modules } = await inquirer.prompt({
         type: "checkbox",
@@ -73,13 +73,15 @@ export async function initProject() {
     if (modules.includes("antd")) await addAntd()
     if (modules.includes("tailwind")) await addTailwind()
     else await addPrettier()
+    if (modules.includes("@heroui/react")) added.push("@heroui/react", "soda-heroui")
     if (modules.includes("@tanstack/react-query")) added.push("@tanstack/react-query")
+    if (modules.includes("@tanstack/react-form")) added.push("@tanstack/react-form", "soda-tanstack-form")
     if (modules.includes("dayjs")) added.push("dayjs")
     if (modules.includes("deepsea-components")) added.push("deepsea-components")
     if (modules.includes("deepsea-tools")) added.push("deepsea-tools")
     if (modules.includes("stable-hash")) added.push("stable-hash")
     if (modules.includes("zod")) added.push("zod")
-    if (modules.includes("react-router-dom")) added.push("react-router-dom")
+    if (modules.includes("react-router")) added.push("react-router")
     if (modules.includes("stable-hash")) added.push("stable-hash")
 
     await addDependency({
