@@ -3,17 +3,16 @@ import consola from "consola"
 
 import { addDependency } from "./addDependency"
 import { checkTailwind } from "./checkTailwind"
-import { createIndexHtml } from "./createIndexHtml"
 import { readPackageJson } from "./readPackageJson"
 import { readTsConfig } from "./readTsConfig"
-import { writeRsbuildConfig } from "./writeRsbuildConfig"
+import { WriteRsbuildConfigParams, writeRsbuildConfig } from "./writeRsbuildConfig"
 import { writeTsConfig } from "./writeTsConfig"
 
 export async function rsbuild() {
     consola.start("开始设置 rsbuild 配置")
     const { default: inquirer } = await import("inquirer")
     await addDependency({
-        package: ["@rsbuild/plugin-svgr"],
+        package: ["@rsbuild/plugin-svgr", "@rsbuild/plugin-babel", "babel-plugin-react-compiler"],
         type: "devDependencies",
     })
     const packageJson = await readPackageJson()
@@ -21,7 +20,7 @@ export async function rsbuild() {
     tsConfig.compilerOptions.lib = tsConfig.compilerOptions.lib.map((item: string) => (item === tsConfig.compilerOptions.target ? "ESNext" : item))
     tsConfig.compilerOptions.target = "ESNext"
     await writeTsConfig(tsConfig)
-    const { description, title, entryId } = await inquirer.prompt([
+    const { description, title, mountId } = await inquirer.prompt<WriteRsbuildConfigParams>([
         {
             type: "input",
             name: "description",
@@ -36,13 +35,12 @@ export async function rsbuild() {
         },
         {
             type: "input",
-            name: "entryId",
+            name: "mountId",
             message: "入口 id",
             default: "root",
         },
     ])
-    await writeRsbuildConfig()
-    await createIndexHtml({ description, title, entryId })
+    await writeRsbuildConfig({ description, title, mountId })
     await rm(`src/App.css`, { force: true })
 
     await writeFile(
@@ -71,12 +69,14 @@ export default App`,
     await writeFile(
         `src/index.tsx`,
         `import { StrictMode } from "react"
-import ReactDOM from "react-dom/client"
+import { createRoot } from "react-dom/client"
 import App from "./App"
 
 import "./index.css"
 
-ReactDOM.createRoot(document.getElementById("${entryId}") as HTMLDivElement).render(
+const root = createRoot(document.getElementById("${mountId}") as HTMLDivElement)
+
+root.render(
     <StrictMode>
         <App />
     </StrictMode>
