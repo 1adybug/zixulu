@@ -17,11 +17,13 @@ import { removeESLint } from "./removeESLint"
 import { rsbuild } from "./rsbuild"
 import { setTsConfig } from "./setTsConfig"
 import { vite } from "./vite"
+import { addEslint } from "./addEslint"
 
 export async function initProject() {
     consola.start("开始初始化项目")
     const { default: inquirer } = await import("inquirer")
     await createBrowserlistrc()
+    await addEslint()
     const packageJson = await readPackageJson()
     const allDependcies = Object.keys(packageJson.dependencies || {}).concat(Object.keys(packageJson.devDependencies || {}))
     if (!allDependcies.includes("react") || !allDependcies.includes("react-dom")) {
