@@ -20,11 +20,7 @@ export type InstallDependcenyConfig = {
 }
 
 export async function installDependceny(config?: InstallDependcenyConfig): Promise<boolean> {
-    let {
-        silent,
-        manager,
-        dir,
-    } = config ?? {}
+    let { silent, manager, dir } = config ?? {}
 
     if (!silent) {
         const { default: inquirer } = await import("inquirer")
@@ -40,10 +36,14 @@ export async function installDependceny(config?: InstallDependcenyConfig): Promi
 
     manager ??= await getPackageManager(dir)
 
-    await spawnAsync(
-        `${manager} install${global.__ZIXULU_REGISTRY__ ? ` --registry ${global.__ZIXULU_REGISTRY__}` : ""}${manager !== PackageManager.bun && global.__ZIXULU_PROXY__ ? ` --proxy http://localhost:7890 --https-proxy http://localhost:7890` : ""}`,
-        { shell: true, stdio: "inherit", cwd: dir },
-    )
+    try {
+        await spawnAsync(
+            `${manager} install${global.__ZIXULU_REGISTRY__ ? ` --registry ${global.__ZIXULU_REGISTRY__}` : ""}${manager !== PackageManager.bun && global.__ZIXULU_PROXY__ ? ` --proxy http://localhost:7890 --https-proxy http://localhost:7890` : ""}`,
+            { shell: true, stdio: "inherit", cwd: dir },
+        )
+    } catch (error) {
+        return false
+    }
 
     return true
 }
