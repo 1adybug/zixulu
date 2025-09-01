@@ -87,7 +87,7 @@ const pkg = readPackageJsonSync(resolve(__dirname, "../"))
 
 program.name("格数科技").version(pkg.version)
 
-console.log(chalk.redBright.bold("zixulu  1.68.6"))
+console.log(chalk.redBright.bold(`zixulu ${pkg.version}`))
 
 program
     .command("eslint")
