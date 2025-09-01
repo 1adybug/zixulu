@@ -4,6 +4,7 @@ import { ProjectType } from "@constant/index"
 
 import { addAntd } from "./addAntd"
 import { addDependency } from "./addDependency"
+import { addEslint } from "./addEslint"
 import { addGitignore } from "./addGitignore"
 import { addPrettier } from "./addPrettier"
 import { addPrisma } from "./addPrisma"
@@ -13,11 +14,9 @@ import { getPackageManager } from "./getPackageManager"
 import { installDependceny } from "./installDependceny"
 import { next } from "./next"
 import { readPackageJson } from "./readPackageJson"
-import { removeESLint } from "./removeESLint"
 import { rsbuild } from "./rsbuild"
 import { setTsConfig } from "./setTsConfig"
 import { vite } from "./vite"
-import { addEslint } from "./addEslint"
 
 export async function initProject() {
     consola.start("开始初始化项目")
@@ -49,15 +48,6 @@ export async function initProject() {
         type: "devDependencies",
     })
     const manager = await getPackageManager()
-    if (allDependcies.some(item => item.includes("eslint"))) {
-        const { removeEslintConfig } = await inquirer.prompt({
-            type: "confirm",
-            name: "removeEslintConfig",
-            message: "是否删除 ESLint 配置文件",
-            default: true,
-        })
-        if (removeEslintConfig) await removeESLint()
-    }
     const isFullStack = type === ProjectType.next || type === ProjectType.remix
     const choices = isFullStack
         ? ["antd", "@heroui/react", "@tanstack/react-form", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod"]
