@@ -11,11 +11,18 @@ import { readPackageJson } from "./readPackageJson"
  */
 export async function addAntd() {
     consola.start("开始添加 antd 配置")
-    await addDependency({ package: ["@ant-design/cssinjs", "@ant-design/icons", "antd"] })
+    await addDependency({ package: ["@ant-design/icons", "@ant-design/v5-patch-for-react-19", "antd"] })
     const dir = await readdir(".")
     const componentDir = dir.includes("src") ? "src/components" : "components"
     await mkdir(componentDir, { recursive: true })
     const packageJson = await readPackageJson()
+
+    if (packageJson.dependencies.next) {
+        await addDependency({ package: "@ant-design/nextjs-registry" })
+    } else {
+        await addDependency({ package: "@ant-design/cssinjs" })
+    }
+
     if (packageJson.dependencies.next) {
         await addDependency({ package: "@ant-design/nextjs-registry" })
         await writeFile(
@@ -26,6 +33,8 @@ import { FC, ReactNode } from "react"
 import { AntdRegistry } from "@ant-design/nextjs-registry"
 import { ConfigProvider } from "antd"
 import zhCN from "antd/locale/zh_CN"
+
+import "@ant-design/v5-patch-for-react-19"
 
 export interface RegistryProps {
     children?: ReactNode
@@ -50,6 +59,8 @@ export default Registry
 import { ConfigProvider } from "antd"
 import zhCN from "antd/locale/zh_CN"
 import { FC, ReactNode } from "react"
+
+import "@ant-design/v5-patch-for-react-19"
 
 export interface RegistryProps {
     children?: ReactNode
