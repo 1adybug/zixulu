@@ -1,9 +1,9 @@
 import { readFile } from "fs/promises"
+import clipboard from "clipboardy"
 import consola from "consola"
 import { isNonNullable, json2type as j2t } from "deepsea-tools"
 
 export async function json2type(path?: string) {
-    const { default: clipboard } = await import("clipboardy")
     const json = isNonNullable(path) ? await readFile(path, "utf-8") : await clipboard.read()
     try {
         JSON.parse(json)

@@ -1,6 +1,7 @@
 import { createWriteStream } from "fs"
 import { join } from "path"
 import { Readable } from "stream"
+import fetch from "node-fetch"
 
 import { agent } from "@constant/index"
 
@@ -14,7 +15,6 @@ import { getFilename } from "./getFilename"
  * @returns 实际保存的文件名
  */
 export async function download(url: string, dir: string, filename?: string) {
-    const { default: fetch } = await import("node-fetch")
     const response = await fetch(url, { agent })
     filename = getFilename(response.headers) || filename || new URL(url).pathname.split("/").at(-1)!
     const writeable = createWriteStream(join(dir, filename))

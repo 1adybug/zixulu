@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "fs/promises"
 import consola from "consola"
+import inquirer from "inquirer"
 
 import { checkType } from "./checkType"
 import { getFiles } from "./getFiles"
@@ -15,8 +16,6 @@ export async function interfaceToType() {
         match: (path, stats) => (path.ext === ".tsx" || path.ext === ".ts") && !path.base.endsWith(".d.ts") && stats.isFile(),
         exclude: (path, stats) => stats.isDirectory() && path.base === "node_modules",
     })
-
-    const { default: inquirer } = await import("inquirer")
 
     const { cont } = await inquirer.prompt({
         type: "confirm",

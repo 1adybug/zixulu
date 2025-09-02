@@ -1,4 +1,5 @@
 import consola from "consola"
+import inquirer from "inquirer"
 
 import { ProjectType } from "@constant/index"
 
@@ -20,7 +21,6 @@ import { vite } from "./vite"
 
 export async function initProject() {
     consola.start("开始初始化项目")
-    const { default: inquirer } = await import("inquirer")
     await createBrowserlistrc()
     await addEslint()
     const packageJson = await readPackageJson()
@@ -50,7 +50,18 @@ export async function initProject() {
     const manager = await getPackageManager()
     const isFullStack = type === ProjectType.next || type === ProjectType.remix
     const choices = isFullStack
-        ? ["antd", "@heroui/react", "@tanstack/react-form", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "prisma", "tailwind", "zod"]
+        ? [
+              "antd",
+              "@heroui/react",
+              "@tanstack/react-form",
+              "@tanstack/react-query",
+              "dayjs",
+              "deepsea-components",
+              "deepsea-tools",
+              "prisma",
+              "tailwind",
+              "zod",
+          ]
         : ["antd", "@heroui/react", "@tanstack/react-form", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "react-router"]
 
     const { modules } = await inquirer.prompt({

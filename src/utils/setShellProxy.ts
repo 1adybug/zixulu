@@ -1,9 +1,9 @@
+import inquirer from "inquirer"
 import { spawnAsync } from "soda-nodejs"
 
 import { isShellProxy } from "./isShellProxy"
 
 export async function setShellProxy() {
-    const { default: inquirer } = await import("inquirer")
     const isOpen = await isShellProxy()
     if (isOpen) {
         const { open } = await inquirer.prompt({

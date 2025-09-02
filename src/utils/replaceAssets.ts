@@ -4,7 +4,7 @@ import { join, parse } from "path"
 import { Readable } from "stream"
 import consola from "consola"
 import md5 from "md5"
-import { Response } from "node-fetch"
+import fetch, { Headers, Response } from "node-fetch"
 
 import { agent } from "@src/constant"
 
@@ -34,8 +34,6 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
     const { base, input, output = "assets", proxy } = options
 
     await mkdir(output, { recursive: true })
-
-    const { default: fetch, Headers } = await import("node-fetch")
 
     const headers = new Headers()
     headers.set(

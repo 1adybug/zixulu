@@ -1,3 +1,4 @@
+import inquirer from "inquirer"
 import { spawnAsync } from "soda-nodejs"
 
 import { PackageManager } from "@src/constant"
@@ -23,8 +24,6 @@ export async function installDependceny(config?: InstallDependcenyConfig): Promi
     let { silent, manager, dir } = config ?? {}
 
     if (!silent) {
-        const { default: inquirer } = await import("inquirer")
-
         const { install } = await inquirer.prompt({
             type: "confirm",
             name: "install",

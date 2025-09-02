@@ -1,5 +1,6 @@
 import { rm } from "fs/promises"
 import consola from "consola"
+import inquirer from "inquirer"
 
 import { getFiles } from "./getFiles"
 import { readPackageJson } from "./readPackageJson"
@@ -10,7 +11,6 @@ import { writePackageJson } from "./writePackageJson"
  */
 export async function removeESLint() {
     consola.start("开始删除 ESLint 配置文件")
-    const { default: inquirer } = await import("inquirer")
 
     const files = await getFiles({
         match: (path, stats) => path.base.toLowerCase().includes("eslint") && stats.isFile(),

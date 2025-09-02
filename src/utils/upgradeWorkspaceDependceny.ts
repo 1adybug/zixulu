@@ -2,6 +2,7 @@ import { readdir, stat } from "fs/promises"
 import { join, resolve } from "path"
 import { chdir } from "process"
 import consola from "consola"
+import inquirer from "inquirer"
 
 import { actionWithBackup } from "./actionWithBackup"
 import { getUpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
@@ -23,8 +24,6 @@ export async function upgradeWorkspaceDependceny() {
     }
 
     const setting = await readZixuluSetting()
-
-    const { default: inquirer } = await import("inquirer")
     type PromptResult = {
         packages3: string[]
     }

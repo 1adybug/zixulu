@@ -1,5 +1,6 @@
 import consola from "consola"
 import dayjs from "dayjs"
+import inquirer from "inquirer"
 import { execAsync, spawnAsync } from "soda-nodejs"
 
 import { backupFirst } from "./backupFirst"
@@ -28,7 +29,6 @@ export async function getBetaVersion() {
         packageJson.version = newVersion
         return newVersion
     }
-    const { default: inquirer } = await import("inquirer")
     const { level } = await inquirer.prompt({
         type: "list",
         name: "level",
@@ -73,7 +73,6 @@ export async function betaVersion() {
         await execAsync(`git commit -m "${version}"`)
         await execAsync(`git tag ${version}`)
     }
-    const { default: inquirer } = await import("inquirer")
     const { publish } = await inquirer.prompt({
         type: "confirm",
         name: "publish",

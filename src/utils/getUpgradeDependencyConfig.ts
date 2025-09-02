@@ -1,4 +1,4 @@
-import { DistinctQuestion } from "inquirer"
+import inquirer, { DistinctQuestion } from "inquirer"
 
 export type UpgradeType = "dependencies" | "devDependencies"
 export type UpgradeLevel = "major" | "minor" | "patch"
@@ -16,7 +16,6 @@ export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependen
     ...keys: T[]
 ): Promise<Pick<UpgradeDependencyConfig, T> & Partial<Pick<UpgradeDependencyConfig, Exclude<keyof UpgradeDependencyConfig, T>>>> {
     const ks = keys.length === 0 ? ["dir", "types", "level"] : keys
-    const { default: inquirer } = await import("inquirer")
 
     const questions: DistinctQuestion<UpgradeDependencyConfig>[] = []
 

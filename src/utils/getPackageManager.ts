@@ -1,5 +1,6 @@
 import { readdir } from "fs/promises"
 import { getEnumValues } from "deepsea-tools"
+import inquirer from "inquirer"
 
 import { PackageManager } from "@src/constant"
 
@@ -23,7 +24,6 @@ export async function getPackageManager(dir = "."): Promise<PackageManager> {
     if (dir2.includes("package-lock.json")) return PackageManager.npm
     if (dir2.includes("pnpm-lock.yaml")) return PackageManager.pnpm
     if (dir2.includes("bun.lockb") || dir2.includes("bun.lock")) return PackageManager.bun
-    const { default: inquirer } = await import("inquirer")
 
     type PromptResult = {
         manager: PackageManager

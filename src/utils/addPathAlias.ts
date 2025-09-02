@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "fs/promises"
 import { join, parse } from "path"
+import inquirer from "inquirer"
 
 import { CommitType } from "@src/constant"
 
@@ -15,7 +16,6 @@ import { writeTsConfig } from "./writeTsConfig"
  * @param name 别名名称
  */
 export async function getPathAlias(name: string) {
-    const { default: inquirer } = await import("inquirer")
     const folder = await getFiles({
         match(path, stats) {
             return stats.isDirectory() && path.base === name
@@ -138,7 +138,6 @@ export async function replacePathAlias() {
  * 为文件夹添加路径别名
  */
 export async function addFolderPathAlias() {
-    const { default: inquirer } = await import("inquirer")
     const { folder } = await inquirer.prompt({
         type: "input",
         name: "folder",

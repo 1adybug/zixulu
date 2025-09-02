@@ -5,10 +5,10 @@
  */
 import { readFile } from "fs/promises"
 import { parse } from "path"
+import clipboard from "clipboardy"
+import inquirer from "inquirer"
 
 export async function code2Snippet(path: string) {
-    const { default: clipboard } = await import("clipboardy")
-    const { default: inquirer } = await import("inquirer")
     const { name } = parse(path)
     const code = await readFile(path, "utf-8")
     const placeholders: string[] = []

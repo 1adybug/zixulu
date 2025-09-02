@@ -1,6 +1,7 @@
 import { copyFile, mkdir, readdir, writeFile } from "fs/promises"
 import consola from "consola"
 import { getEnumValues } from "deepsea-tools"
+import inquirer from "inquirer"
 
 import { PackageManager } from "@src/constant"
 
@@ -23,8 +24,6 @@ export type ApplicationType = (typeof ApplicationType)[keyof typeof ApplicationT
 
 export async function addBuildDocker() {
     await backupFirst()
-
-    const { default: inquirer } = await import("inquirer")
 
     interface Answer {
         type: ApplicationType

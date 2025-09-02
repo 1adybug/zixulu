@@ -1,3 +1,5 @@
+import clipboard from "clipboardy"
+
 /**
  * 将浏览器中直接复制的 headers 转换为对象
  * 此函数从剪贴板读取 headers 文本，并转换为 Headers 对象的初始化代码
@@ -5,7 +7,6 @@
  * @throws Error 当 headers 格式不正确时抛出错误
  */
 export async function getHeaders() {
-    const { default: clipboard } = await import("clipboardy")
     const str = await clipboard.read()
     const reg = /^(.+?):$[\n\r]*^(.+?)$/gm
     const reg2 = new RegExp(reg.source, "m")

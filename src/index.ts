@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { resolve } from "path"
+import chalk from "chalk"
 import { Command } from "commander"
 import consola from "consola"
 import { emailReg } from "deepsea-tools"
@@ -74,7 +74,6 @@ import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
-import chalk from "chalk"
 
 setDefaultOptions({
     shell: true,
@@ -83,7 +82,7 @@ setDefaultOptions({
 
 const program = new Command()
 
-const pkg = readPackageJsonSync(resolve(__dirname, "../"))
+const pkg = readPackageJsonSync(import.meta.resolve("../").replace(/^file:\/\/\//, ""))
 
 program.name("格数科技").version(pkg.version)
 

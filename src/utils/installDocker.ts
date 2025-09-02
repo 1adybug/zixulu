@@ -1,4 +1,5 @@
 import { readdir, rm } from "fs/promises"
+import inquirer from "inquirer"
 import { JSDOM } from "jsdom"
 import { execAsync } from "soda-nodejs"
 
@@ -32,7 +33,6 @@ export async function installDocker() {
     )
     await execAsync(`dpkg -i ${debs.join(" ")}`)
     for (const deb of debs) await rm(deb, { force: true, recursive: true })
-    const { default: inquirer } = await import("inquirer")
     type Answer = {
         addMirrors?: boolean
     }

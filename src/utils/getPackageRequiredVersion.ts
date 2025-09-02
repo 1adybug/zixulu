@@ -1,3 +1,4 @@
+import fetch from "node-fetch"
 import semver from "semver"
 
 import { agent } from "@src/constant"
@@ -98,7 +99,6 @@ export type Time = {
 export async function getPackageRequiredVersion(packageName: string, versionRange?: string) {
     const registry = await getRegistry()
     const url = new URL(`/${packageName}`, registry)
-    const { default: fetch } = await import("node-fetch")
     const response = await fetch(url, {
         agent: global.__ZIXULU_PROXY__ ? agent : undefined,
     })

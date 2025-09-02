@@ -1,7 +1,7 @@
+import inquirer from "inquirer"
 import { spawnAsync } from "soda-nodejs"
 
 export async function setGitProxy() {
-    const { default: inquirer } = await import("inquirer")
     const { global } = await inquirer.prompt({
         type: "list",
         name: "global",

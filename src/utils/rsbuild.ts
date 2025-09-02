@@ -1,5 +1,6 @@
 import { rm, writeFile } from "fs/promises"
 import consola from "consola"
+import inquirer from "inquirer"
 
 import { addDependency } from "./addDependency"
 import { checkTailwind } from "./checkTailwind"
@@ -10,7 +11,6 @@ import { writeTsConfig } from "./writeTsConfig"
 
 export async function rsbuild() {
     consola.start("开始设置 rsbuild 配置")
-    const { default: inquirer } = await import("inquirer")
     await addDependency({
         package: ["@rsbuild/plugin-svgr", "@rsbuild/plugin-babel", { packageName: "babel-plugin-react-compiler", versionRange: "@rc" }],
         type: "devDependencies",

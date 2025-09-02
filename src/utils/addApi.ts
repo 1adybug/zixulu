@@ -2,6 +2,7 @@ import { existsSync } from "fs"
 import { writeFile as _writeFile, mkdir } from "fs/promises"
 import { join } from "path"
 import { capitalize } from "deepsea-tools"
+import inquirer from "inquirer"
 import { isPathLike } from "soda-nodejs"
 
 export interface AddApiParams {
@@ -13,8 +14,6 @@ export interface AddApiParams {
 async function writeFile(...args: Parameters<typeof _writeFile>) {
     const [path] = args
     if (isPathLike(path) && existsSync(path)) {
-        const { default: inquirer } = await import("inquirer")
-
         interface Answer {
             override: boolean
         }
@@ -39,8 +38,6 @@ export async function addApi({ type, api, hook }: AddApiParams) {
     await mkdir(hook, { recursive: true })
 
     const type2 = type.replace(/([A-Z])/g, (_, c) => `-${c.toLowerCase()}`).replace(/^-/, "")
-
-    const { default: inquirer } = await import("inquirer")
 
     interface Answer {
         items: string[]
