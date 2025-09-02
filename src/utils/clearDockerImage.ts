@@ -22,11 +22,11 @@ export async function clearDockerImage(name?: string) {
         type: "checkbox",
         name: "images",
         message: "选择要删除的镜像",
-        default: true,
         choices: outputs.map((item, index) => ({
             name: item,
             value: index === 0 ? "" : images[index - 1],
             disabled: index === 0,
+            checked: index !== 0, // 默认选中除第一项外的所有项
         })),
     })
 
