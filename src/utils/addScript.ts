@@ -1,3 +1,5 @@
+import inquirer from "inquirer"
+
 import { readPackageJson } from "./readPackageJson"
 import { sortArrayOrObject } from "./sortArrayOrObject"
 import { writePackageJson } from "./writePackageJson"
@@ -6,7 +8,6 @@ export type Scripts = Record<string, string>
 
 export async function addScript(scripts: Scripts) {
     const packageJson = await readPackageJson()
-    const { default: inquirer } = await import("inquirer")
 
     interface Answer {
         replace: boolean

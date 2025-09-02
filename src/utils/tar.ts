@@ -1,4 +1,5 @@
 import { existsSync } from "fs"
+import inquirer from "inquirer"
 import { compress } from "soda-nodejs"
 
 export interface TarParams {
@@ -9,7 +10,6 @@ export interface TarParams {
 export async function tar({ input, output }: TarParams) {
     output = `${input}.tar.gz`
     if (existsSync(output)) {
-        const { default: inquirer } = await import("inquirer")
         interface Answer {
             overwrite: boolean
         }

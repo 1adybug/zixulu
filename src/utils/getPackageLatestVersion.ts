@@ -1,3 +1,5 @@
+import fetch from "node-fetch"
+
 import { agent } from "@src/constant"
 
 import { getRegistry } from "./getRegistry"
@@ -13,7 +15,6 @@ import { getRegistry } from "./getRegistry"
 export async function getPackageLatestVersion(packageName: string) {
     const registry = await getRegistry()
     const url = new URL(`/${packageName}/latest`, registry)
-    const { default: fetch } = await import("node-fetch")
     const response = await fetch(url, {
         agent: global.__ZIXULU_PROXY__ ? agent : undefined,
     })

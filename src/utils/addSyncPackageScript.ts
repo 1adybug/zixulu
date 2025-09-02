@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from "fs/promises"
+import inquirer from "inquirer"
 
 import { CommitType } from "@src/constant"
 
@@ -24,7 +25,6 @@ export type AddSyncPackageScriptParams = {
  */
 export async function addSyncPackageScript({ monorepo }: AddSyncPackageScriptParams = {}) {
     let dir: string | undefined
-    const { default: inquirer } = await import("inquirer")
     if (monorepo) {
         type Answer = {
             dir: string

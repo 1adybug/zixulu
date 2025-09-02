@@ -1,5 +1,6 @@
 import { exec } from "child_process"
 import consola from "consola"
+import inquirer from "inquirer"
 
 import { getPidInfoFromPort, getProcessInfoFromPid } from "./processInfo"
 
@@ -9,7 +10,6 @@ export async function killProcessByPort(port: string | number) {
         consola.error("无效的端口号")
         throw new Error("无效的端口号")
     }
-    const { default: inquirer } = await import("inquirer")
     const pidInfos = await getPidInfoFromPort(port)
     const choices: { name: string; value: number }[] = []
     for (const { pid, info } of pidInfos) {

@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "fs/promises"
 import consola from "consola"
+import inquirer from "inquirer"
 
 import { getFiles } from "./getFiles"
 import { getTypeInGenerics } from "./getTypeInGenerics"
@@ -25,7 +26,6 @@ export type ArrowToFunctionChoice = {
  */
 export async function arrowToFunction() {
     consola.start("开始将转换箭头函数组件为函数组件")
-    const { default: inquirer } = await import("inquirer")
     const files = await getFiles({
         dir: "src",
         match: (path, stats) => path.ext === ".tsx" && stats.isFile(),

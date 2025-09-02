@@ -3,6 +3,7 @@ import { readFile, rename, writeFile } from "fs/promises"
 import { homedir } from "os"
 import { join, parse } from "path"
 import consola from "consola"
+import inquirer from "inquirer"
 
 import { readZixuluSetting } from "./readZixuluSetting"
 import { writeZixuluSetting } from "./writeZixuluSetting"
@@ -58,7 +59,6 @@ export async function syncEditorFile({ source, target }: SyncEditorFileParams) {
             consola.success(`${target} 已是最新`)
             return
         } else {
-            const { default: inquirer } = await import("inquirer")
             type Answer = { backup: boolean }
             const { backup } = await inquirer.prompt<Answer>({
                 type: "confirm",
@@ -80,7 +80,6 @@ export async function syncEditorFile({ source, target }: SyncEditorFileParams) {
 
 export async function syncEditorSetting() {
     const setting = await readZixuluSetting()
-    const { default: inquirer } = await import("inquirer")
 
     interface Answer {
         source: SyncEditorSettingSource

@@ -1,4 +1,5 @@
 import consola from "consola"
+import inquirer from "inquirer"
 
 import { addGitCommit } from "./addGitCommit"
 import { backupFirst } from "./backupFirst"
@@ -22,7 +23,6 @@ export function actionWithBackup(action: (...args: any[]) => Promise<string | vo
         const skip = await backupFirst()
         const msg = await action(...args)
         if (!(await isRepository()) || skip || !(await hasChangeNoCommit())) return
-        const { default: inquirer } = await import("inquirer")
         const { commit } = await inquirer.prompt({
             type: "confirm",
             name: "commit",

@@ -4,6 +4,7 @@ import { join } from "path"
 import consola from "consola"
 import dayjs from "dayjs"
 import { getEnumEntries, getEnumValues } from "deepsea-tools"
+import inquirer from "inquirer"
 
 import { download } from "./download"
 import { downloadVscodeExts } from "./downloadVscodeExts"
@@ -15,7 +16,6 @@ export enum VscodeSyncOption {
 }
 
 export async function syncVscode() {
-    const { default: inquirer } = await import("inquirer")
     const options: VscodeSyncOption[] = (
         await inquirer.prompt({
             type: "checkbox",

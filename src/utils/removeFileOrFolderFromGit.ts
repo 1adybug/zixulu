@@ -1,5 +1,6 @@
 import { stat } from "fs/promises"
 import consola from "consola"
+import inquirer from "inquirer"
 import { execAsync } from "soda-nodejs"
 
 import { backupFirst } from "./backupFirst"
@@ -14,7 +15,6 @@ export async function removeFileOrFolderFromGit(input: string) {
         const stats = await stat(input)
         recursive = stats.isDirectory()
     } catch {
-        const { default: inquirer } = await import("inquirer")
         type Answer = {
             recursive: boolean
         }

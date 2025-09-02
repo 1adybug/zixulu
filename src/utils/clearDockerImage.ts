@@ -1,4 +1,5 @@
 import consola from "consola"
+import inquirer from "inquirer"
 import { execAsync, spawnAsync } from "soda-nodejs"
 
 export async function clearDockerImage(name?: string) {
@@ -12,7 +13,6 @@ export async function clearDockerImage(name?: string) {
     }
 
     const images = outputs.slice(1).map(item => item.match(/<none> +([0-9a-f]{12}) +/)![1])
-    const { default: inquirer } = await import("inquirer")
 
     interface Answer {
         images: string[]

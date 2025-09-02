@@ -1,5 +1,7 @@
 import { mkdir } from "fs/promises"
 import consola from "consola"
+import inquirer from "inquirer"
+import fetch from "node-fetch"
 import { execAsync } from "soda-nodejs"
 
 import { agent } from "@constant/index"
@@ -25,7 +27,6 @@ export interface VscodeExt {
  * @returns Promise<VscodeExt> 扩展详细信息
  */
 export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
-    const { default: fetch } = await import("node-fetch")
     const response = await fetch(`https://marketplace.visualstudio.com/items?itemName=${ext}`, { agent })
     const html = await response.text()
     const reg = /^(.+?)\.(.+?)$/
@@ -60,7 +61,6 @@ export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
  */
 export async function downloadVscodeExts(dir: string) {
     await mkdir(dir, { recursive: true })
-    const { default: inquirer } = await import("inquirer")
     consola.start("正在获取 VS Code 扩展列表")
     const extList = await execAsync("code --list-extensions")
     const exts = await Promise.all(

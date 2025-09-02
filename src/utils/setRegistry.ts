@@ -1,4 +1,5 @@
 import { getEnumKeys, getEnumValues } from "deepsea-tools"
+import inquirer from "inquirer"
 import { spawnAsync } from "soda-nodejs"
 
 import { PackageManager, Registry } from "@constant/index"
@@ -7,8 +8,6 @@ import { readBunConfig } from "./readBunConfig"
 import { writeBunConfig } from "./writeBunConfig"
 
 export async function setRegistry() {
-    const { default: inquirer } = await import("inquirer")
-
     const { manager } = await inquirer.prompt({
         type: "list",
         name: "manager",

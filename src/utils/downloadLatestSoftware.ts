@@ -1,6 +1,7 @@
 import { mkdir } from "fs/promises"
 import consola from "consola"
 import dayjs from "dayjs"
+import inquirer from "inquirer"
 
 import { Software } from "@constant/index"
 
@@ -50,7 +51,6 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
  */
 export async function downloadLatestSoftware() {
     consola.start("开始下载软件")
-    const { default: inquirer } = await import("inquirer")
     const dir = `softwares-${dayjs().format("YYYYMMDDHHmmss")}`
     const setting = await readZixuluSetting()
     const softwareDownloadHistory = setting?.softwareDownloadHistory as Software[] | undefined

@@ -1,6 +1,7 @@
 import { rename } from "fs/promises"
 import { join } from "path"
 import consola from "consola"
+import fetch from "node-fetch"
 import YAML from "yaml"
 
 import { agent } from "@constant/index"
@@ -88,7 +89,6 @@ export interface Links {
  * @param param0.filter 安装包筛选函数
  */
 export async function downloadFromWinget({ name, id, dir, filter }: WingetDownloadInfo) {
-    const { default: fetch } = await import("node-fetch")
     const firstLetter = id[0].toLowerCase()
     const path = id.replace(/\./g, "/")
     const response = await fetch(`https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${firstLetter}/${path}`, { agent })

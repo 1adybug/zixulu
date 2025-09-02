@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "fs/promises"
 import consola from "consola"
+import inquirer from "inquirer"
 import { execAsync } from "soda-nodejs"
 
 import { isSudo } from "@src/constant"
@@ -24,7 +25,6 @@ export async function setDockerRegistry() {
     daemon["exec-opts"] ??= []
     daemon["exec-opts"].push("native.cgroupdriver=systemd")
     daemon["exec-opts"] = unique(daemon["exec-opts"])
-    const { default: inquirer } = await import("inquirer")
     type Answer = {
         mirrors: string
     }
