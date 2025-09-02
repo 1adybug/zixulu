@@ -19,12 +19,12 @@ export default tseslint.config([
             "no-empty": "off",
             "no-extra-boolean-cast": "off",
             "no-unused-vars": "off",
-            "react-refresh/only-export-components": "warn",
             "@typescript-eslint/no-unused-vars": [
                 "warn",
                 {
                     ignoreRestSiblings: true,
                     args: "none",
+                    caughtErrors: "none",
                 },
             ],
             "prefer-const": [
