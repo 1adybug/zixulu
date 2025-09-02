@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises"
 
 import { CommitType } from "@src/constant"
 
-import { addDependency } from "./addDependency"
+import { PackageVersion, addDependency } from "./addDependency"
 import { addScript } from "./addScript"
 import { getCommitMessage } from "./getCommitMessage"
 import { hasDependency } from "./hasDependency"
@@ -65,8 +65,8 @@ export async function addEslint() {
     const isReact = await hasDependency("react")
     const config = getEslintConfig({ isReact })
     await writeFile("eslint.config.mjs", config)
-    const packages = ["@eslint/js", "typescript-eslint", "globals"]
-    if (isReact) packages.push("eslint-plugin-react-hooks", "eslint-plugin-react-refresh")
+    const packages: (string | PackageVersion)[] = ["@eslint/js", "typescript-eslint", "globals"]
+    if (isReact) packages.push({ packageName: "eslint-plugin-react-hooks", versionRange: "@rc" }, "eslint-plugin-react-refresh")
     await addDependency({
         package: packages,
         type: "devDependencies",

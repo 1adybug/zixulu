@@ -12,7 +12,7 @@ export async function rsbuild() {
     consola.start("开始设置 rsbuild 配置")
     const { default: inquirer } = await import("inquirer")
     await addDependency({
-        package: ["@rsbuild/plugin-svgr", "@rsbuild/plugin-babel", "babel-plugin-react-compiler"],
+        package: ["@rsbuild/plugin-svgr", "@rsbuild/plugin-babel", { packageName: "babel-plugin-react-compiler", versionRange: "@rc" }],
         type: "devDependencies",
     })
     const packageJson = await readPackageJson()
