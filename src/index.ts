@@ -259,7 +259,7 @@ program
     .option("-p, --port <port>", "端口地址")
     .option("-c, --core <core>", "实例数")
     .option("-h, --hostname <hostname>", "主机名")
-    .option("-pem, --pemPath <pemPath>", "证书目录")
+    .option("--pem <pemPath>", "证书目录")
     .description("添加 express 启动脚本")
     .action(async (type, { port, core, pemPath }) => actionWithBackup(addStartScript)({ type, port, core, pemPath }))
 
