@@ -82,7 +82,9 @@ setDefaultOptions({
 
 const program = new Command()
 
-const pkg = readPackageJsonSync(import.meta.resolve("../").replace(/^file:\/\/\//, ""))
+const pkg = readPackageJsonSync(
+    process.platform === "win32" ? import.meta.resolve("../").replace(/^file:\/\/\//, "") : import.meta.resolve("../").replace(/^file:\/\//, ""),
+)
 
 program.name("格数科技").version(pkg.version)
 
