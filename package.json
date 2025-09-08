@@ -3,7 +3,7 @@
     "version": "1.68.14",
     "type": "module",
     "main": "dist/index.js",
-    "bin": "dist/cli.js",
+    "bin": "dist/index.js",
     "scripts": {
         "build": "rslib build",
         "dev": "rslib build --watch",
