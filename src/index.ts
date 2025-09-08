@@ -69,7 +69,7 @@ import { syncEditorSetting } from "./utils/syncEditorSetting"
 import { tailwindPatch } from "./utils/tailwindPatch"
 import { tar } from "./utils/tar"
 import { test } from "./utils/test"
-import { updateDockerImage } from "./utils/updateDockerImage"
+import { updateDockerCompose } from "./utils/updateDockerCompose"
 import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
@@ -391,6 +391,6 @@ program.command("clear-docker-image").alias("cdi").description("清除 docker �
 
 program.command("clear-docker-log").alias("cdl").description("清除 docker 容器日志").argument("name", "容器名称或者 ID").action(clearDockerLog)
 
-program.command("update-docker-image").alias("udi").description("更新 docker 镜像").arguments("<images...>").action(updateDockerImage)
+program.command("update-docker-compose").alias("udc").description("更新 docker compose 镜像").action(updateDockerCompose)
 
 program.parse()
