@@ -248,7 +248,6 @@ events {
     worker_connections 1024;
 }
 
-
 http {
     include mime.types;
     # default_type application/octet-stream;
@@ -278,7 +277,7 @@ http {
                 ...json,
                 scripts: {
                     ...json.scripts,
-                    "build:docker": `${manager === "bun" ? "bun" : "node"} scripts/build-docker.mjs`,
+                    "build:docker": `cross-env NODE_ENV=production ${manager === "bun" ? "bun" : "node"} scripts/build-docker.mjs`,
                 },
             },
         })
@@ -360,7 +359,7 @@ CMD ["bun", "run", "start"]
 
     if (docker) await addRuleToGitIgnore(docker)
 
-    const packages = ["soda-nodejs"]
+    const packages = ["soda-nodejs", "cross-env"]
 
     if (versionSource === "Day.js version") packages.push("dayjs")
 
