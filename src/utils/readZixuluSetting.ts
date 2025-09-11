@@ -3,7 +3,7 @@ import { readFile } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
 
-import { Editor, FileType, SyncEditorSettingSource } from "./syncEditorSetting"
+import { Editor, EditorConfigType, SyncEditorSettingSource } from "./syncEditorSetting"
 
 export interface SyncEditorFileConfig {
     backup?: boolean
@@ -11,7 +11,7 @@ export interface SyncEditorFileConfig {
 
 export interface SyncEditorConfig {
     fileConfigs?: Record<string, SyncEditorFileConfig>
-    fileTypes?: FileType[]
+    types?: EditorConfigType[]
     source?: SyncEditorSettingSource
     targets?: Editor[]
 }
