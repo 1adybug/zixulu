@@ -4,7 +4,9 @@ import { homedir } from "os"
 import { join, parse } from "path"
 import consola from "consola"
 import inquirer from "inquirer"
+import { execAsync } from "soda-nodejs"
 
+import { getEditorExtensions } from "./getEditorExtensions"
 import { readZixuluSetting } from "./readZixuluSetting"
 import { writeZixuluSetting } from "./writeZixuluSetting"
 
@@ -12,13 +14,15 @@ export type Editor = "Code" | "Cursor"
 
 export type SyncEditorSettingSource = Editor | "Online"
 
-export type FileType = "settings" | "snippets"
+export type EditorFileType = "settings" | "snippets"
 
-export type FileSourceMap = Record<FileType, Record<SyncEditorSettingSource, string>>
+export type EditorConfigType = EditorFileType | "extensions"
+
+export type EditorFileSourceMap = Record<EditorFileType, Record<SyncEditorSettingSource, string>>
 
 const userDir = homedir()
 
-const fileSourceMap: FileSourceMap = {
+const fileSourceMap: EditorFileSourceMap = {
     settings: {
         Code: join(userDir, "AppData/Roaming/Code/User/settings.json"),
         Cursor: join(userDir, "AppData/Roaming/Cursor/User/settings.json"),
@@ -83,7 +87,7 @@ export async function syncEditorSetting() {
 
     interface Answer {
         source: SyncEditorSettingSource
-        fileTypes: FileType[]
+        types: EditorConfigType[]
         targets: Editor[]
     }
 
@@ -100,7 +104,7 @@ export async function syncEditorSetting() {
     setting.syncEditor ??= {}
     setting.syncEditor.source = source
 
-    const { targets, fileTypes } = await inquirer.prompt<Answer>([
+    const { targets, types } = await inquirer.prompt<Answer>([
         {
             type: "checkbox",
             name: "targets",
@@ -110,19 +114,20 @@ export async function syncEditorSetting() {
         },
         {
             type: "checkbox",
-            name: "fileTypes",
-            message: "选择同步文件类型",
-            choices: ["settings", "snippets"],
-            default: setting.syncEditor?.fileTypes ?? ["settings", "snippets"],
+            name: "types",
+            message: "选择的配置类型",
+            choices: ["settings", "snippets", "extensions"],
+            default: setting.syncEditor?.types ?? ["settings", "snippets", "extensions"],
         },
     ])
 
     setting.syncEditor.targets = targets
-    setting.syncEditor.fileTypes = fileTypes
+    setting.syncEditor.types = types
 
     await writeZixuluSetting(setting)
 
-    const configs: SyncEditorFileParams[] = fileTypes
+    const configs: SyncEditorFileParams[] = types
+        .filter(item => item !== "extensions")
         .map(fileType =>
             targets.map(target => ({
                 source: fileSourceMap[fileType][source],
@@ -133,5 +138,55 @@ export async function syncEditorSetting() {
 
     for (const config of configs) {
         await syncEditorFile(config)
+    }
+
+    if (types.includes("extensions")) {
+        const vscodeExtensions = await getEditorExtensions({ source: "Code" })
+        const cursorExtensions = await getEditorExtensions({ source: "Cursor" })
+        const onlineExtensions = await getEditorExtensions({ source: "Online" })
+
+        const sourceExtensions = source === "Code" ? vscodeExtensions : source === "Cursor" ? cursorExtensions : onlineExtensions
+
+        if (targets.includes("Code")) {
+            const installExtensions = sourceExtensions.difference(vscodeExtensions)
+            for (const ext of installExtensions) {
+                try {
+                    console.log(`code --install-extension ${ext}`)
+                    await execAsync(`code --install-extension ${ext}`)
+                } catch (error) {
+                    console.error(`${ext} 安装失败`)
+                }
+            }
+            const uninstallExtensions = vscodeExtensions.difference(sourceExtensions)
+            for (const ext of uninstallExtensions) {
+                try {
+                    console.log(`code --uninstall-extension ${ext}`)
+                    await execAsync(`code --uninstall-extension ${ext}`)
+                } catch (error) {
+                    console.error(`${ext} 卸载失败`)
+                }
+            }
+        }
+
+        if (targets.includes("Cursor")) {
+            const installExtensions = sourceExtensions.difference(cursorExtensions)
+            for (const ext of installExtensions) {
+                try {
+                    console.log(`cursor --install-extension ${ext}`)
+                    await execAsync(`cursor --install-extension ${ext}`)
+                } catch (error) {
+                    console.error(`${ext} 安装失败`)
+                }
+            }
+            const uninstallExtensions = cursorExtensions.difference(sourceExtensions)
+            for (const ext of uninstallExtensions) {
+                try {
+                    console.log(`cursor --uninstall-extension ${ext}`)
+                    await execAsync(`cursor --uninstall-extension ${ext}`)
+                } catch (error) {
+                    console.error(`${ext} 卸载失败`)
+                }
+            }
+        }
     }
 }
