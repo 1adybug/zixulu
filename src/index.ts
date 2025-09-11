@@ -74,6 +74,7 @@ import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
+import { syncCursorExtToCode } from "./utils/syncCursorExtToCode"
 
 setDefaultOptions({
     shell: true,
@@ -394,5 +395,7 @@ program.command("clear-docker-image").alias("cdi").description("清除 docker �
 program.command("clear-docker-log").alias("cdl").description("清除 docker 容器日志").argument("name", "容器名称或者 ID").action(clearDockerLog)
 
 program.command("update-docker-compose").alias("udc").description("更新 docker compose 镜像").action(updateDockerCompose)
+
+program.command("sync-cursor-ext-to-code").alias("sce2c").description("同步 cursor 扩展到 vscode").action(syncCursorExtToCode)
 
 program.parse()
