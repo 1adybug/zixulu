@@ -29,6 +29,7 @@ export enum Software {
     "Firefox" = "Firefox",
     "PotPlayer" = "PotPlayer",
     "Bun" = "Bun",
+    "PowerShell" = "PowerShell",
 }
 
 export enum ProjectType {
