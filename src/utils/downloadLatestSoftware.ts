@@ -17,6 +17,7 @@ import { downloadHoneyview } from "./downloadHoneyview"
 import { downloadNodeJS } from "./downloadNodeJS"
 import { downloadPeaZip } from "./downloadPeazip"
 import { downloadPotPlayer } from "./downloadPotPlayer"
+import { downloadPowerShell } from "./downloadPowerShell"
 import { downloadPowerToys } from "./downloadPowerToys"
 import { downloadVscode } from "./downloadVscode"
 import { readZixuluSetting } from "./readZixuluSetting"
@@ -41,6 +42,7 @@ export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void
     [Software.Firefox]: downloadFirefox,
     [Software.PotPlayer]: downloadPotPlayer,
     [Software.Bun]: downloadBun,
+    [Software.PowerShell]: downloadPowerShell,
 }
 
 /**

@@ -65,6 +65,7 @@ import { setBun } from "./utils/setBun"
 import { setDockerRegistry } from "./utils/setDockerRegistry"
 import { setEnv } from "./utils/setEnv"
 import { setGlobalConfig } from "./utils/setGlobalConfig"
+import { syncCursorExtToCode } from "./utils/syncCursorExtToCode"
 import { syncEditorSetting } from "./utils/syncEditorSetting"
 import { tailwindPatch } from "./utils/tailwindPatch"
 import { tar } from "./utils/tar"
@@ -74,7 +75,6 @@ import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
-import { syncCursorExtToCode } from "./utils/syncCursorExtToCode"
 
 setDefaultOptions({
     shell: true,
