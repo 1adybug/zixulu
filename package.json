@@ -1,6 +1,6 @@
 {
     "name": "zixulu",
-    "version": "1.68.19",
+    "version": "1.68.20",
     "type": "module",
     "main": "dist/index.js",
     "bin": "dist/index.js",
