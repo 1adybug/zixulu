@@ -50,6 +50,7 @@ import { addZipDist } from "./utils/addZipDist"
 import { clearDockerImage } from "./utils/clearDockerImage"
 import { clearDockerLog } from "./utils/clearDockerLog"
 import { createBrowserlistrc } from "./utils/createBrowserlistrc"
+import { createPrismaDebugger } from "./utils/createPrismaDebugger"
 import { getCommitMessage } from "./utils/getCommitMessage"
 import { getHeaders } from "./utils/getHeaders"
 import { initNode } from "./utils/initNode"
@@ -397,5 +398,7 @@ program.command("clear-docker-log").alias("cdl").description("清除 docker 容�
 program.command("update-docker-compose").alias("udc").description("更新 docker compose 镜像").action(updateDockerCompose)
 
 program.command("sync-cursor-ext-to-code").alias("sce2c").description("同步 cursor 扩展到 vscode").action(syncCursorExtToCode)
+
+program.command("create-prisma-debugger").alias("cpd").description("创建 prisma 调试器").action(createPrismaDebugger)
 
 program.parse()
