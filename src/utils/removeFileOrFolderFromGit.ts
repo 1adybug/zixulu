@@ -10,6 +10,7 @@ import { backupFirst } from "./backupFirst"
  * @param input 文件或文件夹路径
  */
 export async function removeFileOrFolderFromGit(input: string) {
+    input = input.replace(/\\/g, "/")
     let recursive = false
     try {
         const stats = await stat(input)
