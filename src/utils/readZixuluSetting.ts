@@ -21,6 +21,7 @@ export interface ZixuluSetting {
     softwareDownloadHistory?: string[]
     upgradeWorkspaceDependcenyHistory?: Record<string, string[]>
     syncEditor?: SyncEditorConfig
+    verdaccioPath?: string
 }
 
 export async function readZixuluSetting(): Promise<ZixuluSetting> {

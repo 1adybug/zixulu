@@ -76,6 +76,7 @@ import { upgradeRsbuild } from "./utils/upgradeRsbuild"
 import { upgradeTailwind } from "./utils/upgradeTailwind"
 import { upgradeWorkspaceDependceny } from "./utils/upgradeWorkspaceDependceny"
 import { winget } from "./utils/winget"
+import { verdaccio } from "./utils/verdaccio"
 
 setDefaultOptions({
     shell: true,
@@ -400,5 +401,7 @@ program.command("update-docker-compose").alias("udc").description("更新 docker
 program.command("sync-cursor-ext-to-code").alias("sce2c").description("同步 cursor 扩展到 vscode").action(syncCursorExtToCode)
 
 program.command("create-prisma-debugger").alias("cpd").description("创建 prisma 调试器").action(createPrismaDebugger)
+
+program.command("verdaccio").description("同步 verdaccio 配置").action(verdaccio)
 
 program.parse()
