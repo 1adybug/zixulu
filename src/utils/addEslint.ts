@@ -22,11 +22,11 @@ import reactHooks from "eslint-plugin-react-hooks"
 import reactRefresh from "eslint-plugin-react-refresh"`
             : ""
     }
-import { globalIgnores } from "eslint/config"
+import { defineConfig, globalIgnores } from "eslint/config"
 import globals from "globals"
 import tseslint from "typescript-eslint"
 
-export default tseslint.config([
+export default defineConfig([
     globalIgnores(["node_modules", "dist", "build", "public"]),
     {
         files: ["**/*.{js,mjs,ts${isReact ? ",tsx" : ""}}"],
@@ -70,7 +70,7 @@ export async function addEslint() {
     const isReact = await hasDependency("react")
     const config = getEslintConfig({ isReact })
     await writeFile("eslint.config.mjs", config)
-    const packages: (string | PackageVersion)[] = ["@eslint/js", "typescript-eslint", "globals"]
+    const packages: (string | PackageVersion)[] = ["@eslint/js", "eslint", "typescript-eslint", "globals"]
     if (isReact) packages.push({ packageName: "eslint-plugin-react-hooks", versionRange: "@rc" }, "eslint-plugin-react-refresh")
     await addDependency({
         package: packages,
