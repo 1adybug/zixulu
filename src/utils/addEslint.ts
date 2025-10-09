@@ -27,10 +27,15 @@ import globals from "globals"
 import tseslint from "typescript-eslint"
 
 export default defineConfig([
-    globalIgnores(["node_modules", "dist", "build", "public"]),
+    globalIgnores(["node_modules", "dist", "build", "public"]),${
+        isReact
+            ? `
+    reactHooks.configs.flat.recommended,`
+            : ""
+    }
     {
         files: ["**/*.{js,mjs,ts${isReact ? ",tsx" : ""}}"],
-        extends: [js.configs.recommended, tseslint.configs.recommended${isReact ? `, reactHooks.configs["recommended-latest"], reactRefresh.configs.vite` : ""}],
+        extends: [js.configs.recommended, tseslint.configs.recommended${isReact ? `, reactRefresh.configs.vite` : ""}],
         languageOptions: {
             ecmaVersion: "latest",
             globals: globals.browser,
@@ -71,7 +76,7 @@ export async function addEslint() {
     const config = getEslintConfig({ isReact })
     await writeFile("eslint.config.mjs", config)
     const packages: (string | PackageVersion)[] = ["@eslint/js", "eslint", "typescript-eslint", "globals"]
-    if (isReact) packages.push({ packageName: "eslint-plugin-react-hooks", versionRange: "@rc" }, "eslint-plugin-react-refresh")
+    if (isReact) packages.push({ packageName: "eslint-plugin-react-hooks" }, "eslint-plugin-react-refresh")
     await addDependency({
         package: packages,
         type: "devDependencies",
