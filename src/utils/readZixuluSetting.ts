@@ -3,7 +3,7 @@ import { readFile } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
 
-import { Editor, EditorConfigType, SyncEditorSettingSource } from "./syncEditorSetting"
+import { EditorConfigType, SyncEditorSettingSource } from "./syncEditorSetting"
 
 export interface SyncEditorFileConfig {
     backup?: boolean
@@ -13,7 +13,8 @@ export interface SyncEditorConfig {
     fileConfigs?: Record<string, SyncEditorFileConfig>
     types?: EditorConfigType[]
     source?: SyncEditorSettingSource
-    targets?: Editor[]
+    targets?: SyncEditorSettingSource[]
+    onlinePath?: string
 }
 
 export interface ZixuluSetting {
