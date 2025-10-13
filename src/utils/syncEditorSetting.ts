@@ -6,7 +6,12 @@ import consola from "consola"
 import inquirer from "inquirer"
 import { execAsync } from "soda-nodejs"
 
+import { CommitType } from "@src/constant"
+
+import { addGitCommit } from "./addGitCommit"
+import { getCommitMessage } from "./getCommitMessage"
 import { getEditorExtensions } from "./getEditorExtensions"
+import { hasChangeNoCommit } from "./hasChangeNoCommit"
 import { readZixuluSetting } from "./readZixuluSetting"
 import { writeZixuluSetting } from "./writeZixuluSetting"
 
@@ -88,7 +93,7 @@ export async function syncEditorSetting() {
     interface Answer {
         source: SyncEditorSettingSource
         types: EditorConfigType[]
-        targets: Editor[]
+        targets: SyncEditorSettingSource[]
     }
 
     const { source } = await inquirer.prompt<Answer>([
@@ -109,8 +114,8 @@ export async function syncEditorSetting() {
             type: "checkbox",
             name: "targets",
             message: "选择同步目标",
-            choices: ["Code", "Cursor"].filter(v => v !== source),
-            default: (setting.syncEditor?.targets ?? ["Code", "Cursor"]).filter(v => v !== source),
+            choices: ["Code", "Cursor", "Online"].filter(v => v !== source),
+            default: (setting.syncEditor?.targets ?? ["Code", "Cursor", "Online"]).filter(v => v !== source),
         },
         {
             type: "checkbox",
@@ -124,14 +129,32 @@ export async function syncEditorSetting() {
     setting.syncEditor.targets = targets
     setting.syncEditor.types = types
 
-    await writeZixuluSetting(setting)
+    if (targets.includes("Online")) {
+        interface Answer {
+            onlinePath: string
+        }
+
+        const { onlinePath } = await inquirer.prompt<Answer>({
+            type: "input",
+            name: "onlinePath",
+            message: "请输入 blog 文件夹的路径",
+            default: setting.syncEditor?.onlinePath ?? "C:\\Users\\lenovo\\Desktop\\workspace\\blog",
+        })
+
+        setting.syncEditor.onlinePath = onlinePath
+    }
+
+    const onlinePath = setting.syncEditor.onlinePath!
 
     const configs: SyncEditorFileParams[] = types
         .filter(item => item !== "extensions")
         .map(fileType =>
             targets.map(target => ({
                 source: fileSourceMap[fileType][source],
-                target: fileSourceMap[fileType][target],
+                target:
+                    target === "Online"
+                        ? join(onlinePath, "static", fileType === "settings" ? "settings.json" : "global.code-snippets")
+                        : fileSourceMap[fileType][target],
             })),
         )
         .flat()
@@ -188,5 +211,20 @@ export async function syncEditorSetting() {
                 }
             }
         }
+
+        if (targets.includes("Online")) {
+            await writeFile(join(onlinePath, "static", "extensions.json"), JSON.stringify(Array.from(sourceExtensions), null, 4))
+        }
     }
+
+    if (targets.includes("Online")) {
+        if (await hasChangeNoCommit(onlinePath)) {
+            await addGitCommit({
+                message: getCommitMessage(CommitType.feature, "sync editor setting"),
+                cwd: onlinePath,
+            })
+        }
+    }
+
+    await writeZixuluSetting(setting)
 }
