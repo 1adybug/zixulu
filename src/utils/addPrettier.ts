@@ -26,7 +26,6 @@ const config = {
     semi: false,
     tabWidth: 4,
     arrowParens: "avoid",
-    printWidth: 160,
     endOfLine: "lf",
     plugins: ["./prettier-plugin-sort-imports.mjs"],
 }
@@ -139,7 +138,10 @@ ${
         return "third-party"
     },
     sortGroup(a, b) {
-        return Number(a.isSideEffect) - Number(b.isSideEffect) || compareGroupName(a.name, b.name)
+        return (
+            Number(a.isSideEffect) - Number(b.isSideEffect) ||
+            compareGroupName(a.name, b.name)
+        )
     },
     separator: "",
     sortSideEffect: true,
