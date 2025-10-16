@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "fs/promises"
 import { join, parse } from "path"
+
 import inquirer from "inquirer"
 
 import { CommitType } from "@src/constant"
@@ -23,7 +24,11 @@ export async function getPathAlias(name: string) {
         exclude(path, stats) {
             return (
                 stats.isDirectory() &&
-                (path.base === "node_modules" || path.base === ".git" || path.base === ".vscode" || path.base === "dist" || path.base === "build")
+                (path.base === "node_modules" ||
+                    path.base === ".git" ||
+                    path.base === ".vscode" ||
+                    path.base === "dist" ||
+                    path.base === "build")
             )
         },
         count: 1,
@@ -49,16 +54,24 @@ export type PathAlias = {
  */
 export async function addPathAlias(name: string, path: string): Promise<void>
 export async function addPathAlias(alias: PathAlias[]): Promise<void>
-export async function addPathAlias(nameOrAlias: string | PathAlias[], path?: string) {
-    nameOrAlias = Array.isArray(nameOrAlias) ? nameOrAlias : [{ name: nameOrAlias, path: path! }]
+export async function addPathAlias(
+    nameOrAlias: string | PathAlias[],
+    path?: string,
+) {
+    nameOrAlias = Array.isArray(nameOrAlias)
+        ? nameOrAlias
+        : [{ name: nameOrAlias, path: path! }]
     const tsConfig = await readTsConfig()
     tsConfig.compilerOptions ??= {}
     tsConfig.compilerOptions.paths ??= {}
+
     nameOrAlias.forEach(({ name, path }) => {
         tsConfig.compilerOptions.paths[`@${name}/*`] ??= []
         path = `${getRelativePath(path)}/*`
-        if (!tsConfig.compilerOptions.paths[`@${name}/*`].includes(path)) tsConfig.compilerOptions.paths[`@${name}/*`].push(path)
+        if (!tsConfig.compilerOptions.paths[`@${name}/*`].includes(path))
+            tsConfig.compilerOptions.paths[`@${name}/*`].push(path)
     })
+
     await writeTsConfig(tsConfig)
 }
 
@@ -67,11 +80,16 @@ export async function addPathAlias(nameOrAlias: string | PathAlias[], path?: str
  */
 export async function replacePathAlias() {
     const tsConfig = await readTsConfig()
-    const oldPaths: Record<string, string[]> = tsConfig.compilerOptions?.paths ?? {}
+    const oldPaths: Record<string, string[]> =
+        tsConfig.compilerOptions?.paths ?? {}
+
     const paths: Record<string, string[]> = {}
+
     Object.entries(oldPaths).forEach(([key, value]) => {
-        paths[key.replace(/\/?\*?$/, "")] = value.map(item => item.replace(/\/?\*?$/, ""))
+        paths[key.replace(/\/?\*?$/, "")] = value.map(item =>
+            item.replace(/\/?\*?$/, ""))
     })
+
     const files = await getFiles({
         match(path, stats) {
             return (path.ext === ".ts" || path.ext === ".tsx") && stats.isFile()
@@ -79,22 +97,35 @@ export async function replacePathAlias() {
         exclude(path, stats) {
             return (
                 stats.isDirectory() &&
-                (path.base === "node_modules" || path.base === ".git" || path.base === ".vscode" || path.base === "dist" || path.base === "build")
+                (path.base === "node_modules" ||
+                    path.base === ".git" ||
+                    path.base === ".vscode" ||
+                    path.base === "dist" ||
+                    path.base === "build")
             )
         },
     })
     const reg = /(import [\d\D]*?")(.+?)(")/gm
+
     for (const file of files) {
         let code = await readFile(file, "utf-8")
-        code = code.replace(reg, (match: string, arg: string, arg2: string, arg3: string) => {
+        code = code.replace(reg, (
+            match: string,
+            arg: string,
+            arg2: string,
+            arg3: string,
+        ) => {
             // 如果不是相对路径，直接返回
             if (!arg2.startsWith("./") && !arg2.startsWith("../")) return match
 
             /** 获取最终的 ts 文件地址 */
             let pathToReplace: string
             let depth: 0 | 1
+
             try {
-                const tsFile = getTsFile(getRelativePath(join(file, "../", arg2)))
+                const tsFile = getTsFile(
+                    getRelativePath(join(file, "../", arg2)),
+                )
                 pathToReplace = tsFile.path
                 depth = tsFile.depth
             } catch {
@@ -111,10 +142,14 @@ export async function replacePathAlias() {
 
             let matchedKey = ""
             let matchedPath = ""
+
             Object.entries(paths).forEach(([key, value]) => {
                 value.forEach(item => {
                     /** 必须等于路径或者以路径开头 */
-                    if (pathToReplace === item || pathToReplace.startsWith(`${item}/`)) {
+                    if (
+                        pathToReplace === item ||
+                        pathToReplace.startsWith(`${item}/`)
+                    ) {
                         if (!matchedPath || item.length > matchedPath.length) {
                             matchedKey = key
                             matchedPath = item
@@ -122,15 +157,21 @@ export async function replacePathAlias() {
                     }
                 })
             })
+
             if (matchedKey && matchedPath) {
-                const newPath = `${matchedKey}${pathToReplace.slice(matchedPath.length)}`.replace(/\/$/, "").replace(/\.tsx?$/, "")
+                const newPath =
+                    `${matchedKey}${pathToReplace.slice(matchedPath.length)}`
+                        .replace(/\/$/, "")
+                        .replace(/\.tsx?$/, "")
                 const finalPath = `${arg}${newPath}${arg3}`
                 return finalPath
             }
+
             return match
         })
         await writeFile(file, code, "utf-8")
     }
+
     return getCommitMessage(CommitType.feature, "replace path alias")
 }
 
@@ -157,8 +198,23 @@ export async function addFolderPathAlias() {
         name: "result",
         message: "请选择要添加的文件夹",
         choices: names,
-        default: names.filter(item => item !== "node_modules" && item !== ".git" && item !== ".vscode" && item !== "dist" && item !== "build"),
+        default: names.filter(
+            item =>
+                item !== "node_modules" &&
+                item !== ".git" &&
+                item !== ".vscode" &&
+                item !== "dist" &&
+                item !== "build",
+        ),
     })
-    await addPathAlias(result.map((item: string) => ({ name: item, path: getRelativePath(join(folder, item)) })))
-    return getCommitMessage(CommitType.feature, `add path alias: ${result.join(", ")}`)
+    await addPathAlias(
+        result.map((item: string) => ({
+            name: item,
+            path: getRelativePath(join(folder, item)),
+        })),
+    )
+    return getCommitMessage(
+        CommitType.feature,
+        `add path alias: ${result.join(", ")}`,
+    )
 }

@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from "fs/promises"
+
 import inquirer from "inquirer"
 
 import { CommitType } from "@src/constant"
@@ -23,12 +24,16 @@ export type AddSyncPackageScriptParams = {
  * @param params 配置选项
  * @returns commit message
  */
-export async function addSyncPackageScript({ monorepo }: AddSyncPackageScriptParams = {}) {
+export async function addSyncPackageScript({
+    monorepo,
+}: AddSyncPackageScriptParams = {}) {
     let dir: string | undefined
+
     if (monorepo) {
         type Answer = {
             dir: string
         }
+
         const result = await inquirer.prompt<Answer>([
             {
                 type: "input",
@@ -39,6 +44,7 @@ export async function addSyncPackageScript({ monorepo }: AddSyncPackageScriptPar
         ])
         dir = result.dir
     }
+
     const syncPackageScript = `// @ts-check
 
 /**
@@ -84,15 +90,18 @@ ${
 
 main()
 `
+
     await mkdir("scripts", { recursive: true })
     await writeFile("scripts/syncPackage.mjs", syncPackageScript)
     const packageJson = await readPackageJson()
     packageJson.scripts ??= {}
     let name = "sync"
+
     if (packageJson.scripts.sync) {
         type Answer = {
             override: boolean
         }
+
         const { override } = await inquirer.prompt<Answer>([
             {
                 type: "confirm",
@@ -101,10 +110,12 @@ main()
                 default: false,
             },
         ])
+
         if (!override) {
             type Answer = {
                 name: string
             }
+
             const answer = await inquirer.prompt<Answer>([
                 {
                     type: "input",
@@ -116,9 +127,13 @@ main()
             name = answer.name
         }
     }
+
     packageJson.scripts[name] = "node scripts/syncPackage.mjs"
-    if (packageJson.scripts.postpublish) packageJson.scripts.postpublish += ` && npm run ${name}`
+
+    if (packageJson.scripts.postpublish)
+        packageJson.scripts.postpublish += ` && npm run ${name}`
     else packageJson.scripts.postpublish = `npm run ${name}`
+
     await writePackageJson({ data: packageJson })
     return getCommitMessage(CommitType.feature, "添加同步包脚本")
 }

@@ -1,6 +1,7 @@
 import { writeFile } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
+
 import { JsonMap, stringify } from "@iarna/toml"
 
 export async function writeBunConfig(config: JsonMap) {

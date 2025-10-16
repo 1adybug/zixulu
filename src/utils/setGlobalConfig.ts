@@ -19,7 +19,9 @@ export type GlobalConfig = {
  * @param param 全局配置对象
  */
 export function setGlobalConfig({ registry, proxy }: GlobalConfig) {
-    if (Object.keys(Registry).includes(registry!)) global.__ZIXULU_REGISTRY__ = Registry[registry as keyof typeof Registry]
+    if (Object.keys(Registry).includes(registry!))
+        global.__ZIXULU_REGISTRY__ = Registry[registry as keyof typeof Registry]
     else global.__ZIXULU_REGISTRY__ = registry
+
     global.__ZIXULU_PROXY__ = !!proxy
 }

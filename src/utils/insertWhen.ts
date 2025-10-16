@@ -3,7 +3,11 @@ export interface InsertWhenParams {
     breakAfter?: boolean
 }
 
-export function insertWhen(condition: unknown, str: string | string[], params: InsertWhenParams = {}) {
+export function insertWhen(
+    condition: unknown,
+    str: string | string[],
+    params: InsertWhenParams = {},
+) {
     const { breakBefore, breakAfter } = params
     const strs = Array.isArray(str) ? str : [str]
     if (breakBefore) strs.unshift("")

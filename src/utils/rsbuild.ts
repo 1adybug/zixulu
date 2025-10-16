@@ -1,4 +1,5 @@
 import { rm, writeFile } from "fs/promises"
+
 import consola from "consola"
 import inquirer from "inquirer"
 
@@ -6,40 +7,50 @@ import { addDependency } from "./addDependency"
 import { checkTailwind } from "./checkTailwind"
 import { readPackageJson } from "./readPackageJson"
 import { readTsConfig } from "./readTsConfig"
-import { WriteRsbuildConfigParams, writeRsbuildConfig } from "./writeRsbuildConfig"
+import {
+    writeRsbuildConfig,
+    WriteRsbuildConfigParams,
+} from "./writeRsbuildConfig"
 import { writeTsConfig } from "./writeTsConfig"
 
 export async function rsbuild() {
     consola.start("开始设置 rsbuild 配置")
     await addDependency({
-        package: ["@rsbuild/plugin-svgr", "@rsbuild/plugin-babel", { packageName: "babel-plugin-react-compiler", versionRange: "@rc" }],
+        package: [
+            "@rsbuild/plugin-svgr",
+            "@rsbuild/plugin-babel",
+            { packageName: "babel-plugin-react-compiler", versionRange: "@rc" },
+        ],
         type: "devDependencies",
     })
     const packageJson = await readPackageJson()
     const tsConfig = await readTsConfig()
-    tsConfig.compilerOptions.lib = tsConfig.compilerOptions.lib.map((item: string) => (item === tsConfig.compilerOptions.target ? "ESNext" : item))
+    tsConfig.compilerOptions.lib = tsConfig.compilerOptions.lib.map((
+        item: string,
+    ) => (item === tsConfig.compilerOptions.target ? "ESNext" : item))
     tsConfig.compilerOptions.target = "ESNext"
     await writeTsConfig(tsConfig)
-    const { description, title, mountId } = await inquirer.prompt<WriteRsbuildConfigParams>([
-        {
-            type: "input",
-            name: "description",
-            message: "项目描述",
-            default: "designed by someone",
-        },
-        {
-            type: "input",
-            name: "title",
-            message: "项目标题",
-            default: packageJson.name,
-        },
-        {
-            type: "input",
-            name: "mountId",
-            message: "入口 id",
-            default: "root",
-        },
-    ])
+    const { description, title, mountId } =
+        await inquirer.prompt<WriteRsbuildConfigParams>([
+            {
+                type: "input",
+                name: "description",
+                message: "项目描述",
+                default: "designed by someone",
+            },
+            {
+                type: "input",
+                name: "title",
+                message: "项目标题",
+                default: packageJson.name,
+            },
+            {
+                type: "input",
+                name: "mountId",
+                message: "入口 id",
+                default: "root",
+            },
+        ])
     await writeRsbuildConfig({ description, title, mountId })
     await rm(`src/App.css`, { force: true })
 

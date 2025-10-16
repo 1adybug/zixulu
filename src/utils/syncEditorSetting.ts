@@ -2,6 +2,7 @@ import { existsSync } from "fs"
 import { readFile, rename, writeFile } from "fs/promises"
 import { homedir } from "os"
 import { join, parse } from "path"
+
 import consola from "consola"
 import inquirer from "inquirer"
 import { execAsync } from "soda-nodejs"
@@ -23,7 +24,10 @@ export type EditorFileType = "settings" | "snippets"
 
 export type EditorConfigType = EditorFileType | "extensions"
 
-export type EditorFileSourceMap = Record<EditorFileType, Record<SyncEditorSettingSource, string>>
+export type EditorFileSourceMap = Record<
+    EditorFileType,
+    Record<SyncEditorSettingSource, string>
+>
 
 const userDir = homedir()
 
@@ -34,8 +38,14 @@ const fileSourceMap: EditorFileSourceMap = {
         Online: "https://luzixu.geskj.com/settings.json",
     },
     snippets: {
-        Code: join(userDir, "AppData/Roaming/Code/User/snippets/global.code-snippets"),
-        Cursor: join(userDir, "AppData/Roaming/Cursor/User/snippets/global.code-snippets"),
+        Code: join(
+            userDir,
+            "AppData/Roaming/Code/User/snippets/global.code-snippets",
+        ),
+        Cursor: join(
+            userDir,
+            "AppData/Roaming/Cursor/User/snippets/global.code-snippets",
+        ),
         Online: "https://luzixu.geskj.com/global.code-snippets",
     },
 }
@@ -55,6 +65,7 @@ async function getFile(source: string) {
         const response = await fetch(source)
         return await response.text()
     }
+
     return await readFile(source, "utf-8")
 }
 
@@ -62,27 +73,33 @@ export async function syncEditorFile({ source, target }: SyncEditorFileParams) {
     const { dir, base } = parse(target)
     const setting = await readZixuluSetting()
     const code = await getFile(source)
+
     if (existsSync(target)) {
         const text = await readFile(target, "utf-8")
+
         if (text === code) {
             consola.success(`${target} 已是最新`)
             return
         } else {
             type Answer = { backup: boolean }
+
             const { backup } = await inquirer.prompt<Answer>({
                 type: "confirm",
                 name: "backup",
                 message: `是否备份原文件（${target}）`,
-                default: setting.syncEditor?.fileConfigs?.[target]?.backup ?? true,
+                default:
+                    setting.syncEditor?.fileConfigs?.[target]?.backup ?? true,
             })
             setting.syncEditor ??= {}
             setting.syncEditor.fileConfigs ??= {}
             setting.syncEditor.fileConfigs[target] ??= {}
             setting.syncEditor.fileConfigs[target].backup = backup
             await writeZixuluSetting(setting)
-            if (backup) await rename(target, join(dir, `${base}.${Date.now()}.bak`))
+            if (backup)
+                await rename(target, join(dir, `${base}.${Date.now()}.bak`))
         }
     }
+
     await writeFile(target, code, "utf-8")
     consola.success(`${target} 同步完成`)
 }
@@ -115,14 +132,20 @@ export async function syncEditorSetting() {
             name: "targets",
             message: "选择同步目标",
             choices: ["Code", "Cursor", "Online"].filter(v => v !== source),
-            default: (setting.syncEditor?.targets ?? ["Code", "Cursor", "Online"]).filter(v => v !== source),
+            default: (
+                setting.syncEditor?.targets ?? ["Code", "Cursor", "Online"]
+            ).filter(v => v !== source),
         },
         {
             type: "checkbox",
             name: "types",
             message: "选择的配置类型",
             choices: ["settings", "snippets", "extensions"],
-            default: setting.syncEditor?.types ?? ["settings", "snippets", "extensions"],
+            default: setting.syncEditor?.types ?? [
+                "settings",
+                "snippets",
+                "extensions",
+            ],
         },
     ])
 
@@ -138,7 +161,9 @@ export async function syncEditorSetting() {
             type: "input",
             name: "onlinePath",
             message: "请输入 blog 文件夹的路径",
-            default: setting.syncEditor?.onlinePath ?? "C:\\Users\\lenovo\\Desktop\\workspace\\blog",
+            default:
+                setting.syncEditor?.onlinePath ??
+                "C:\\Users\\lenovo\\Desktop\\workspace\\blog",
         })
 
         setting.syncEditor.onlinePath = onlinePath
@@ -153,10 +178,15 @@ export async function syncEditorSetting() {
                 source: fileSourceMap[fileType][source],
                 target:
                     target === "Online"
-                        ? join(onlinePath, "static", fileType === "settings" ? "settings.json" : "global.code-snippets")
+                        ? join(
+                              onlinePath,
+                              "static",
+                              fileType === "settings"
+                                  ? "settings.json"
+                                  : "global.code-snippets",
+                          )
                         : fileSourceMap[fileType][target],
-            })),
-        )
+            })))
         .flat()
 
     for (const config of configs) {
@@ -168,10 +198,17 @@ export async function syncEditorSetting() {
         const cursorExtensions = await getEditorExtensions({ source: "Cursor" })
         const onlineExtensions = await getEditorExtensions({ source: "Online" })
 
-        const sourceExtensions = source === "Code" ? vscodeExtensions : source === "Cursor" ? cursorExtensions : onlineExtensions
+        const sourceExtensions =
+            source === "Code"
+                ? vscodeExtensions
+                : source === "Cursor"
+                  ? cursorExtensions
+                  : onlineExtensions
 
         if (targets.includes("Code")) {
-            const installExtensions = sourceExtensions.difference(vscodeExtensions)
+            const installExtensions =
+                sourceExtensions.difference(vscodeExtensions)
+
             for (const ext of installExtensions) {
                 try {
                     console.log(`code --install-extension ${ext}`)
@@ -180,7 +217,10 @@ export async function syncEditorSetting() {
                     console.error(`${ext} 安装失败`)
                 }
             }
-            const uninstallExtensions = vscodeExtensions.difference(sourceExtensions)
+
+            const uninstallExtensions =
+                vscodeExtensions.difference(sourceExtensions)
+
             for (const ext of uninstallExtensions) {
                 try {
                     console.log(`code --uninstall-extension ${ext}`)
@@ -192,7 +232,9 @@ export async function syncEditorSetting() {
         }
 
         if (targets.includes("Cursor")) {
-            const installExtensions = sourceExtensions.difference(cursorExtensions)
+            const installExtensions =
+                sourceExtensions.difference(cursorExtensions)
+
             for (const ext of installExtensions) {
                 try {
                     console.log(`cursor --install-extension ${ext}`)
@@ -201,7 +243,10 @@ export async function syncEditorSetting() {
                     console.error(`${ext} 安装失败`)
                 }
             }
-            const uninstallExtensions = cursorExtensions.difference(sourceExtensions)
+
+            const uninstallExtensions =
+                cursorExtensions.difference(sourceExtensions)
+
             for (const ext of uninstallExtensions) {
                 try {
                     console.log(`cursor --uninstall-extension ${ext}`)
@@ -213,14 +258,20 @@ export async function syncEditorSetting() {
         }
 
         if (targets.includes("Online")) {
-            await writeFile(join(onlinePath, "static", "extensions.json"), JSON.stringify(Array.from(sourceExtensions), null, 4))
+            await writeFile(
+                join(onlinePath, "static", "extensions.json"),
+                JSON.stringify(Array.from(sourceExtensions), null, 4),
+            )
         }
     }
 
     if (targets.includes("Online")) {
         if (await hasChangeNoCommit(onlinePath)) {
             await addGitCommit({
-                message: getCommitMessage(CommitType.feature, "sync editor setting"),
+                message: getCommitMessage(
+                    CommitType.feature,
+                    "sync editor setting",
+                ),
                 cwd: onlinePath,
             })
         }

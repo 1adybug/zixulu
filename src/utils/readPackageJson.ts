@@ -1,4 +1,5 @@
 import { readFile } from "fs/promises"
+
 import consola from "consola"
 
 import { getPackageJsonPath } from "./getPackageJsonPath"
@@ -9,9 +10,13 @@ import { getPackageJsonPath } from "./getPackageJsonPath"
  * @returns package.json
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function readPackageJson(dir?: string): Promise<Record<string, any>> {
+export async function readPackageJson(
+    dir?: string,
+): Promise<Record<string, any>> {
     try {
-        const result = JSON.parse(await readFile(getPackageJsonPath(dir), "utf-8"))
+        const result = JSON.parse(
+            await readFile(getPackageJsonPath(dir), "utf-8"),
+        )
         return result
     } catch (error) {
         consola.error(error)

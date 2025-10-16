@@ -19,17 +19,32 @@ export async function replaceCommitAuthor({
     prev: { name: prevName, email: prevEmail } = {},
     next: { name: nextName, email: nextEmail } = {},
 }: ReplaceCommitAuthorParams) {
-    if (!nextName && !nextEmail) throw new Error("新的作者信息不能为空。请提供新的作者名称或邮箱。")
+    if (!nextName && !nextEmail)
+        throw new Error("新的作者信息不能为空。请提供新的作者名称或邮箱。")
     const isRepo = await git.checkIsRepo()
-    if (!isRepo) throw new Error("当前目录不是一个 Git 仓库。请在一个有效的 Git 仓库中运行此命令。")
+    if (!isRepo)
+        throw new Error(
+            "当前目录不是一个 Git 仓库。请在一个有效的 Git 仓库中运行此命令。",
+        )
     const status = await git.status()
-    if (status.files.length) throw new Error("当前 Git 仓库存在未提交的文件。请提交或暂存这些文件后再试。")
+    if (status.files.length)
+        throw new Error(
+            "当前 Git 仓库存在未提交的文件。请提交或暂存这些文件后再试。",
+        )
     consola.start("开始修改 Git 提交历史...")
     console.log()
-    const committerName = nextName ? ` export GIT_COMMITTER_NAME=\\"${nextName}\\"` : ""
-    const committerEmail = nextEmail ? ` export GIT_COMMITTER_EMAIL=\\"${nextEmail}\\"` : ""
-    const authorName = nextName ? ` export GIT_AUTHOR_NAME=\\"${nextName}\\"` : ""
-    const authorEmail = nextEmail ? ` export GIT_AUTHOR_EMAIL=\\"${nextEmail}\\"` : ""
+    const committerName = nextName
+        ? ` export GIT_COMMITTER_NAME=\\"${nextName}\\"`
+        : ""
+    const committerEmail = nextEmail
+        ? ` export GIT_COMMITTER_EMAIL=\\"${nextEmail}\\"`
+        : ""
+    const authorName = nextName
+        ? ` export GIT_AUTHOR_NAME=\\"${nextName}\\"`
+        : ""
+    const authorEmail = nextEmail
+        ? ` export GIT_AUTHOR_EMAIL=\\"${nextEmail}\\"`
+        : ""
     const committerCondition =
         prevName && prevEmail
             ? `[ \\"$GIT_COMMITTER_NAME\\" = \\"${prevName}\\" ] && [ \\"$GIT_COMMITTER_EMAIL\\" = \\"${prevEmail}\\" ]`

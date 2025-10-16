@@ -1,4 +1,5 @@
 import { exit } from "process"
+
 import consola from "consola"
 
 import { hasChangeNoCommit } from "./hasChangeNoCommit"
@@ -19,11 +20,13 @@ export async function backupFirst(forceRepo = false): Promise<true | void> {
             consola.error("git 不可用")
             throw new Error("git 不可用")
         }
+
         consola.warn("建议使用前备份代码")
         const cont = await shouldContinue()
         if (!cont) exit()
         return
     }
+
     if (await hasChangeNoCommit()) {
         consola.warn("建议使用前提交代码")
         const cont = await shouldContinue()

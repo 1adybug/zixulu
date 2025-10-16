@@ -27,6 +27,7 @@ export async function addScript(scripts: Scripts) {
             ])
             if (!replace) continue
         }
+
         keys.push(key)
     }
 

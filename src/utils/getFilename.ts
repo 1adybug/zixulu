@@ -1,4 +1,4 @@
-import { type Headers as NodeFetchHeaders } from "node-fetch"
+import type { Headers as NodeFetchHeaders } from "node-fetch"
 
 /**
  * 从 HTTP headers 中提取文件名

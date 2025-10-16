@@ -27,17 +27,27 @@ export type GetPackageUpgradeVersionConfig = {
  * 2. 根据语义化版本规则过滤符合升级要求的版本
  * 3. 按版本号排序并返回最新的符合条件的版本
  */
-export async function getPackageUpgradeVersion({ packageName, version, level }: GetPackageUpgradeVersionConfig) {
+export async function getPackageUpgradeVersion({
+    packageName,
+    version,
+    level,
+}: GetPackageUpgradeVersionConfig) {
     version = getPackageVersionFromRange(version)
     const minorVersion = semver.inc(version, "minor")
     const majorVersion = semver.inc(version, "major")
 
-    const versionRange = level === "patch" ? `>=${version} <${minorVersion}` : level === "minor" ? `>=${version} <${majorVersion}` : `>=${version}`
+    const versionRange =
+        level === "patch"
+            ? `>=${version} <${minorVersion}`
+            : level === "minor"
+              ? `>=${version} <${majorVersion}`
+              : `>=${version}`
 
     const result = await retry({
         action: () => getPackageRequiredVersion(packageName, versionRange),
         count: 4,
-        callback: (error, current) => consola.error(`获取 ${packageName} 版本失败，第 ${current} 次重试`),
+        callback: (error, current) =>
+            consola.error(`获取 ${packageName} 版本失败，第 ${current} 次重试`),
     })
     return result
 }

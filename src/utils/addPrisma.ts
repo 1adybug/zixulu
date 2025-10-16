@@ -1,4 +1,5 @@
 import { readdir, writeFile } from "fs/promises"
+
 import consola from "consola"
 import { spawnAsync } from "soda-nodejs"
 import { PackageManager } from "src/constant"
@@ -33,8 +34,12 @@ export async function addPrisma(manager?: PackageManager) {
     })
     const dir = await readdir(".")
     await installDependceny({ silent: true, manager })
-    if (!dir.includes("tsconfig.json")) await spawnAsync("npx tsc --init", { shell: true, stdio: "inherit" })
-    await spawnAsync("npx prisma init --datasource-provider sqlite", { shell: true, stdio: "inherit" })
+    if (!dir.includes("tsconfig.json"))
+        await spawnAsync("npx tsc --init", { shell: true, stdio: "inherit" })
+    await spawnAsync("npx prisma init --datasource-provider sqlite", {
+        shell: true,
+        stdio: "inherit",
+    })
     await writeFile("prisma/index.ts", prismaFile, "utf-8")
     consola.success("添加 Prisma 配置成功")
 }

@@ -1,9 +1,10 @@
 import { rm, writeFile } from "fs/promises"
+
 import consola from "consola"
 
 import { addGitignore } from "./addGitignore"
 import { readPackageJson } from "./readPackageJson"
-import { Module, ModuleResolution, Target, setTsConfig } from "./setTsConfig"
+import { Module, ModuleResolution, setTsConfig, Target } from "./setTsConfig"
 import { sortArrayOrObject } from "./sortArrayOrObject"
 import { writePackageJson } from "./writePackageJson"
 
@@ -33,21 +34,33 @@ export async function setFatherConfig() {
     const dependencies = packageJson.dependencies
     const devDependencies = packageJson.devDependencies
     const peerDependencies = packageJson.peerDependencies
-    if (packageJson.repository?.url && !packageJson.repository.url.startsWith("git+")) packageJson.repository.url = `git+${packageJson.repository.url}.git`
+    if (
+        packageJson.repository?.url &&
+        !packageJson.repository.url.startsWith("git+")
+    )
+        packageJson.repository.url = `git+${packageJson.repository.url}.git`
     packageJson.repository ??= {}
     packageJson.repository.type ??= "git"
     packageJson.repository.url ??= `git+https://github.com/1adybug/${packageJson.name}.git`
+
     if (!packageJson.types) {
-        packageJson = Object.entries(packageJson).reduce((prev: Record<string, unknown>, [key, value]) => {
+        packageJson = Object.entries(packageJson).reduce((
+            prev: Record<string, unknown>,
+            [key, value],
+        ) => {
             prev[key] = value
+
             if (Object.hasOwn(packageJson, "module")) {
-                if (key === "module") prev.types = value.replace(/\.js$/, ".d.ts")
+                if (key === "module")
+                    prev.types = value.replace(/\.js$/, ".d.ts")
             } else if (Object.hasOwn(packageJson, "main")) {
                 if (key === "main") prev.types = value.replace(/\.js$/, ".d.ts")
             }
+
             return prev
         }, {})
     }
+
     delete packageJson.dependencies
     delete packageJson.devDependencies
     delete packageJson.peerDependencies

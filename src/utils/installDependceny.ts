@@ -2,7 +2,6 @@ import inquirer from "inquirer"
 import { spawnAsync } from "soda-nodejs"
 
 import { PackageManager } from "@src/constant"
-
 import { getPackageManager } from "@utils/getPackageManager"
 
 export type InstallDependcenyConfig = {
@@ -20,7 +19,9 @@ export type InstallDependcenyConfig = {
     dir?: string
 }
 
-export async function installDependceny(config?: InstallDependcenyConfig): Promise<boolean> {
+export async function installDependceny(
+    config?: InstallDependcenyConfig,
+): Promise<boolean> {
     let { silent, manager, dir } = config ?? {}
 
     if (!silent) {

@@ -5,19 +5,26 @@
  */
 export function sortArrayOrObject(data: Record<string, unknown> | unknown[]) {
     if (typeof data !== "object" || data === null) return data
+
     if (Array.isArray(data)) {
         const _data = [...data]
+
         _data.sort()
         return _data
     }
+
     if (Object.getPrototypeOf(data) === Object.prototype) {
         const keys = Object.keys(data)
         keys.sort()
+
         const _data: Record<string, unknown> = {}
+
         for (const key of keys) {
             _data[key] = data[key]
         }
+
         return _data
     }
+
     return data
 }

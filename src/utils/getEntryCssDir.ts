@@ -8,13 +8,16 @@ import { join } from "path"
  */
 export async function getEntryCssDir(dir: string): Promise<string> {
     const dir2 = await readdir(dir)
+
     if (dir2.includes("app")) {
         const stats = await stat(join(dir, "app"))
         if (stats.isDirectory()) return getEntryCssDir(join(dir, "app"))
     }
+
     if (dir2.includes("src")) {
         const stats = await stat(join(dir, "src"))
         if (stats.isDirectory()) return getEntryCssDir(join(dir, "src"))
     }
+
     return dir
 }

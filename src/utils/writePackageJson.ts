@@ -9,7 +9,10 @@ export type WritePackageJsonConfig = {
 }
 
 /** 写回 package.json */
-export async function writePackageJson({ data, dir }: WritePackageJsonConfig): Promise<void> {
+export async function writePackageJson({
+    data,
+    dir,
+}: WritePackageJsonConfig): Promise<void> {
     try {
         await writeJson({ data, output: getPackageJsonPath(dir) })
         consola.success("修改 package.json 成功")

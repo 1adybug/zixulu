@@ -8,7 +8,11 @@ export async function setEnv(key: string, value?: string) {
     const isWindows = process.platform === "win32"
 
     // Windows 系统
-    if (isWindows) await execAsync(`[Environment]::SetEnvironmentVariable("${key}", "${value}", "User")`, { shell: "powershell" })
+    if (isWindows)
+        await execAsync(
+            `[Environment]::SetEnvironmentVariable("${key}", "${value}", "User")`,
+            { shell: "powershell" },
+        )
     else {
         // Linux/Mac 系统修改配置文件
         // 对于 bash，添加到 ~/.bashrc

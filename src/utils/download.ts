@@ -1,6 +1,7 @@
 import { createWriteStream } from "fs"
 import { join } from "path"
 import { Readable } from "stream"
+
 import fetch from "node-fetch"
 
 import { agent } from "@constant/index"
@@ -16,14 +17,16 @@ import { getFilename } from "./getFilename"
  */
 export async function download(url: string, dir: string, filename?: string) {
     const response = await fetch(url, { agent })
-    filename = getFilename(response.headers) || filename || new URL(url).pathname.split("/").at(-1)!
+    filename =
+        getFilename(response.headers) ||
+        filename ||
+        new URL(url).pathname.split("/").at(-1)!
     filename = filename.replace(/^"(.+?)"$/, "$1")
     const writeable = createWriteStream(join(dir, filename))
     await new Promise<0>((resolve, reject) =>
         Readable.from(response.body!)
             .pipe(writeable)
             .on("finish", () => resolve(0))
-            .on("error", reject),
-    )
+            .on("error", reject))
     return filename
 }

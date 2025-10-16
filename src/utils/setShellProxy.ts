@@ -5,6 +5,7 @@ import { isShellProxy } from "./isShellProxy"
 
 export async function setShellProxy() {
     const isOpen = await isShellProxy()
+
     if (isOpen) {
         const { open } = await inquirer.prompt({
             type: "list",
@@ -21,16 +22,24 @@ export async function setShellProxy() {
                 },
             ],
         })
+
         if (!open) {
-            await spawnAsync(`netsh winhttp reset proxy`, { shell: true, stdio: "inherit" })
+            await spawnAsync(`netsh winhttp reset proxy`, {
+                shell: true,
+                stdio: "inherit",
+            })
             return
         }
     }
+
     const { proxy } = await inquirer.prompt({
         type: "input",
         name: "proxy",
         message: "请输入代理地址",
         default: "http://localhost:7890",
     })
-    await spawnAsync(`netsh winhttp set proxy "${proxy}" "<local>"`, { shell: true, stdio: "inherit" })
+    await spawnAsync(`netsh winhttp set proxy "${proxy}" "<local>"`, {
+        shell: true,
+        stdio: "inherit",
+    })
 }

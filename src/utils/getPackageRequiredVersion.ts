@@ -96,17 +96,23 @@ export type Time = {
  * 通过 registry API 获取指定包的所有历史版本信息
  * 支持通过代理访问
  */
-export async function getPackageRequiredVersion(packageName: string, versionRange?: string) {
+export async function getPackageRequiredVersion(
+    packageName: string,
+    versionRange?: string,
+) {
     const registry = await getRegistry()
     const url = new URL(`/${packageName}`, registry)
     const response = await fetch(url, {
         agent: global.__ZIXULU_PROXY__ ? agent : undefined,
     })
     const data = (await response.json()) as Registry
+
     if (versionRange?.startsWith("@")) {
         const version = versionRange.slice(1)
+
         // 先精确匹配版本
         let result = Object.keys(data.versions).find(item => item === version)
+
         if (result) return result
         // 再匹配 dist-tags 中的版本
         result = data["dist-tags"][version]
@@ -120,7 +126,11 @@ export async function getPackageRequiredVersion(packageName: string, versionRang
     }
 
     const result = Object.keys(data.versions)
-        .filter(version => isStableVersion(version) && (!versionRange || semver.satisfies(version, versionRange)))
+        .filter(
+            version =>
+                isStableVersion(version) &&
+                (!versionRange || semver.satisfies(version, versionRange)),
+        )
         .at(-1) as string | undefined
     if (!result) throw new Error(`${packageName} 没有符合条件的版本`)
     return result
