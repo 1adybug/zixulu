@@ -1,4 +1,5 @@
 import { readFileSync } from "fs"
+
 import consola from "consola"
 
 import { getPackageJsonPath } from "./getPackageJsonPath"
@@ -11,7 +12,9 @@ import { getPackageJsonPath } from "./getPackageJsonPath"
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function readPackageJsonSync(dir?: string): Record<string, any> {
     try {
-        const result = JSON.parse(readFileSync(getPackageJsonPath(dir), "utf-8"))
+        const result = JSON.parse(
+            readFileSync(getPackageJsonPath(dir), "utf-8"),
+        )
         return result
     } catch (error) {
         consola.error(error)

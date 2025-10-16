@@ -1,4 +1,5 @@
 import { exit } from "process"
+
 import consola from "consola"
 
 import { readTsConfig } from "./readTsConfig"
@@ -47,34 +48,47 @@ export enum ModuleResolution {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function setTsConfig(key: string, value?: any) {
     const tsconfig = await readTsConfig()
+
     if (value === undefined) {
         delete tsconfig.compilerOptions[key]
     } else {
         switch (key) {
             case "target": {
-                const t = Object.values(Target).find(t => t.toLowerCase() === value.trim().toLowerCase())
+                const t = Object.values(Target).find(
+                    t => t.toLowerCase() === value.trim().toLowerCase(),
+                )
+
                 if (!t) {
                     consola.fail("无效的 target 选项")
                     exit()
                 }
+
                 tsconfig.compilerOptions.target = t
                 break
             }
             case "module": {
-                const m = Object.values(Module).find(m => m.toLowerCase() === value.trim().toLowerCase())
+                const m = Object.values(Module).find(
+                    m => m.toLowerCase() === value.trim().toLowerCase(),
+                )
+
                 if (!m) {
                     consola.fail("无效的 module 选项")
                     exit()
                 }
+
                 tsconfig.compilerOptions.module = m
                 break
             }
             case "moduleResolution": {
-                const mr = Object.values(ModuleResolution).find(mr => mr.toLowerCase() === value.trim().toLowerCase())
+                const mr = Object.values(ModuleResolution).find(
+                    mr => mr.toLowerCase() === value.trim().toLowerCase(),
+                )
+
                 if (!mr) {
                     consola.fail("无效的 moduleResolution 选项")
                     exit()
                 }
+
                 tsconfig.compilerOptions.moduleResolution = mr
                 break
             }
@@ -86,6 +100,7 @@ export async function setTsConfig(key: string, value?: any) {
                 exit()
         }
     }
+
     await writeTsConfig(tsconfig)
     consola.success(`修改 ${key} 成功`)
 }

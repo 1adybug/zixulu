@@ -1,4 +1,5 @@
 import { readFile } from "fs/promises"
+
 import consola from "consola"
 import JSON5 from "json5"
 
@@ -6,9 +7,13 @@ import { getTsConfigJsonPath } from "./getTsConfigPath"
 
 /** 读取 tsconfig.json */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function readTsConfig(path?: string): Promise<Record<string, any>> {
+export async function readTsConfig(
+    path?: string,
+): Promise<Record<string, any>> {
     try {
-        const result = JSON5.parse(await readFile(getTsConfigJsonPath(path), "utf-8"))
+        const result = JSON5.parse(
+            await readFile(getTsConfigJsonPath(path), "utf-8"),
+        )
         return result
     } catch (error) {
         consola.fail("读取 tsconfig.json 失败")

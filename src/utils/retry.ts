@@ -5,15 +5,24 @@ export type RetryConfig<T> = {
 }
 
 export async function retry<T>(config: RetryConfig<T>): Promise<T>
-export async function retry<T>(action: () => Promise<T>, count?: number): Promise<T>
-export async function retry<T>(actionOrConfig: RetryConfig<T> | (() => Promise<T>), countNumber?: number) {
+export async function retry<T>(
+    action: () => Promise<T>,
+    count?: number,
+): Promise<T>
+export async function retry<T>(
+    actionOrConfig: RetryConfig<T> | (() => Promise<T>),
+    countNumber?: number,
+) {
     let current = 1
     let {
         action,
         count = 2,
 
         callback,
-    } = typeof actionOrConfig === "function" ? ({ action: actionOrConfig, count: countNumber } as RetryConfig<T>) : actionOrConfig
+    } = typeof actionOrConfig === "function"
+        ? ({ action: actionOrConfig, count: countNumber } as RetryConfig<T>)
+        : actionOrConfig
+
     async function _retry() {
         try {
             return await action()
@@ -25,5 +34,6 @@ export async function retry<T>(actionOrConfig: RetryConfig<T> | (() => Promise<T
             return await _retry()
         }
     }
+
     return await _retry()
 }

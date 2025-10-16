@@ -1,4 +1,5 @@
 import { writeFile } from "fs/promises"
+
 import consola from "consola"
 
 import { hasDependency } from "./hasDependency"

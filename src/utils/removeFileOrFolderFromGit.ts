@@ -1,4 +1,5 @@
 import { stat } from "fs/promises"
+
 import consola from "consola"
 import inquirer from "inquirer"
 import { execAsync } from "soda-nodejs"
@@ -12,6 +13,7 @@ import { backupFirst } from "./backupFirst"
 export async function removeFileOrFolderFromGit(input: string) {
     input = input.replace(/\\/g, "/")
     let recursive = false
+
     try {
         const stats = await stat(input)
         recursive = stats.isDirectory()
@@ -19,6 +21,7 @@ export async function removeFileOrFolderFromGit(input: string) {
         type Answer = {
             recursive: boolean
         }
+
         const answer = await inquirer.prompt<Answer>({
             type: "confirm",
             name: "recursive",
@@ -27,6 +30,7 @@ export async function removeFileOrFolderFromGit(input: string) {
         })
         recursive = answer.recursive
     }
+
     await backupFirst(true)
     consola.start(`开始从 git 中删除 ${input}`)
     await execAsync(

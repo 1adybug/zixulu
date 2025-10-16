@@ -1,6 +1,7 @@
 import { existsSync } from "fs"
 import { writeFile as _writeFile, mkdir } from "fs/promises"
 import { join } from "path"
+
 import { capitalize } from "deepsea-tools"
 import inquirer from "inquirer"
 import { isPathLike } from "soda-nodejs"
@@ -13,6 +14,7 @@ export interface AddApiParams {
 
 async function writeFile(...args: Parameters<typeof _writeFile>) {
     const [path] = args
+
     if (isPathLike(path) && existsSync(path)) {
         interface Answer {
             override: boolean
@@ -26,6 +28,7 @@ async function writeFile(...args: Parameters<typeof _writeFile>) {
 
         if (!override) return
     }
+
     return await _writeFile(...args)
 }
 
@@ -37,7 +40,9 @@ export async function addApi({ type, api, hook }: AddApiParams) {
     await mkdir(api, { recursive: true })
     await mkdir(hook, { recursive: true })
 
-    const type2 = type.replace(/([A-Z])/g, (_, c) => `-${c.toLowerCase()}`).replace(/^-/, "")
+    const type2 = type
+        .replace(/([A-Z])/g, (_, c) => `-${c.toLowerCase()}`)
+        .replace(/^-/, "")
 
     interface Answer {
         items: string[]
@@ -77,7 +82,8 @@ export async function query${type}(params: Query${type}Params) {
 }
 `
 
-    if (items.includes("query")) await writeFile(join(api, `query${type}.ts`), query)
+    if (items.includes("query"))
+        await writeFile(join(api, `query${type}.ts`), query)
 
     const add = `import { request } from "@/utils/request"
 
@@ -111,7 +117,8 @@ export async function update${type}(params: Update${type}Params) {
 }
 `
 
-    if (items.includes("update")) await writeFile(join(api, `update${type}.ts`), update)
+    if (items.includes("update"))
+        await writeFile(join(api, `update${type}.ts`), update)
 
     const _delete = `import { request } from "@/utils/request"
 
@@ -127,7 +134,8 @@ export async function delete${type}(id: Delete${type}Params) {
 }
 `
 
-    if (items.includes("delete")) await writeFile(join(api, `delete${type}.ts`), _delete)
+    if (items.includes("delete"))
+        await writeFile(join(api, `delete${type}.ts`), _delete)
 
     const get = `import { request } from "@/utils/request"
 
@@ -157,7 +165,8 @@ export function useQuery${type}(params: Query${type}Params) {
 }
 `
 
-    if (items.includes("query")) await writeFile(join(hook, `useQuery${type}.ts`), useQuery)
+    if (items.includes("query"))
+        await writeFile(join(hook, `useQuery${type}.ts`), useQuery)
 
     const useGet = `import { useQuery } from "@tanstack/react-query"
 import { isNonNullable, resolveNull } from "deepsea-tools"
@@ -179,7 +188,9 @@ export function useGet${type}(idOrParams?: UseGet${type}Params | Get${type}Param
     })
 }
 `
-    if (items.includes("get")) await writeFile(join(hook, `useGet${type}.ts`), useGet)
+
+    if (items.includes("get"))
+        await writeFile(join(hook, `useGet${type}.ts`), useGet)
 
     const useAdd = `import { useId } from "react"
 import { UseMutationOptions, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -229,7 +240,9 @@ export function useAdd${type}<TContext = never>({ onMutate, onSuccess, onError, 
     })
 }
 `
-    if (items.includes("add")) await writeFile(join(hook, `useAdd${type}.ts`), useAdd)
+
+    if (items.includes("add"))
+        await writeFile(join(hook, `useAdd${type}.ts`), useAdd)
 
     const useUpdate = `import { useId } from "react"
 import { UseMutationOptions, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -281,7 +294,8 @@ export function useUpdate${type}<TContext = never>({ onMutate, onSuccess, onErro
 }
 `
 
-    if (items.includes("update")) await writeFile(join(hook, `useUpdate${type}.ts`), useUpdate)
+    if (items.includes("update"))
+        await writeFile(join(hook, `useUpdate${type}.ts`), useUpdate)
 
     const useDelete = `import { useId } from "react"
 import { UseMutationOptions, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -332,5 +346,6 @@ export function useDelete${type}<TContext = never>({ onMutate, onSuccess, onErro
 }
 `
 
-    if (items.includes("delete")) await writeFile(join(hook, `useDelete${type}.ts`), useDelete)
+    if (items.includes("delete"))
+        await writeFile(join(hook, `useDelete${type}.ts`), useDelete)
 }

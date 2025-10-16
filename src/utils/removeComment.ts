@@ -1,4 +1,5 @@
 import { readFile, writeFile } from "fs/promises"
+
 import consola from "consola"
 
 export async function removeComment(path: string) {

@@ -2,6 +2,7 @@ import { existsSync } from "fs"
 import { readFile } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
+
 import { parse } from "@iarna/toml"
 
 export async function readBunConfig() {

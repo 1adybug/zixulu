@@ -1,6 +1,7 @@
 import { copyFile, mkdir, readdir, rm, writeFile } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
+
 import consola from "consola"
 import dayjs from "dayjs"
 import { getEnumEntries, getEnumValues } from "deepsea-tools"
@@ -21,7 +22,10 @@ export async function syncVscode() {
             type: "checkbox",
             name: "options",
             message: "请选择要同步的内容",
-            choices: getEnumEntries(VscodeSyncOption).map(([name, value]) => ({ name, value })),
+            choices: getEnumEntries(VscodeSyncOption).map(([name, value]) => ({
+                name,
+                value,
+            })),
             default: getEnumValues(VscodeSyncOption),
         })
     ).options
@@ -30,6 +34,7 @@ export async function syncVscode() {
     const snippetSource = join(userDir, "AppData/Roaming/Code/User/snippets")
     const setting = join(userDir, "AppData/Roaming/Code/User/settings.json")
     const dir = `vscode-${dayjs().format("YYYYMMDDHHmmss")}`
+
     try {
         await mkdir(dir, { recursive: true })
 
@@ -39,7 +44,11 @@ export async function syncVscode() {
             consola.start("开始下载最新 VSCode 配置")
             await copyFile(setting, join(dir, "settings.json"))
             const files = await readdir(snippetSource)
-            for (const file of files) await copyFile(join(snippetSource, file), join(snippetTarget, file))
+            for (const file of files)
+                await copyFile(
+                    join(snippetSource, file),
+                    join(snippetTarget, file),
+                )
             consola.success("下载最新 VSCode 配置完成")
         }
 
@@ -48,7 +57,10 @@ export async function syncVscode() {
             consola.success("下载最新 VSCode 插件完成")
         }
 
-        if (options.includes(VscodeSyncOption.配置) || options.includes(VscodeSyncOption.插件)) {
+        if (
+            options.includes(VscodeSyncOption.配置) ||
+            options.includes(VscodeSyncOption.插件)
+        ) {
             const script = `// @ts-check
 
 import { spawn } from "child_process"
@@ -95,12 +107,16 @@ ${
             }}
 
 main()`
+
             await writeFile(join(dir, "syncVscode.mjs"), script, "utf-8")
         }
 
         if (options.includes(VscodeSyncOption.软件)) {
             consola.start("开始下载最新 VSCode")
-            await download(`https://code.visualstudio.com/sha/download?build=stable&os=win32-x64`, dir)
+            await download(
+                `https://code.visualstudio.com/sha/download?build=stable&os=win32-x64`,
+                dir,
+            )
             consola.success("下载最新 VSCode 完成")
         }
     } catch (error) {

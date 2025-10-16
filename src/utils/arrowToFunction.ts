@@ -1,4 +1,5 @@
 import { readFile, writeFile } from "fs/promises"
+
 import consola from "consola"
 import inquirer from "inquirer"
 
@@ -49,20 +50,25 @@ export async function arrowToFunction() {
                     warnFiles.add(file)
                     return match
                 }
+
                 modifiedFiles.add(file)
                 const hasExport = match.startsWith("export ")
                 const name = match.match(/const (\w+?):/)![1]
                 const edReg = new RegExp(`^export default ${name}$`, "m")
                 let hasExportDefault = false
+
                 if (!exportDefaultReg && !hasExport && edReg.test(code)) {
                     exportDefaultReg = edReg
                     hasExportDefault = true
                 }
+
                 const typeIndex = match.indexOf("FC<")
+
                 if (typeIndex > 0) {
                     const type = getTypeInGenerics(match, typeIndex + 2)
                     return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}(props: ${type}) {`
                 }
+
                 return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}() {`
             })
             if (exportDefaultReg) code = code.replace(exportDefaultReg, "")
@@ -74,24 +80,44 @@ export async function arrowToFunction() {
             const matches = code.match(reg)
             if (!matches) continue
             consola.start(file)
-            const choices = Array.from(matches).reduce((prev: ArrowToFunctionChoice[], match, index) => {
+
+            const choices = Array.from(matches).reduce((
+                prev: ArrowToFunctionChoice[],
+                match,
+                index,
+            ) => {
                 if (match.includes("memo(") || match.includes("forwardRef(")) {
                     warnFiles.add(file)
                     return prev
                 }
+
                 modifiedFiles.add(file)
                 const hasExport = match.startsWith("export ")
                 const funName = match.match(/const (\w+?):/)![1]
                 const typeIndex = match.indexOf("FC<")
+
                 if (typeIndex > 0) {
                     const type = getTypeInGenerics(match, typeIndex + 2)
+
                     const name = `◆ ${match}
     ◆ ${hasExport ? "export " : ""}function ${funName}(props: ${type}) {`
-                    prev.push({ value: index.toString(), short: funName, name, checked: true })
+
+                    prev.push({
+                        value: index.toString(),
+                        short: funName,
+                        name,
+                        checked: true,
+                    })
                 } else {
                     const name = `◆ ${match}
     ◆ ${hasExport ? "export " : ""}function ${funName}() {`
-                    prev.push({ value: index.toString(), short: funName, name, checked: true })
+
+                    prev.push({
+                        value: index.toString(),
+                        short: funName,
+                        name,
+                        checked: true,
+                    })
                 }
 
                 return prev
@@ -106,6 +132,7 @@ export async function arrowToFunction() {
                         first = false
                         return `◆ ${(index + 1).toString().padStart(length, "0")}.`
                     }
+
                     return "".padStart(length + 3, " ")
                 })
             })
@@ -127,15 +154,19 @@ export async function arrowToFunction() {
                 const name = match.match(/const (\w+?):/)![1]
                 const edReg = new RegExp(`^export default ${name}$`, "m")
                 let hasExportDefault = false
+
                 if (!exportDefaultReg && !hasExport && edReg.test(code)) {
                     exportDefaultReg = edReg
                     hasExportDefault = true
                 }
+
                 const typeIndex = match.indexOf("FC<")
+
                 if (typeIndex > 0) {
                     const type = getTypeInGenerics(match, typeIndex + 2)
                     return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}(props: ${type}) {`
                 }
+
                 return `${hasExport ? "export " : ""}${hasExportDefault ? "export default " : ""}function ${name}() {`
             })
 
@@ -147,7 +178,13 @@ export async function arrowToFunction() {
         }
     }
 
-    if (modifiedFiles.size > 0) consola.success(`以下文件中的箭头函数组件已经转换为函数组件：\n\n${Array.from(modifiedFiles).join("\n")}`)
+    if (modifiedFiles.size > 0)
+        consola.success(
+            `以下文件中的箭头函数组件已经转换为函数组件：\n\n${Array.from(modifiedFiles).join("\n")}`,
+        )
 
-    if (warnFiles.size > 0) consola.warn(`以下文件中存在 memo 或 forwardRef，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`)
+    if (warnFiles.size > 0)
+        consola.warn(
+            `以下文件中存在 memo 或 forwardRef，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`,
+        )
 }

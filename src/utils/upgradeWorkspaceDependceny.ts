@@ -1,6 +1,7 @@
 import { readdir, stat } from "fs/promises"
 import { join, resolve } from "path"
 import { chdir } from "process"
+
 import consola from "consola"
 import inquirer from "inquirer"
 
@@ -14,6 +15,7 @@ export async function upgradeWorkspaceDependceny() {
     const { dir, ...rest } = await getUpgradeDependencyConfig()
     const dir2 = resolve(dir)
     const packages = await readdir(dir2)
+
     const packages2: string[] = []
 
     for (const pkg of packages) {
@@ -24,9 +26,11 @@ export async function upgradeWorkspaceDependceny() {
     }
 
     const setting = await readZixuluSetting()
+
     type PromptResult = {
         packages3: string[]
     }
+
     const { packages3 } = await inquirer.prompt<PromptResult>([
         {
             type: "checkbox",
@@ -49,7 +53,6 @@ export async function upgradeWorkspaceDependceny() {
             upgradeDependency({
                 dir: ".",
                 ...rest,
-            }),
-        )()
+            }))()
     }
 }

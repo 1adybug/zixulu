@@ -1,5 +1,6 @@
 import { copyFile, mkdir, readdir, rm, writeFile } from "fs/promises"
 import { join } from "path"
+
 import { spawnAsync, zip } from "soda-nodejs"
 
 const json = {
@@ -45,7 +46,11 @@ const env = `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 export async function createPrismaDebugger() {
     try {
         await mkdir("prisma-debugger/prisma", { recursive: true })
-        await writeFile("prisma-debugger/package.json", JSON.stringify(json, null, 4), "utf-8")
+        await writeFile(
+            "prisma-debugger/package.json",
+            JSON.stringify(json, null, 4),
+            "utf-8",
+        )
 
         await spawnAsync("npm i @prisma/client", {
             cwd: "prisma-debugger",
@@ -53,11 +58,14 @@ export async function createPrismaDebugger() {
             shell: true,
         })
 
-        await spawnAsync("npm i @types/node cross-env prisma tsx typescript --save-dev", {
-            cwd: "prisma-debugger",
-            stdio: "inherit",
-            shell: true,
-        })
+        await spawnAsync(
+            "npm i @types/node cross-env prisma tsx typescript --save-dev",
+            {
+                cwd: "prisma-debugger",
+                stdio: "inherit",
+                shell: true,
+            },
+        )
 
         await writeFile("prisma-debugger/prisma/schema.prisma", schema, "utf-8")
 
@@ -71,7 +79,10 @@ export async function createPrismaDebugger() {
 
         for (const item of dir) {
             if (item.endsWith(".node")) {
-                await copyFile(join("prisma-debugger/prisma/generated", item), join("prisma-debugger/node_modules/prisma", item))
+                await copyFile(
+                    join("prisma-debugger/prisma/generated", item),
+                    join("prisma-debugger/node_modules/prisma", item),
+                )
             }
         }
 
@@ -85,5 +96,6 @@ export async function createPrismaDebugger() {
     } catch (error) {
         await rm("prisma-debugger", { recursive: true })
     }
+
     await rm("prisma-debugger", { recursive: true })
 }

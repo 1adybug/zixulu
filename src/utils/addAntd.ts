@@ -1,5 +1,6 @@
 import { mkdir, readdir, writeFile } from "fs/promises"
 import { join } from "path"
+
 import consola from "consola"
 
 import { addDependency } from "./addDependency"
@@ -11,7 +12,13 @@ import { readPackageJson } from "./readPackageJson"
  */
 export async function addAntd() {
     consola.start("开始添加 antd 配置")
-    await addDependency({ package: ["@ant-design/icons", "@ant-design/v5-patch-for-react-19", "antd"] })
+    await addDependency({
+        package: [
+            "@ant-design/icons",
+            "@ant-design/v5-patch-for-react-19",
+            "antd",
+        ],
+    })
     const dir = await readdir(".")
     const componentDir = dir.includes("src") ? "src/components" : "components"
     await mkdir(componentDir, { recursive: true })
@@ -79,5 +86,6 @@ export default Registry
 `,
         )
     }
+
     consola.success("添加 antd 配置成功")
 }

@@ -1,5 +1,6 @@
 import { rename } from "fs/promises"
 import { join } from "path"
+
 import consola from "consola"
 import fetch from "node-fetch"
 import YAML from "yaml"
@@ -88,28 +89,42 @@ export interface Links {
  * @param param0.dir 下载目录
  * @param param0.filter 安装包筛选函数
  */
-export async function downloadFromWinget({ name, id, dir, filter }: WingetDownloadInfo) {
+export async function downloadFromWinget({
+    name,
+    id,
+    dir,
+    filter,
+}: WingetDownloadInfo) {
     const firstLetter = id[0].toLowerCase()
     const path = id.replace(/\./g, "/")
-    const response = await fetch(`https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${firstLetter}/${path}`, { agent })
+    const response = await fetch(
+        `https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${firstLetter}/${path}`,
+        { agent },
+    )
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: GithubContent[] = (await response.json()) as any
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!Array.isArray(data)) throw new Error((data as any).message)
+
     const reg2 = /^\d+(\.\d+?)*$/
     const stables = data.filter(item => reg2.test(item.name))
+
     stables.sort((a, b) => {
         const avs = a.name.split(".")
         const bvs = b.name.split(".")
         const max = Math.max(avs.length, bvs.length)
+
         for (let i = 0; i < max; i++) {
             const av = avs[i] ? parseInt(avs[i]) : 0
             const bv = bvs[i] ? parseInt(bvs[i]) : 0
             if (av < bv) return 1
             if (av > bv) return -1
         }
+
         return 0
     })
+
     const response2 = await fetch(
         `https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/${firstLetter}/${path}/${stables[0].name}/${id}.installer.yaml`,
         { agent },
@@ -128,12 +143,22 @@ export async function downloadFromWinget({ name, id, dir, filter }: WingetDownlo
 
     for (const { InstallerUrl, Architecture } of installers) {
         const filename = await download(InstallerUrl, dir)
-        result.push({ filename, version: pkg.PackageVersion, ext: new URL(InstallerUrl).pathname.endsWith(".exe") ? "exe" : "msi", architecture: Architecture })
+        result.push({
+            filename,
+            version: pkg.PackageVersion,
+            ext: new URL(InstallerUrl).pathname.endsWith(".exe")
+                ? "exe"
+                : "msi",
+            architecture: Architecture,
+        })
     }
 
     for (const { version, filename, architecture, ext } of result) {
         await sleep(100)
-        await rename(join(dir, filename), join(dir, `${name}-${version}-${architecture}.${ext}`))
+        await rename(
+            join(dir, filename),
+            join(dir, `${name}-${version}-${architecture}.${ext}`),
+        )
     }
 }
 
@@ -148,5 +173,9 @@ export type WingetDownloadInfo = {
     name: string
     id: string
     dir: string
-    filter: (item: Winget.Installer, index: number, arr: Winget.Installer[]) => boolean
+    filter: (
+        item: Winget.Installer,
+        index: number,
+        arr: Winget.Installer[],
+    ) => boolean
 }

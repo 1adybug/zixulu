@@ -1,4 +1,5 @@
 import { readdir } from "fs/promises"
+
 import { getEnumValues } from "deepsea-tools"
 import inquirer from "inquirer"
 
@@ -18,12 +19,14 @@ declare global {
  * 3. 如果无法判断，则提示用户选择
  */
 export async function getPackageManager(dir = "."): Promise<PackageManager> {
-    if (globalThis.__ZIXULU_PACKAGE_MANAGER__) return globalThis.__ZIXULU_PACKAGE_MANAGER__
+    if (globalThis.__ZIXULU_PACKAGE_MANAGER__)
+        return globalThis.__ZIXULU_PACKAGE_MANAGER__
     const dir2 = await readdir(dir)
     if (dir2.includes("yarn.lock")) return PackageManager.yarn
     if (dir2.includes("package-lock.json")) return PackageManager.npm
     if (dir2.includes("pnpm-lock.yaml")) return PackageManager.pnpm
-    if (dir2.includes("bun.lockb") || dir2.includes("bun.lock")) return PackageManager.bun
+    if (dir2.includes("bun.lockb") || dir2.includes("bun.lock"))
+        return PackageManager.bun
 
     type PromptResult = {
         manager: PackageManager
