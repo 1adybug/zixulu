@@ -32,25 +32,41 @@ export async function setGitProxy() {
             },
         ],
     })
+
     if (!open) {
         try {
-            await spawnAsync(`git config${global ? " --global" : ""} --unset http.proxy`, { shell: true, stdio: "inherit" })
+            await spawnAsync(
+                `git config${global ? " --global" : ""} --unset http.proxy`,
+                { shell: true, stdio: "inherit" },
+            )
         } catch {
             /* empty */
         }
+
         try {
-            await spawnAsync(`git config${global ? " --global" : ""} --unset https.proxy`, { shell: true, stdio: "inherit" })
+            await spawnAsync(
+                `git config${global ? " --global" : ""} --unset https.proxy`,
+                { shell: true, stdio: "inherit" },
+            )
         } catch {
             /* empty */
         }
+
         return
     }
+
     const { proxy } = await inquirer.prompt({
         type: "input",
         name: "proxy",
         message: "请输入代理地址",
         default: "http://localhost:7890",
     })
-    await spawnAsync(`git config${global ? " --global" : ""} http.proxy ${proxy}`, { shell: true, stdio: "inherit" })
-    await spawnAsync(`git config${global ? " --global" : ""} https.proxy ${proxy}`, { shell: true, stdio: "inherit" })
+    await spawnAsync(
+        `git config${global ? " --global" : ""} http.proxy ${proxy}`,
+        { shell: true, stdio: "inherit" },
+    )
+    await spawnAsync(
+        `git config${global ? " --global" : ""} https.proxy ${proxy}`,
+        { shell: true, stdio: "inherit" },
+    )
 }
