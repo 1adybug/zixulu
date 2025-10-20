@@ -3,11 +3,10 @@ import { readFile, rename, writeFile } from "fs/promises"
 import { homedir } from "os"
 import { join, parse } from "path"
 
+import { CommitType } from "@src/constant"
 import consola from "consola"
 import inquirer from "inquirer"
 import { execAsync } from "soda-nodejs"
-
-import { CommitType } from "@src/constant"
 
 import { addGitCommit } from "./addGitCommit"
 import { getCommitMessage } from "./getCommitMessage"
@@ -272,6 +271,9 @@ export async function syncEditorSetting() {
                     CommitType.feature,
                     "sync editor setting",
                 ),
+                cwd: onlinePath,
+            })
+            await execAsync(`git push`, {
                 cwd: onlinePath,
             })
         }

@@ -4,6 +4,8 @@ import inquirer from "inquirer"
 import { JSDOM } from "jsdom"
 import { execAsync } from "soda-nodejs"
 
+import { isSudo } from "@src/constant"
+
 import { setDockerRegistry } from "./setDockerRegistry"
 import { sudoCommand } from "./sudoCommand"
 

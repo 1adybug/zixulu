@@ -143,6 +143,7 @@ export async function downloadFromWinget({
 
     for (const { InstallerUrl, Architecture } of installers) {
         const filename = await download(InstallerUrl, dir)
+
         result.push({
             filename,
             version: pkg.PackageVersion,

@@ -1,7 +1,8 @@
 import { createWriteStream } from "fs"
-import { mkdir, readFile, readdir, stat, writeFile } from "fs/promises"
+import { mkdir, readdir, readFile, stat, writeFile } from "fs/promises"
 import { join, parse } from "path"
 import { Readable } from "stream"
+
 import consola from "consola"
 import md5 from "md5"
 import fetch, { Headers, Response } from "node-fetch"
@@ -46,7 +47,10 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
     headers.set("dnt", `1`)
     headers.set("pragma", `no-cache`)
     headers.set("priority", `u=0, i`)
-    headers.set("sec-ch-ua", `"Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"`)
+    headers.set(
+        "sec-ch-ua",
+        `"Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"`,
+    )
     headers.set("sec-ch-ua-mobile", `?0`)
     headers.set("sec-ch-ua-platform", `"Windows"`)
     headers.set("sec-fetch-dest", `document`)
@@ -54,7 +58,10 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
     headers.set("sec-fetch-site", `none`)
     headers.set("sec-fetch-user", `?1`)
     headers.set("upgrade-insecure-requests", `1`)
-    headers.set("user-agent", `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36`)
+    headers.set(
+        "user-agent",
+        `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36`,
+    )
 
     const downloadMap: Map<string, string> = new Map()
 
@@ -67,6 +74,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
             const { ext } = parse(new URL(url).pathname)
             let response: Response
             let filename: string
+
             if (ext) {
                 filename = `${md5(url)}${ext}`
             } else {
@@ -76,7 +84,9 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
                 })
                 filename = `${md5(url)}.${response.headers.get("content-type")?.split("/")[1].split("+")[0]}`
             }
+
             const dir = await readdir(output)
+
             if (!dir.includes(filename)) {
                 response ??= await fetch(url, {
                     agent: proxy ? agent : undefined,
@@ -87,16 +97,20 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
                     Readable.from(response.body!)
                         .pipe(file)
                         .on("finish", () => resolve(0))
-                        .on("error", reject),
-                )
+                        .on("error", reject))
             }
+
             const url2 = `${base ? (base.endsWith("/") ? base.slice(0, -1) : base) : ""}/${filename}`
+
             // consola.success(`${url} -> ${url2}`)
             downloadMap.set(url, url2)
+
             errors.delete(url)
+
             if (filename.endsWith(".js")) {
                 await replace(join(output, filename), url)
             }
+
             return url2
         } catch (error) {
             consola.error(error)
@@ -114,6 +128,7 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
             } catch {
                 /* empty */
             }
+
             try {
                 const newUrl = url.replace(/^href="/, "https:")
                 const replaceUrl = await retry(() => download(newUrl), 4)
@@ -121,24 +136,35 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
             } catch {
                 /* empty */
             }
+
             return url
         }
+
         if (url.startsWith("from") || url.startsWith("import")) {
             const match = url.match(reg3)
             if (!match) return url
             let url2 = match[2].trim()
+
             if (!url2.startsWith("http")) {
-                if (url2.startsWith("/")) url2 = new URL(url2, source).toString()
-                else if (url2.startsWith("./")) url2 = parse(source!).dir + url2.slice(1)
-                else if (url2.startsWith("../")) url2 = parse(parse(source!).dir).dir + url2.slice(2)
+                if (url2.startsWith("/"))
+                    url2 = new URL(url2, source).toString()
+                else if (url2.startsWith("./"))
+                    url2 = parse(source!).dir + url2.slice(1)
+                else if (url2.startsWith("../"))
+                    url2 = parse(parse(source!).dir).dir + url2.slice(2)
                 else {
                     return url
                 }
             }
+
             const replaceUrl = await retry(() => download(url2), 4)
             if (replaceUrl === url2) return url
-            return url.replace(reg3, `$1${replaceUrl.startsWith("/") ? "." : ""}${replaceUrl}$3`)
+            return url.replace(
+                reg3,
+                `$1${replaceUrl.startsWith("/") ? "." : ""}${replaceUrl}$3`,
+            )
         }
+
         try {
             const replaceUrl = await retry(() => download(url), 4)
             return replaceUrl
@@ -150,14 +176,24 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
     async function replace(input: string, source?: string) {
         consola.start(`scanning ${input.replace(/\\/g, "/")}`)
         const status = await stat(input)
+
         if (status.isFile()) {
             const path = parse(input)
-            if (path.ext === ".js" || path.ext === ".html" || path.ext === ".css" || path.ext === ".json") {
+
+            if (
+                path.ext === ".js" ||
+                path.ext === ".html" ||
+                path.ext === ".css" ||
+                path.ext === ".json"
+            ) {
                 const data = await readFile(input, "utf-8")
                 const match = data.match(source ? getReg2() : getReg())
                 if (!match) return
+
                 const urlsToReplace: string[] = []
+
                 let index = 0
+
                 for (const url of match) {
                     if (isAsset(url) || getReg2().test(url)) {
                         const url2 = await getReplaceUrl(url, source)
@@ -166,18 +202,27 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
                         urlsToReplace.push(url)
                     }
                 }
-                const newData = data.replace(source ? getReg2() : getReg(), () => urlsToReplace[index++])
+
+                const newData = data.replace(
+                    source ? getReg2() : getReg(),
+                    () => urlsToReplace[index++],
+                )
+
                 if (source) {
                     urlsToReplace.forEach(url => {
                         if (!reg4.test(url)) console.log(url)
                     })
                 }
+
                 await writeFile(input, newData, "utf-8")
             }
+
             return
         }
+
         if (status.isDirectory()) {
             const dir2 = await readdir(input)
+
             for (const item of dir2) {
                 await replace(join(input, item))
             }
@@ -186,7 +231,9 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
 
     await replace(input)
 
-    consola.success(errors.size > 0 ? "替换完成，以下文件下载失败：" : "替换完成")
+    consola.success(
+        errors.size > 0 ? "替换完成，以下文件下载失败：" : "替换完成",
+    )
 
     errors.forEach(url => consola.error(url))
 }
