@@ -73,16 +73,13 @@ export const addedRules = [
     "node_modules",
     "bun.lockb",
     "bun.lock",
-    "dist",
+    "dist*",
     "build",
     "yarn.lock",
     "yarn-error.log",
     ".yarnrc.yml",
     ".yarn",
-    "test.js",
-    "test.mjs",
-    "test.ts",
-    "test",
+    "test*",
 ]
 
 export const isSudo = !!process.env.SUDO_USER
