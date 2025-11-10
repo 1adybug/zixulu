@@ -9,6 +9,6 @@ export async function readBunConfig() {
     const path = join(homedir(), ".bunfig.toml")
     if (existsSync(path) === false) return {}
     const str = await readFile(join(homedir(), ".bunfig.toml"), "utf-8")
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     return parse(str) as any
 }
