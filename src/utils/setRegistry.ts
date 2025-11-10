@@ -2,7 +2,7 @@ import { getEnumKeys, getEnumValues } from "deepsea-tools"
 import inquirer from "inquirer"
 import { spawnAsync } from "soda-nodejs"
 
-import { PackageManager, Registry } from "@constant/index"
+import { PackageManager, Registry } from "@/constant/index"
 
 import { readBunConfig } from "./readBunConfig"
 import { writeBunConfig } from "./writeBunConfig"

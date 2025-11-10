@@ -5,7 +5,7 @@ import consola from "consola"
 import fetch from "node-fetch"
 import YAML from "yaml"
 
-import { agent } from "@constant/index"
+import { agent } from "@/constant/index"
 
 import { download } from "./download"
 import { sleep } from "./sleep"

@@ -1,6 +1,6 @@
 import fetch from "node-fetch"
 
-import { agent } from "@src/constant"
+import { agent } from "@/constant"
 
 import { getRegistry } from "./getRegistry"
 

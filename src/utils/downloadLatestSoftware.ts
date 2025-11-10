@@ -4,7 +4,7 @@ import consola from "consola"
 import dayjs from "dayjs"
 import inquirer from "inquirer"
 
-import { Software } from "@constant/index"
+import { Software } from "@/constant/index"
 
 import { download7Zip } from "./download7Zip"
 import { downloadAnydesk } from "./downloadAnydesk"

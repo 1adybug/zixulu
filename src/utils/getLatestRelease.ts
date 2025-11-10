@@ -1,6 +1,6 @@
 import fetch from "node-fetch"
 
-import { agent } from "@src/constant"
+import { agent } from "@/constant"
 
 /**
  * GitHub Release 信息接口

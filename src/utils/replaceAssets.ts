@@ -7,7 +7,7 @@ import consola from "consola"
 import md5 from "md5"
 import fetch, { Headers, Response } from "node-fetch"
 
-import { agent } from "@src/constant"
+import { agent } from "@/constant"
 
 import { isAsset } from "./isAsset"
 import { retry } from "./retry"

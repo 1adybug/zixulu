@@ -4,7 +4,7 @@ import { Readable } from "stream"
 
 import fetch from "node-fetch"
 
-import { agent } from "@constant/index"
+import { agent } from "@/constant/index"
 
 import { getFilename } from "./getFilename"
 

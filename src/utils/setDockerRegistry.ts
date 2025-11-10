@@ -4,7 +4,7 @@ import consola from "consola"
 import inquirer from "inquirer"
 import { execAsync } from "soda-nodejs"
 
-import { isSudo } from "@src/constant"
+import { isSudo } from "@/constant"
 
 import { isUrl } from "./isUrl"
 import { sudoCommand } from "./sudoCommand"
