@@ -9,7 +9,7 @@ import { getPackageJsonPath } from "./getPackageJsonPath"
  * @param dir 目录
  * @returns package.json
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export async function readPackageJson(
     dir?: string,
 ): Promise<Record<string, any>> {

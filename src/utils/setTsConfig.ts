@@ -45,7 +45,7 @@ export enum ModuleResolution {
     NodeNext = "NodeNext",
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export async function setTsConfig(key: string, value?: any) {
     const tsconfig = await readTsConfig()
 

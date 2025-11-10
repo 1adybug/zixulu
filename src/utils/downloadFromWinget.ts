@@ -101,10 +101,10 @@ export async function downloadFromWinget({
         `https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${firstLetter}/${path}`,
         { agent },
     )
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const data: GithubContent[] = (await response.json()) as any
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     if (!Array.isArray(data)) throw new Error((data as any).message)
 
     const reg2 = /^\d+(\.\d+?)*$/
