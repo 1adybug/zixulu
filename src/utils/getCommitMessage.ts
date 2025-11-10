@@ -1,4 +1,4 @@
-import { CommitType, CommitTypeMap } from "@src/constant"
+import { CommitType, CommitTypeMap } from "@/constant"
 
 /**
  * 获取提交信息

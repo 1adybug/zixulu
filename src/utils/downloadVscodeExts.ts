@@ -5,7 +5,7 @@ import inquirer from "inquirer"
 import fetch from "node-fetch"
 import { execAsync } from "soda-nodejs"
 
-import { agent } from "@constant/index"
+import { agent } from "@/constant/index"
 
 import { download } from "./download"
 import { readZixuluSetting } from "./readZixuluSetting"

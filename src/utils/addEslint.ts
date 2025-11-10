@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises"
 
-import { CommitType } from "@src/constant"
+import { CommitType } from "@/constant"
 
 import { addDependency, PackageVersion } from "./addDependency"
 import { addScript } from "./addScript"

@@ -1,7 +1,7 @@
 import consola from "consola"
 import inquirer from "inquirer"
 
-import { ProjectType } from "@constant/index"
+import { ProjectType } from "@/constant/index"
 
 import { addAntd } from "./addAntd"
 import { addDependency } from "./addDependency"

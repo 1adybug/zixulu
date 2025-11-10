@@ -1,7 +1,7 @@
 import fetch from "node-fetch"
 import semver from "semver"
 
-import { agent } from "@src/constant"
+import { agent } from "@/constant"
 
 import { getRegistry } from "./getRegistry"
 import { isStableVersion } from "./isStableVersion"

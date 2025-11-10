@@ -1,4 +1,4 @@
-import { Registry } from "@src/constant"
+import { Registry } from "@/constant"
 
 declare global {
     /** 全局 npm 镜像源配置地址 */

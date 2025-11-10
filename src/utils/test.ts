@@ -1,4 +1,4 @@
-import { isSudo } from "@src/constant"
+import { isSudo } from "@/constant"
 
 export async function test() {
     console.log(isSudo)

@@ -4,7 +4,7 @@ import consola from "consola"
 import { getEnumValues } from "deepsea-tools"
 import inquirer from "inquirer"
 
-import { PackageManager } from "@src/constant"
+import { PackageManager } from "@/constant"
 
 import { addDependency } from "./addDependency"
 import { addRuleToGitIgnore } from "./addRuleToGitIgnore"

@@ -3,10 +3,11 @@ import { readFile, rename, writeFile } from "fs/promises"
 import { homedir } from "os"
 import { join, parse } from "path"
 
-import { CommitType } from "@src/constant"
 import consola from "consola"
 import inquirer from "inquirer"
 import { execAsync } from "soda-nodejs"
+
+import { CommitType } from "@/constant"
 
 import { addGitCommit } from "./addGitCommit"
 import { getCommitMessage } from "./getCommitMessage"

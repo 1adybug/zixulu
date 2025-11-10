@@ -1,4 +1,4 @@
-import { addedRules } from "@constant/index"
+import { addedRules } from "@/constant/index"
 
 import { addGitAttributes } from "./addGitAttributes"
 import { addRuleToGitIgnore } from "./addRuleToGitIgnore"

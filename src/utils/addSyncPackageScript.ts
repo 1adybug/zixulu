@@ -2,7 +2,7 @@ import { mkdir, writeFile } from "fs/promises"
 
 import inquirer from "inquirer"
 
-import { CommitType } from "@src/constant"
+import { CommitType } from "@/constant"
 
 import { getCommitMessage } from "./getCommitMessage"
 import { readPackageJson } from "./readPackageJson"

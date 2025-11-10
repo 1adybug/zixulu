@@ -3,7 +3,7 @@ import { readdir } from "fs/promises"
 import { getEnumValues } from "deepsea-tools"
 import inquirer from "inquirer"
 
-import { PackageManager } from "@src/constant"
+import { PackageManager } from "@/constant"
 
 declare global {
     var __ZIXULU_PACKAGE_MANAGER__: PackageManager | undefined

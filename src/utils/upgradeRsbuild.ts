@@ -1,6 +1,6 @@
 import consola from "consola"
 
-import { CommitType } from "@src/constant"
+import { CommitType } from "@/constant"
 
 import { getCommitMessage } from "./getCommitMessage"
 import { getPackageLatestVersion } from "./getPackageLatestVersion"
