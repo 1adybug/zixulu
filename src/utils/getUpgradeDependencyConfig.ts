@@ -49,7 +49,7 @@ export async function getUpgradeDependencyConfig<
 
     if (ks.includes("level"))
         questions.push({
-            type: "list",
+            type: "select",
             name: "level",
             message: "请选择升级的级别",
             choices: ["major", "minor", "patch"],
