@@ -101,10 +101,9 @@ export async function downloadFromWinget({
         `https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${firstLetter}/${path}`,
         { agent },
     )
-     
+
     const data: GithubContent[] = (await response.json()) as any
 
-     
     if (!Array.isArray(data)) throw new Error((data as any).message)
 
     const reg2 = /^\d+(\.\d+?)*$/

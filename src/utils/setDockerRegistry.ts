@@ -14,7 +14,6 @@ export async function setDockerRegistry() {
     if (!isSudo) return sudoCommand()
     await execAsync(`mkdir -p /etc/docker`)
 
-     
     let daemon: any = {}
 
     try {

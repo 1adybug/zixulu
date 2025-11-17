@@ -18,7 +18,7 @@ export async function getPackageLatestVersion(packageName: string) {
     const response = await fetch(url, {
         agent: global.__ZIXULU_PROXY__ ? agent : undefined,
     })
-     
+
     const data = (await response.json()) as any
     return data.version as string
 }

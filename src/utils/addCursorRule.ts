@@ -4,6 +4,7 @@ import { join } from "path"
 
 import inquirer from "inquirer"
 import { spawnAsync } from "soda-nodejs"
+
 import { CommitType } from "@/constant"
 
 import { getCommitMessage } from "./getCommitMessage"

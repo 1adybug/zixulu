@@ -45,7 +45,6 @@ export enum ModuleResolution {
     NodeNext = "NodeNext",
 }
 
- 
 export async function setTsConfig(key: string, value?: any) {
     const tsconfig = await readTsConfig()
 

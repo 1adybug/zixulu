@@ -9,7 +9,7 @@ import { getPackageJsonPath } from "./getPackageJsonPath"
  * @param dir 目录
  * @returns package.json
  */
- 
+
 export async function readPackageJson(
     dir?: string,
 ): Promise<Record<string, any>> {
