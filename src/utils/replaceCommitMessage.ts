@@ -1,12 +1,12 @@
 import { simpleGit } from "simple-git"
 import { consola } from "consola"
-import { confirm } from "@inquirer/prompts"
 import { spawnAsync } from "soda-nodejs"
 import { writeFile, unlink } from "fs/promises"
 import { join } from "path"
 import { tmpdir } from "os"
 
 import { preprocessRegex } from "./preprocessRegex"
+import { shouldContinue } from "./shouldContinue"
 
 export interface ReplaceCommitMessageParams {
     /** 正则表达式字符串 */
@@ -59,9 +59,9 @@ export async function replaceCommitMessage({ reg, replace, flags, push, remote =
     consola.box(`正则表达式: /${processedReg}/${flags ?? ""}\n替换字符串: ${replace}`)
 
     // 询问用户是否继续
-    const shouldContinue = await confirm({ message: "是否继续？", default: false })
+    const cont = await shouldContinue("⚠️ 是否继续？此操作将重写 Git 历史")
 
-    if (!shouldContinue) {
+    if (!cont) {
         consola.info("操作已取消")
         return
     }

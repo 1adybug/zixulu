@@ -1,8 +1,8 @@
 import { simpleGit } from "simple-git"
 import { consola } from "consola"
-import { confirm } from "@inquirer/prompts"
 
 import { preprocessRegex } from "./preprocessRegex"
+import { shouldContinue } from "./shouldContinue"
 
 export interface RemoveTagParams {
     /** 正则表达式字符串 */
@@ -44,9 +44,9 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
     consola.box(`正则表达式: /${processedReg}/${flags ?? ""}`)
 
     // 询问用户是否继续
-    const shouldContinue = await confirm({ message: "是否继续？", default: true })
+    const cont = await shouldContinue("是否继续？")
 
-    if (!shouldContinue) {
+    if (!cont) {
         consola.info("操作已取消")
         return
     }

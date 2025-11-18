@@ -1,8 +1,8 @@
 import { simpleGit } from "simple-git"
 import { consola } from "consola"
-import { confirm } from "@inquirer/prompts"
 
 import { preprocessRegex } from "./preprocessRegex"
+import { shouldContinue } from "./shouldContinue"
 
 export interface AddTagParams {
     /** 用于匹配 commit message 的正则表达式字符串 */
@@ -48,9 +48,9 @@ export async function addTag({ reg, flags, replacement, push, remote = "origin",
     consola.box(`正则表达式: /${processedReg}/${flags ?? ""}\n替换字符串: ${replacement}`)
 
     // 询问用户是否继续
-    const shouldContinue = await confirm({ message: "是否继续？", default: true })
+    const cont = await shouldContinue("是否继续？")
 
-    if (!shouldContinue) {
+    if (!cont) {
         consola.info("操作已取消")
         return
     }
