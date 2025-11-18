@@ -1,5 +1,6 @@
 import { simpleGit } from "simple-git"
 import { consola } from "consola"
+import { confirm } from "@inquirer/prompts"
 
 import { preprocessRegex } from "./preprocessRegex"
 
@@ -40,6 +41,20 @@ export async function addTag({ reg, flags, replacement, push, remote = "origin",
         return
     }
 
+    // 预处理正则表达式，替换占位符
+    const processedReg = preprocessRegex(reg)
+
+    // 显示正则表达式和替换字符串
+    consola.box(`正则表达式: /${processedReg}/${flags ?? ""}\n替换字符串: ${replacement}`)
+
+    // 询问用户是否继续
+    const shouldContinue = await confirm({ message: "是否继续？", default: true })
+
+    if (!shouldContinue) {
+        consola.info("操作已取消")
+        return
+    }
+
     // 获取所有 commit 日志
     const log = await git.log()
     const commits = log.all
@@ -56,9 +71,6 @@ export async function addTag({ reg, flags, replacement, push, remote = "origin",
     const allExistingTags = new Set(existingTags.all)
 
     const tagsToAdd = []
-
-    // 预处理正则表达式，替换占位符
-    const processedReg = preprocessRegex(reg)
 
     // 遍历所有 commit，查找匹配的 commit message
     for (const commit of commits) {

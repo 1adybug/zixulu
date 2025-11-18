@@ -1,5 +1,6 @@
 import { simpleGit } from "simple-git"
 import { consola } from "consola"
+import { confirm } from "@inquirer/prompts"
 import { spawnAsync } from "soda-nodejs"
 import { writeFile, unlink } from "fs/promises"
 import { join } from "path"
@@ -48,17 +49,28 @@ export async function replaceCommitMessage({ reg, replace, flags, push, remote =
     // 获取当前分支
     const currentBranch = branch ?? (await git.revparse(["--abbrev-ref", "HEAD"]))
 
+    // 预处理正则表达式，替换占位符
+    const processedReg = preprocessRegex(reg)
+
     consola.warn("⚠️  警告：此操作将重写 Git 历史，建议先备份")
     consola.info(`目标分支: ${currentBranch}`)
+
+    // 显示正则表达式和替换字符串
+    consola.box(`正则表达式: /${processedReg}/${flags ?? ""}\n替换字符串: ${replace}`)
+
+    // 询问用户是否继续
+    const shouldContinue = await confirm({ message: "是否继续？", default: false })
+
+    if (!shouldContinue) {
+        consola.info("操作已取消")
+        return
+    }
 
     // 获取提交数量
     const logResult = await git.log([currentBranch])
     const commitCount = logResult.total
 
     consola.info(`找到 ${commitCount} 个提交`)
-
-    // 预处理正则表达式，替换占位符
-    const processedReg = preprocessRegex(reg)
 
     // 创建临时脚本文件，避免转义问题
     const tempScriptPath = join(tmpdir(), `git-msg-filter-${Date.now()}.js`)

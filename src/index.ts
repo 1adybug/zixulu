@@ -419,7 +419,7 @@ program.command("add-cursor-rule").alias("acr").description("添加 cursor 规�
 program
     .command("replace-tag")
     .alias("rt")
-    .description("替换所有 git tag")
+    .description("替换所有 git tag (正则中可用 {{CARET}} 代替 ^)")
     .argument("regexp", "正则表达式字符串")
     .argument("[replace]", "替换字符串，默认为空字符串")
     .option("-f, --flags <flags>", "正则表达式标志，如 i、g、m 等")
@@ -432,7 +432,7 @@ program
 program
     .command("remove-tag")
     .alias("rmt")
-    .description("删除匹配的 git tag")
+    .description("删除匹配的 git tag (正则中可用 {{CARET}} 代替 ^)")
     .argument("regexp", "正则表达式字符串")
     .option("-f, --flags <flags>", "正则表达式标志，如 i、g、m 等")
     .option("-p, --push", "是否同时删除远程仓库的 tag")
@@ -444,7 +444,7 @@ program
 program
     .command("add-tag")
     .alias("adt")
-    .description("为匹配的 commit 添加 git tag")
+    .description("为匹配的 commit 添加 git tag (正则中可用 {{CARET}} 代替 ^)")
     .argument("regexp", "用于匹配 commit message 的正则表达式字符串")
     .argument("replacement", "用于生成 tag 名称的替换字符串")
     .option("-f, --flags <flags>", "正则表达式标志，如 i、g、m 等")
@@ -458,7 +458,7 @@ program
 program
     .command("replace-commit-message")
     .alias("rcm")
-    .description("替换所有提交消息（⚠️ 会重写 Git 历史）")
+    .description("替换所有提交消息（⚠️ 会重写 Git 历史，正则中可用 {{CARET}} 代替 ^）")
     .argument("regexp", "正则表达式字符串")
     .argument("[replace]", "替换字符串，默认为空字符串")
     .option("-f, --flags <flags>", "正则表达式标志，如 g、i 等（注意：sed 语法）")

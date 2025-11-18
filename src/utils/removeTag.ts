@@ -1,5 +1,6 @@
 import { simpleGit } from "simple-git"
 import { consola } from "consola"
+import { confirm } from "@inquirer/prompts"
 
 import { preprocessRegex } from "./preprocessRegex"
 
@@ -36,6 +37,20 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
         return
     }
 
+    // 预处理正则表达式，替换占位符
+    const processedReg = preprocessRegex(reg)
+
+    // 显示正则表达式
+    consola.box(`正则表达式: /${processedReg}/${flags ?? ""}`)
+
+    // 询问用户是否继续
+    const shouldContinue = await confirm({ message: "是否继续？", default: true })
+
+    if (!shouldContinue) {
+        consola.info("操作已取消")
+        return
+    }
+
     // 获取所有 tag
     const tags = await git.tags()
     const allTags = tags.all
@@ -48,9 +63,6 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
     consola.info(`找到 ${allTags.length} 个 tag`)
 
     const tagsToRemove = []
-
-    // 预处理正则表达式，替换占位符
-    const processedReg = preprocessRegex(reg)
 
     // 遍历所有 tag，查找匹配的 tag
     for (const tag of allTags) {
