@@ -19,9 +19,7 @@ export type InstallDependcenyConfig = {
     dir?: string
 }
 
-export async function installDependceny(
-    config?: InstallDependcenyConfig,
-): Promise<boolean> {
+export async function installDependceny(config?: InstallDependcenyConfig): Promise<boolean> {
     let { silent, manager, dir } = config ?? {}
 
     if (!silent) {

@@ -23,11 +23,7 @@ export async function setDockerRegistry() {
     }
 
     daemon["registry-mirrors"] ??= []
-    daemon["registry-mirrors"].push(
-        "https://docker.sunzishaokao.com",
-        "https://hub.hxui.site",
-        "https://docker.1ms.run",
-    )
+    daemon["registry-mirrors"].push("https://docker.sunzishaokao.com", "https://hub.hxui.site", "https://docker.1ms.run")
     daemon["registry-mirrors"] = unique(daemon["registry-mirrors"])
     daemon["exec-opts"] ??= []
     daemon["exec-opts"].push("native.cgroupdriver=systemd")
@@ -45,11 +41,7 @@ export async function setDockerRegistry() {
         },
     ])
     daemon["registry-mirrors"].push(...mirrors.split(/[,，]/).filter(isUrl))
-    await writeFile(
-        "/etc/docker/daemon.json",
-        JSON.stringify(daemon, undefined, 4),
-        "utf-8",
-    )
+    await writeFile("/etc/docker/daemon.json", JSON.stringify(daemon, undefined, 4), "utf-8")
     consola.success("镜像地址设置成功")
     consola.info("建议重启docker服务：")
     consola.info("sudo systemctl daemon-reload")

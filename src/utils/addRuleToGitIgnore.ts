@@ -11,10 +11,7 @@ import { getCommitMessage } from "./getCommitMessage"
  */
 export async function addRuleToGitIgnore(...rules: string[]) {
     const dir = await readdir(".")
-    const message = getCommitMessage(
-        CommitType.feature,
-        `添加 .gitignore 规则 ${rules.join(", ")}`,
-    )
+    const message = getCommitMessage(CommitType.feature, `添加 .gitignore 规则 ${rules.join(", ")}`)
 
     if (!dir.includes(".gitignore")) {
         await writeFile(".gitignore", rules.join("\n"), "utf-8")

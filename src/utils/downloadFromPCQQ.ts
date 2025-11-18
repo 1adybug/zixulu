@@ -35,28 +35,17 @@ export namespace PCQQ {
  * @param cmdid 命令ID
  * @param soft_id_list 软件ID列表
  */
-export async function downloadFromPCQQ(
-    dir: string,
-    cmdid: number,
-    soft_id_list: number,
-) {
+export async function downloadFromPCQQ(dir: string, cmdid: number, soft_id_list: number) {
     const data = new URLSearchParams()
     data.set("cmdid", cmdid.toString())
     data.set("jprxReq[req][soft_id_list][]", soft_id_list.toString())
     const headers = new Headers()
     headers.set("Content-Type", "application/x-www-form-urlencoded")
-    const response = await fetch(
-        `https://luban.m.qq.com/api/public/software-manager/softwareProxy`,
-        {
-            method: "POST",
-            headers,
-            body: data.toString(),
-        },
-    )
+    const response = await fetch(`https://luban.m.qq.com/api/public/software-manager/softwareProxy`, {
+        method: "POST",
+        headers,
+        body: data.toString(),
+    })
     const result: PCQQ.Result = await response.json()
-    await download(
-        result.resp.soft_list[0].download_https_url,
-        dir,
-        result.resp.soft_list[0].file_name,
-    )
+    await download(result.resp.soft_list[0].download_https_url, dir, result.resp.soft_list[0].file_name)
 }

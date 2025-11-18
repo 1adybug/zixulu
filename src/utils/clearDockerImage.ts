@@ -4,9 +4,7 @@ import { execAsync, spawnAsync } from "soda-nodejs"
 
 export async function clearDockerImage(name?: string) {
     name = name?.trim()
-    const output = await execAsync(
-        `docker images -f "dangling=true"${name ? ` -f "reference=*${name}*"` : ""}`,
-    )
+    const output = await execAsync(`docker images -f "dangling=true"${name ? ` -f "reference=*${name}*"` : ""}`)
     const outputs = output.split("\n").filter(Boolean)
 
     if (outputs.length === 1) {
@@ -14,9 +12,7 @@ export async function clearDockerImage(name?: string) {
         return
     }
 
-    const images = outputs
-        .slice(1)
-        .map(item => item.match(/<none> +([0-9a-f]{12}) +/)![1])
+    const images = outputs.slice(1).map(item => item.match(/<none> +([0-9a-f]{12}) +/)![1])
 
     interface Answer {
         images: string[]

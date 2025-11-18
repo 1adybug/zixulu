@@ -41,25 +41,14 @@ const tsconfig = `{
 
 export async function rollup() {
     await addDependency({
-        package: [
-            "@rollup/plugin-commonjs",
-            "@rollup/plugin-json",
-            "@rollup/plugin-node-resolve",
-            "@rollup/plugin-typescript",
-            "rollup",
-            "typescript",
-        ],
+        package: ["@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "rollup", "typescript"],
         type: "devDependencies",
     })
 
     const packageJson = await readPackageJson()
 
-    if (packageJson.scripts.build)
-        packageJson.scripts["build:rollup"] =
-            "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript"
-    else
-        packageJson.scripts.build =
-            "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript"
+    if (packageJson.scripts.build) packageJson.scripts["build:rollup"] = "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript"
+    else packageJson.scripts.build = "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript"
 
     await writePackageJson({ data: packageJson })
     await writeFile("rollup.config.ts", rollupConfig, "utf-8")
@@ -73,9 +62,7 @@ export async function rollup() {
         tsconfig.compilerOptions.strict = true
         tsconfig.compilerOptions.skipLibCheck = true
         await writeTsConfig({ data: tsconfig })
-    } else {
-        await writeFile("tsconfig.json", tsconfig, "utf-8")
-    }
+    } else await writeFile("tsconfig.json", tsconfig, "utf-8")
 
     await installDependceny()
 }

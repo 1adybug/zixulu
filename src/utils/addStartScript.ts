@@ -168,26 +168,9 @@ export type AddStartScriptOptions = {
  * @param options 配置选项
  * @returns commit message
  */
-export async function addStartScript({
-    type,
-    pemPath,
-    port,
-    core,
-    hostname,
-}: AddStartScriptOptions) {
+export async function addStartScript({ type, pemPath, port, core, hostname }: AddStartScriptOptions) {
     await addDependency({
-        package: [
-            "@types/compression",
-            "@types/cors",
-            "@types/express",
-            "@types/morgan",
-            "@types/node",
-            "compression",
-            "cors",
-            "dotenv",
-            "express",
-            "morgan",
-        ],
+        package: ["@types/compression", "@types/cors", "@types/express", "@types/morgan", "@types/node", "compression", "cors", "dotenv", "express", "morgan"],
         type: "devDependencies",
     })
     await mkdir("scripts", { recursive: true })
@@ -204,23 +187,19 @@ export async function addStartScript({
     }
 
     // 添加证书目录
-    if (/^ *PEM_PATH=/m.test(env))
-        env = env.replace(/^ *PEM_PATH=.*$/m, `PEM_PATH="${pemPath ?? ""}"`)
+    if (/^ *PEM_PATH=/m.test(env)) env = env.replace(/^ *PEM_PATH=.*$/m, `PEM_PATH="${pemPath ?? ""}"`)
     else env += `\nPEM_PATH="${pemPath ?? ""}"`
 
     // 添加端口号
-    if (/^ *PORT=/m.test(env))
-        env = env.replace(/^ *PORT=.*$/m, `PORT="${port ?? ""}"`)
+    if (/^ *PORT=/m.test(env)) env = env.replace(/^ *PORT=.*$/m, `PORT="${port ?? ""}"`)
     else env += `\nPORT="${port ?? ""}"`
 
     // 添加实例数
-    if (/^ *CORE=/m.test(env))
-        env = env.replace(/^ *CORE=.*$/m, `CORE="${core ?? ""}"`)
+    if (/^ *CORE=/m.test(env)) env = env.replace(/^ *CORE=.*$/m, `CORE="${core ?? ""}"`)
     else env += `\nCORE="${core ?? ""}"`
 
     // 添加主机
-    if (/^ *HOSTNAME=/m.test(env))
-        env = env.replace(/^ *HOSTNAME=.*$/m, `HOSTNAME="${hostname || ""}"`)
+    if (/^ *HOSTNAME=/m.test(env)) env = env.replace(/^ *HOSTNAME=.*$/m, `HOSTNAME="${hostname || ""}"`)
     else env += `\nHOSTNAME="${hostname || ""}"`
 
     await writeFile(".env", env, "utf-8")

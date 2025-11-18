@@ -17,25 +17,19 @@ export interface DockerCompose {
 
 export async function updateDockerCompose() {
     const dir = await readdir(".")
-    const file = dir.find(
-        item => item === "docker-compose.yml" || item === "docker-compose.yaml",
-    )
-    if (!file)
-        throw new Error("docker-compose.yml 或 docker-compose.yaml 文件不存在")
+    const file = dir.find(item => item === "docker-compose.yml" || item === "docker-compose.yaml")
+    if (!file) throw new Error("docker-compose.yml 或 docker-compose.yaml 文件不存在")
     const content = await readFile(file, "utf-8")
     const data = yaml.parse(content) as DockerCompose
-    const images = Object.values(data.services).map(
-        service => service.image,
-    ) as string[]
+    const images = Object.values(data.services).map(service => service.image) as string[]
 
     consola.start("开始更新镜像")
 
-    for (const image of images) {
+    for (const image of images)
         await spawnAsync(`docker pull ${image}`, {
             shell: true,
             stdio: "inherit",
         })
-    }
 
     consola.success("更新镜像完成")
 

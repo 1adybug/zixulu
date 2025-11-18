@@ -18,9 +18,7 @@ export async function getHeaders() {
 
     Array.from(match).forEach(item => {
         const match2 = item.match(reg2)
-        result.push(
-            `headers.set("${match2![1].trim()}", \`${match2![2].trim()}\`)`,
-        )
+        result.push(`headers.set("${match2![1].trim()}", \`${match2![2].trim()}\`)`)
     })
 
     await clipboard.write(result.join("\n"))

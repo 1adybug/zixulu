@@ -5,10 +5,7 @@ import { CommitType } from "@/constant/index"
 import { getCommitMessage } from "./getCommitMessage"
 import { getPackageUpgradeVersion } from "./getPackageUpgradeVersion"
 import { getPackageVersionFromRange } from "./getPackageVersionFromRange"
-import {
-    getUpgradeDependencyConfig,
-    UpgradeDependencyConfig,
-} from "./getUpgradeDependencyConfig"
+import { getUpgradeDependencyConfig, UpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
@@ -20,11 +17,8 @@ export type UpgradeInfo = {
     strVersion: string
 }
 
-export async function upgradeDependency(
-    config?: UpgradeDependencyConfig,
-): Promise<string> {
-    const { dir, types, level } =
-        config ?? (await getUpgradeDependencyConfig("types", "level"))
+export async function upgradeDependency(config?: UpgradeDependencyConfig): Promise<string> {
+    const { dir, types, level } = config ?? (await getUpgradeDependencyConfig("types", "level"))
     const packageJson = await readPackageJson(dir)
 
     if (!packageJson.dependencies && !packageJson.devDependencies) return ""
@@ -38,7 +32,7 @@ export async function upgradeDependency(
 
         const allPkgs = Object.keys(packageJson[type] || {})
 
-        for (let i = 0; i < allPkgs.length; i++) {
+        for (let i = 0; i < allPkgs.length; i++)
             try {
                 const pkg = allPkgs[i]
                 const rv = packageJson[type][pkg]
@@ -62,7 +56,6 @@ export async function upgradeDependency(
             } catch {
                 continue
             }
-        }
 
         if (upgrades.length === 0) continue
 
@@ -82,9 +75,7 @@ export async function upgradeDependency(
         pkgs.forEach((pkg: string) => {
             const upgrade = upgrades.find(upgrade => upgrade.package === pkg)!
             packageJson[type][pkg] = upgrade.strVersion
-            upgradeLogs.push(
-                `${pkg} ${upgrade.oldVersion} => ${upgrade.newVersion}`,
-            )
+            upgradeLogs.push(`${pkg} ${upgrade.oldVersion} => ${upgrade.newVersion}`)
         })
     }
 
@@ -93,8 +84,5 @@ export async function upgradeDependency(
     await writePackageJson({ data: packageJson, dir })
     await installDependceny()
 
-    return getCommitMessage(
-        CommitType.feature,
-        `upgrade dependencies: ${upgradeLogs.join(", ")}`,
-    )
+    return getCommitMessage(CommitType.feature, `upgrade dependencies: ${upgradeLogs.join(", ")}`)
 }

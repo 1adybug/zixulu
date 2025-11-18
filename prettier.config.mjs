@@ -8,7 +8,9 @@ const config = {
     tabWidth: 4,
     arrowParens: "avoid",
     endOfLine: "lf",
-    plugins: ["./prettier-plugin-sort-imports.mjs"],
+    printWidth: 160,
+    plugins: ["./prettier-plugin-sort-imports.mjs", "@1adybug/prettier-plugin-remove-braces"],
+    controlStatementBraces: "add",
 }
 
 export default config

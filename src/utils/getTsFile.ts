@@ -9,8 +9,7 @@ export type TsFile = {
 
 export function getTsFile(path: string): TsFile {
     const { ext } = parse(path)
-    if (ext !== "" && ext !== ".ts" && ext !== ".tsx")
-        throw new Error("请传入 ts 或 tsx 文件")
+    if (ext !== "" && ext !== ".ts" && ext !== ".tsx") throw new Error("请传入 ts 或 tsx 文件")
 
     if (ext === ".ts" || ext === ".tsx")
         return {

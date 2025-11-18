@@ -81,11 +81,7 @@ export async function arrowToFunction() {
             if (!matches) continue
             consola.start(file)
 
-            const choices = Array.from(matches).reduce((
-                prev: ArrowToFunctionChoice[],
-                match,
-                index,
-            ) => {
+            const choices = Array.from(matches).reduce((prev: ArrowToFunctionChoice[], match, index) => {
                 if (match.includes("memo(") || match.includes("forwardRef(")) {
                     warnFiles.add(file)
                     return prev
@@ -178,13 +174,7 @@ export async function arrowToFunction() {
         }
     }
 
-    if (modifiedFiles.size > 0)
-        consola.success(
-            `以下文件中的箭头函数组件已经转换为函数组件：\n\n${Array.from(modifiedFiles).join("\n")}`,
-        )
+    if (modifiedFiles.size > 0) consola.success(`以下文件中的箭头函数组件已经转换为函数组件：\n\n${Array.from(modifiedFiles).join("\n")}`)
 
-    if (warnFiles.size > 0)
-        consola.warn(
-            `以下文件中存在 memo 或 forwardRef，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`,
-        )
+    if (warnFiles.size > 0) consola.warn(`以下文件中存在 memo 或 forwardRef，请手动转换：\n\n${Array.from(warnFiles).join("\n")}`)
 }

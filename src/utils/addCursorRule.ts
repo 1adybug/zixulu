@@ -19,18 +19,14 @@ export async function addCursorRule() {
         await writePackageJson({ data: packageJson })
     } catch (error) {}
 
-    await spawnAsync(
-        `npx gitpick 1adybug/cursor-rule/tree/main/.cursor/rules .cursor-rules`,
-    )
+    await spawnAsync(`npx gitpick 1adybug/cursor-rule/tree/main/.cursor/rules .cursor-rules`)
 
     const source = join(".cursor-rules")
     const target = join(".cursor", "rules")
 
     let existed = existsSync(target)
 
-    if (!existed) {
-        await mkdir(target, { recursive: true })
-    }
+    if (!existed) await mkdir(target, { recursive: true })
 
     try {
         const sourceDir = await readdir(source)
@@ -50,8 +46,7 @@ export async function addCursorRule() {
             map[file] = "modified"
         }
 
-        if (Object.keys(map).length === 0)
-            throw new Error("cursor 规则已是最新")
+        if (Object.keys(map).length === 0) throw new Error("cursor 规则已是最新")
 
         interface Answer {
             files: string[]
@@ -68,16 +63,11 @@ export async function addCursorRule() {
             default: Object.keys(map),
         })
 
-        for (const file of files) {
-            await copyFile(join(source, file), join(target, file))
-        }
+        for (const file of files) await copyFile(join(source, file), join(target, file))
 
         await rm(source, { recursive: true })
 
-        return getCommitMessage(
-            CommitType.feature,
-            `${existed ? "更新" : "添加"} cursor 规则`,
-        )
+        return getCommitMessage(CommitType.feature, `${existed ? "更新" : "添加"} cursor 规则`)
     } catch (error) {
         await rm(source, { recursive: true })
         throw error

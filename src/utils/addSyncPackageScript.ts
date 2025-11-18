@@ -24,9 +24,7 @@ export type AddSyncPackageScriptParams = {
  * @param params 配置选项
  * @returns commit message
  */
-export async function addSyncPackageScript({
-    monorepo,
-}: AddSyncPackageScriptParams = {}) {
+export async function addSyncPackageScript({ monorepo }: AddSyncPackageScriptParams = {}) {
     let dir: string | undefined
 
     if (monorepo) {
@@ -130,8 +128,7 @@ main()
 
     packageJson.scripts[name] = "node scripts/syncPackage.mjs"
 
-    if (packageJson.scripts.postpublish)
-        packageJson.scripts.postpublish += ` && npm run ${name}`
+    if (packageJson.scripts.postpublish) packageJson.scripts.postpublish += ` && npm run ${name}`
     else packageJson.scripts.postpublish = `npm run ${name}`
 
     await writePackageJson({ data: packageJson })

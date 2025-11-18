@@ -35,8 +35,7 @@ export async function addPrisma(manager?: PackageManager) {
     })
     const dir = await readdir(".")
     await installDependceny({ silent: true, manager })
-    if (!dir.includes("tsconfig.json"))
-        await spawnAsync("npx tsc --init", { shell: true, stdio: "inherit" })
+    if (!dir.includes("tsconfig.json")) await spawnAsync("npx tsc --init", { shell: true, stdio: "inherit" })
     await spawnAsync("npx prisma init --datasource-provider sqlite", {
         shell: true,
         stdio: "inherit",

@@ -93,15 +93,7 @@ const tsconfigWithReact = `{
 `
 
 export async function rslib() {
-    const {
-        name,
-        version,
-        description,
-        scripts,
-        dependencies,
-        devDependencies,
-        peerDependencies,
-    } = await readPackageJson()
+    const { name, version, description, scripts, dependencies, devDependencies, peerDependencies } = await readPackageJson()
 
     const newPackageJson = {
         name,
@@ -139,18 +131,7 @@ export async function rslib() {
     }
 
     await writePackageJson({ data: newPackageJson })
-    const hasReact =
-        !!dependencies?.["react"] ||
-        !!devDependencies?.["react"] ||
-        !!peerDependencies?.["react"]
-    await writeFile(
-        "rslib.config.ts",
-        hasReact ? rslibConfigWithReact : rslibConfig,
-        "utf-8",
-    )
-    await writeFile(
-        "tsconfig.json",
-        hasReact ? tsconfigWithReact : tsconfig,
-        "utf-8",
-    )
+    const hasReact = !!dependencies?.["react"] || !!devDependencies?.["react"] || !!peerDependencies?.["react"]
+    await writeFile("rslib.config.ts", hasReact ? rslibConfigWithReact : rslibConfig, "utf-8")
+    await writeFile("tsconfig.json", hasReact ? tsconfigWithReact : tsconfig, "utf-8")
 }

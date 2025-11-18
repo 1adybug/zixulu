@@ -15,8 +15,7 @@ export async function tailwindPatch() {
     const packageJson = await readPackageJson()
     packageJson.patchedDependencies ??= {}
     delete packageJson.patchedDependencies[patch.replace(/\.patch$/, "")]
-    packageJson.patchedDependencies[`tailwindcss@${version}`] =
-        `patches/tailwindcss@${version}.patch`
+    packageJson.patchedDependencies[`tailwindcss@${version}`] = `patches/tailwindcss@${version}.patch`
     await writePackageJson({ data: packageJson })
     await installDependceny()
 }

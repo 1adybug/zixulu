@@ -77,18 +77,9 @@ export async function addEslint() {
     const config = getEslintConfig({ isReact })
     await writeFile("eslint.config.mjs", config)
 
-    const packages: (string | PackageVersion)[] = [
-        "@eslint/js",
-        "eslint",
-        "typescript-eslint",
-        "globals",
-    ]
+    const packages: (string | PackageVersion)[] = ["@eslint/js", "eslint", "typescript-eslint", "globals"]
 
-    if (isReact)
-        packages.push(
-            { packageName: "eslint-plugin-react-hooks" },
-            "eslint-plugin-react-refresh",
-        )
+    if (isReact) packages.push({ packageName: "eslint-plugin-react-hooks" }, "eslint-plugin-react-refresh")
     await addDependency({
         package: packages,
         type: "devDependencies",

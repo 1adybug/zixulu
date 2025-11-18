@@ -12,8 +12,5 @@ export async function hasDependency(dependency: string | RegExp, dir?: string) {
         ...peerDependencies,
     })
 
-    return total.some(item =>
-        typeof dependency === "string"
-            ? item === dependency
-            : dependency.test(item))
+    return total.some(item => (typeof dependency === "string" ? item === dependency : dependency.test(item)))
 }

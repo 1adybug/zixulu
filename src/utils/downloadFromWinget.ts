@@ -89,18 +89,10 @@ export interface Links {
  * @param param0.dir 下载目录
  * @param param0.filter 安装包筛选函数
  */
-export async function downloadFromWinget({
-    name,
-    id,
-    dir,
-    filter,
-}: WingetDownloadInfo) {
+export async function downloadFromWinget({ name, id, dir, filter }: WingetDownloadInfo) {
     const firstLetter = id[0].toLowerCase()
     const path = id.replace(/\./g, "/")
-    const response = await fetch(
-        `https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${firstLetter}/${path}`,
-        { agent },
-    )
+    const response = await fetch(`https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/${firstLetter}/${path}`, { agent })
 
     const data: GithubContent[] = (await response.json()) as any
 
@@ -146,19 +138,14 @@ export async function downloadFromWinget({
         result.push({
             filename,
             version: pkg.PackageVersion,
-            ext: new URL(InstallerUrl).pathname.endsWith(".exe")
-                ? "exe"
-                : "msi",
+            ext: new URL(InstallerUrl).pathname.endsWith(".exe") ? "exe" : "msi",
             architecture: Architecture,
         })
     }
 
     for (const { version, filename, architecture, ext } of result) {
         await sleep(100)
-        await rename(
-            join(dir, filename),
-            join(dir, `${name}-${version}-${architecture}.${ext}`),
-        )
+        await rename(join(dir, filename), join(dir, `${name}-${version}-${architecture}.${ext}`))
     }
 }
 
@@ -173,9 +160,5 @@ export type WingetDownloadInfo = {
     name: string
     id: string
     dir: string
-    filter: (
-        item: Winget.Installer,
-        index: number,
-        arr: Winget.Installer[],
-    ) => boolean
+    filter: (item: Winget.Installer, index: number, arr: Winget.Installer[]) => boolean
 }

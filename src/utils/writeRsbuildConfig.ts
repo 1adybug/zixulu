@@ -9,11 +9,7 @@ export interface WriteRsbuildConfigParams {
     mountId: string
 }
 
-export async function writeRsbuildConfig({
-    title,
-    description,
-    mountId,
-}: WriteRsbuildConfigParams) {
+export async function writeRsbuildConfig({ title, description, mountId }: WriteRsbuildConfigParams) {
     const rsbuildConfig = `import { defineConfig } from "@rsbuild/core"
 import { pluginBabel } from "@rsbuild/plugin-babel"
 import { pluginReact } from "@rsbuild/plugin-react"

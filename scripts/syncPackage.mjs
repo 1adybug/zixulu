@@ -5,16 +5,13 @@
  * @param {string} packageName 包名
  */
 function syncPackage(packageName) {
-    return fetch(
-        `https://registry-direct.npmmirror.com/-/package/${packageName}/syncs`,
-        {
-            referrer: "https://npmmirror.com/",
-            referrerPolicy: "strict-origin-when-cross-origin",
-            method: "PUT",
-            mode: "cors",
-            credentials: "omit",
-        },
-    )
+    return fetch(`https://registry-direct.npmmirror.com/-/package/${packageName}/syncs`, {
+        referrer: "https://npmmirror.com/",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        method: "PUT",
+        mode: "cors",
+        credentials: "omit",
+    })
 }
 
 async function main() {

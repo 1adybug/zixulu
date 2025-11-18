@@ -7,10 +7,7 @@ import { readPackageJson } from "./readPackageJson"
  * @returns 版本号，如果未找到则返回 undefined
  * @description 依次检查 dependencies、devDependencies、peerDependencies 和 optionalDependencies
  */
-export async function getPackageVersionInDependcy(
-    packageName: string,
-    dir = ".",
-): Promise<string | undefined> {
+export async function getPackageVersionInDependcy(packageName: string, dir = "."): Promise<string | undefined> {
     const packageJson = await readPackageJson(dir)
     const version =
         packageJson.dependencies?.[packageName] ??

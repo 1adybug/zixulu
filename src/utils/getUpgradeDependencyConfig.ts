@@ -13,19 +13,9 @@ export type UpgradeDependencyConfig = {
 /**
  * 获取升级配置
  */
-export async function getUpgradeDependencyConfig<
-    T extends keyof UpgradeDependencyConfig = keyof UpgradeDependencyConfig,
->(
+export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependencyConfig = keyof UpgradeDependencyConfig>(
     ...keys: T[]
-): Promise<
-    Pick<UpgradeDependencyConfig, T> &
-        Partial<
-            Pick<
-                UpgradeDependencyConfig,
-                Exclude<keyof UpgradeDependencyConfig, T>
-            >
-        >
-> {
+): Promise<Pick<UpgradeDependencyConfig, T> & Partial<Pick<UpgradeDependencyConfig, Exclude<keyof UpgradeDependencyConfig, T>>>> {
     const ks = keys.length === 0 ? ["dir", "types", "level"] : keys
 
     const questions: DistinctQuestion<UpgradeDependencyConfig>[] = []

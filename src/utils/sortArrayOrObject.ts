@@ -19,9 +19,7 @@ export function sortArrayOrObject(data: Record<string, unknown> | unknown[]) {
 
         const _data: Record<string, unknown> = {}
 
-        for (const key of keys) {
-            _data[key] = data[key]
-        }
+        for (const key of keys) _data[key] = data[key]
 
         return _data
     }

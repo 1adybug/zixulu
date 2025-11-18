@@ -37,10 +37,7 @@ export async function downloadNpm(name: string) {
             continue
         }
 
-        await rename(
-            join(folder, "node_modules", item),
-            join(folder, "node_modules", name, "node_modules", item),
-        )
+        await rename(join(folder, "node_modules", item), join(folder, "node_modules", name, "node_modules", item))
     }
 
     await zip({

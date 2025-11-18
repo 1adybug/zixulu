@@ -10,13 +10,9 @@ import { getPackageJsonPath } from "./getPackageJsonPath"
  * @returns package.json
  */
 
-export async function readPackageJson(
-    dir?: string,
-): Promise<Record<string, any>> {
+export async function readPackageJson(dir?: string): Promise<Record<string, any>> {
     try {
-        const result = JSON.parse(
-            await readFile(getPackageJsonPath(dir), "utf-8"),
-        )
+        const result = JSON.parse(await readFile(getPackageJsonPath(dir), "utf-8"))
         return result
     } catch (error) {
         consola.error(error)

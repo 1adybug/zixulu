@@ -28,10 +28,7 @@ export interface VscodeExt {
  * @returns Promise<VscodeExt> 扩展详细信息
  */
 export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
-    const response = await fetch(
-        `https://marketplace.visualstudio.com/items?itemName=${ext}`,
-        { agent },
-    )
+    const response = await fetch(`https://marketplace.visualstudio.com/items?itemName=${ext}`, { agent })
     const html = await response.text()
     const reg = /^(.+?)\.(.+?)$/
     const [, author, name] = ext.match(reg)!
@@ -49,10 +46,7 @@ export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
                 version
                     .split(".")
                     .map(Number)
-                    .every(
-                        (item, index) =>
-                            index >= 2 || item <= codeVersions[index],
-                    )) ?? versions[0]
+                    .every((item, index) => index >= 2 || item <= codeVersions[index])) ?? versions[0]
         version = item.version
     } else {
         const reg2 = /"Version":"(.+?)"/
@@ -81,28 +75,15 @@ export async function downloadVscodeExts(dir: string) {
             .map(ext => getVscodeExtInfo(ext)),
     )
     const setting = await readZixuluSetting()
-    const vscodeDownloadHistory = setting?.vscodeDownloadHistory as
-        | string[]
-        | undefined
+    const vscodeDownloadHistory = setting?.vscodeDownloadHistory as string[] | undefined
     const exts2 = await inquirer.prompt({
         type: "checkbox",
         name: "exts",
         message: "选择需要下载的扩展",
         choices: exts.map(ext => ({ name: ext.name, value: ext.id })),
-        default:
-            vscodeDownloadHistory?.filter(ext =>
-                exts.some(item => item.id === ext)) || exts.map(ext => ext.id),
+        default: vscodeDownloadHistory?.filter(ext => exts.some(item => item.id === ext)) || exts.map(ext => ext.id),
     })
     setting.vscodeDownloadHistory = exts2.exts
     await writeZixuluSetting(setting)
-    await Promise.all(
-        exts
-            .filter(ext => exts2.exts.includes(ext.id))
-            .map(ext =>
-                retry(
-                    () =>
-                        download(ext.url, dir, `${ext.id}-${ext.version}.vsix`),
-                    4,
-                )),
-    )
+    await Promise.all(exts.filter(ext => exts2.exts.includes(ext.id)).map(ext => retry(() => download(ext.url, dir, `${ext.id}-${ext.version}.vsix`), 4)))
 }

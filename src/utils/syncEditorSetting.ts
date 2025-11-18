@@ -24,10 +24,7 @@ export type EditorFileType = "settings" | "snippets"
 
 export type EditorConfigType = EditorFileType | "extensions"
 
-export type EditorFileSourceMap = Record<
-    EditorFileType,
-    Record<SyncEditorSettingSource, string>
->
+export type EditorFileSourceMap = Record<EditorFileType, Record<SyncEditorSettingSource, string>>
 
 const userDir = homedir()
 
@@ -38,14 +35,8 @@ const fileSourceMap: EditorFileSourceMap = {
         Online: "https://luzixu.geskj.com/settings.json",
     },
     snippets: {
-        Code: join(
-            userDir,
-            "AppData/Roaming/Code/User/snippets/global.code-snippets",
-        ),
-        Cursor: join(
-            userDir,
-            "AppData/Roaming/Cursor/User/snippets/global.code-snippets",
-        ),
+        Code: join(userDir, "AppData/Roaming/Code/User/snippets/global.code-snippets"),
+        Cursor: join(userDir, "AppData/Roaming/Cursor/User/snippets/global.code-snippets"),
         Online: "https://luzixu.geskj.com/global.code-snippets",
     },
 }
@@ -87,16 +78,14 @@ export async function syncEditorFile({ source, target }: SyncEditorFileParams) {
                 type: "confirm",
                 name: "backup",
                 message: `是否备份原文件（${target}）`,
-                default:
-                    setting.syncEditor?.fileConfigs?.[target]?.backup ?? true,
+                default: setting.syncEditor?.fileConfigs?.[target]?.backup ?? true,
             })
             setting.syncEditor ??= {}
             setting.syncEditor.fileConfigs ??= {}
             setting.syncEditor.fileConfigs[target] ??= {}
             setting.syncEditor.fileConfigs[target].backup = backup
             await writeZixuluSetting(setting)
-            if (backup)
-                await rename(target, join(dir, `${base}.${Date.now()}.bak`))
+            if (backup) await rename(target, join(dir, `${base}.${Date.now()}.bak`))
         }
     }
 
@@ -132,20 +121,14 @@ export async function syncEditorSetting() {
             name: "targets",
             message: "选择同步目标",
             choices: ["Code", "Cursor", "Online"].filter(v => v !== source),
-            default: (
-                setting.syncEditor?.targets ?? ["Code", "Cursor", "Online"]
-            ).filter(v => v !== source),
+            default: (setting.syncEditor?.targets ?? ["Code", "Cursor", "Online"]).filter(v => v !== source),
         },
         {
             type: "checkbox",
             name: "types",
             message: "选择的配置类型",
             choices: ["settings", "snippets", "extensions"],
-            default: setting.syncEditor?.types ?? [
-                "settings",
-                "snippets",
-                "extensions",
-            ],
+            default: setting.syncEditor?.types ?? ["settings", "snippets", "extensions"],
         },
     ])
 
@@ -161,9 +144,7 @@ export async function syncEditorSetting() {
             type: "input",
             name: "onlinePath",
             message: "请输入 blog 文件夹的路径",
-            default:
-                setting.syncEditor?.onlinePath ??
-                "C:\\Users\\lenovo\\Desktop\\workspace\\blog",
+            default: setting.syncEditor?.onlinePath ?? "C:\\Users\\lenovo\\Desktop\\workspace\\blog",
         })
 
         setting.syncEditor.onlinePath = onlinePath
@@ -178,100 +159,71 @@ export async function syncEditorSetting() {
                 source: fileSourceMap[fileType][source],
                 target:
                     target === "Online"
-                        ? join(
-                              onlinePath,
-                              "static",
-                              fileType === "settings"
-                                  ? "settings.json"
-                                  : "global.code-snippets",
-                          )
+                        ? join(onlinePath, "static", fileType === "settings" ? "settings.json" : "global.code-snippets")
                         : fileSourceMap[fileType][target],
             })))
         .flat()
 
-    for (const config of configs) {
-        await syncEditorFile(config)
-    }
+    for (const config of configs) await syncEditorFile(config)
 
     if (types.includes("extensions")) {
         const vscodeExtensions = await getEditorExtensions({ source: "Code" })
         const cursorExtensions = await getEditorExtensions({ source: "Cursor" })
         const onlineExtensions = await getEditorExtensions({ source: "Online" })
 
-        const sourceExtensions =
-            source === "Code"
-                ? vscodeExtensions
-                : source === "Cursor"
-                  ? cursorExtensions
-                  : onlineExtensions
+        const sourceExtensions = source === "Code" ? vscodeExtensions : source === "Cursor" ? cursorExtensions : onlineExtensions
 
         if (targets.includes("Code")) {
-            const installExtensions =
-                sourceExtensions.difference(vscodeExtensions)
+            const installExtensions = sourceExtensions.difference(vscodeExtensions)
 
-            for (const ext of installExtensions) {
+            for (const ext of installExtensions)
                 try {
                     console.log(`code --install-extension ${ext}`)
                     await execAsync(`code --install-extension ${ext}`)
                 } catch (error) {
                     console.error(`${ext} 安装失败`)
                 }
-            }
 
-            const uninstallExtensions =
-                vscodeExtensions.difference(sourceExtensions)
+            const uninstallExtensions = vscodeExtensions.difference(sourceExtensions)
 
-            for (const ext of uninstallExtensions) {
+            for (const ext of uninstallExtensions)
                 try {
                     console.log(`code --uninstall-extension ${ext}`)
                     await execAsync(`code --uninstall-extension ${ext}`)
                 } catch (error) {
                     console.error(`${ext} 卸载失败`)
                 }
-            }
         }
 
         if (targets.includes("Cursor")) {
-            const installExtensions =
-                sourceExtensions.difference(cursorExtensions)
+            const installExtensions = sourceExtensions.difference(cursorExtensions)
 
-            for (const ext of installExtensions) {
+            for (const ext of installExtensions)
                 try {
                     console.log(`cursor --install-extension ${ext}`)
                     await execAsync(`cursor --install-extension ${ext}`)
                 } catch (error) {
                     console.error(`${ext} 安装失败`)
                 }
-            }
 
-            const uninstallExtensions =
-                cursorExtensions.difference(sourceExtensions)
+            const uninstallExtensions = cursorExtensions.difference(sourceExtensions)
 
-            for (const ext of uninstallExtensions) {
+            for (const ext of uninstallExtensions)
                 try {
                     console.log(`cursor --uninstall-extension ${ext}`)
                     await execAsync(`cursor --uninstall-extension ${ext}`)
                 } catch (error) {
                     console.error(`${ext} 卸载失败`)
                 }
-            }
         }
 
-        if (targets.includes("Online")) {
-            await writeFile(
-                join(onlinePath, "static", "extensions.json"),
-                JSON.stringify(Array.from(sourceExtensions), null, 4),
-            )
-        }
+        if (targets.includes("Online")) await writeFile(join(onlinePath, "static", "extensions.json"), JSON.stringify(Array.from(sourceExtensions), null, 4))
     }
 
     if (targets.includes("Online")) {
         if (await hasChangeNoCommit(onlinePath)) {
             await addGitCommit({
-                message: getCommitMessage(
-                    CommitType.feature,
-                    "sync editor setting",
-                ),
+                message: getCommitMessage(CommitType.feature, "sync editor setting"),
                 cwd: onlinePath,
             })
             await execAsync(`git push`, {

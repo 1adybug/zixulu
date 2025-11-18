@@ -30,8 +30,5 @@ export async function setRegistry() {
         return
     }
 
-    await spawnAsync(
-        `${manager} config set registry ${Registry[registry as keyof typeof Registry]}`,
-        { shell: true, stdio: "inherit" },
-    )
+    await spawnAsync(`${manager} config set registry ${Registry[registry as keyof typeof Registry]}`, { shell: true, stdio: "inherit" })
 }

@@ -85,10 +85,7 @@ export interface Author {
  * @returns Release 信息
  * @description 通过 GitHub API 获取仓库的最新发布信息
  */
-export async function getLatestRelease(
-    owner: string,
-    repo: string,
-): Promise<Release> {
+export async function getLatestRelease(owner: string, repo: string): Promise<Release> {
     const url = `https://api.github.com/repos/${owner}/${repo}/releases/latest`
     const response = await fetch(url, { agent })
     const data = await response.json()

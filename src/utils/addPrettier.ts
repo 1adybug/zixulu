@@ -163,35 +163,23 @@ export async function addPrettier() {
     consola.start("开始添加 prettier 配置")
     const packageJson = await readPackageJson()
     const isTailwind =
-        Object.keys(packageJson.dependencies ?? {}).includes("tailwindcss") ||
-        Object.keys(packageJson.devDependencies ?? {}).includes("tailwindcss")
+        Object.keys(packageJson.dependencies ?? {}).includes("tailwindcss") || Object.keys(packageJson.devDependencies ?? {}).includes("tailwindcss")
     const isReact = await hasDependency("react")
-    await writeFile(
-        "prettier-plugin-sort-imports.mjs",
-        getPluginConfig({ isTailwind, isReact }),
-        "utf-8",
-    )
+    await writeFile("prettier-plugin-sort-imports.mjs", getPluginConfig({ isTailwind, isReact }), "utf-8")
     await writeFile("prettier.config.mjs", prettierConfig, "utf-8")
     await writeFile(".prettierignore", ignoreConfig, "utf-8")
 
     const config2: AddDependenciesConfig = {
-        package: [
-            "prettier",
-            "@1adybug/prettier-plugin-sort-imports",
-            "prettier-plugin-block-padding",
-            "json5",
-        ],
+        package: ["prettier", "@1adybug/prettier-plugin-sort-imports", "prettier-plugin-block-padding", "json5"],
         type: "devDependencies",
     }
 
-    if (isTailwind)
-        (config2.package as string[]).push("prettier-plugin-tailwindcss")
+    if (isTailwind) (config2.package as string[]).push("prettier-plugin-tailwindcss")
     await addDependency(config2)
     const packageJson2 = await readPackageJson()
     packageJson2.scripts ??= {}
     packageJson2.scripts.format = "prettier --write ."
-    packageJson2.scripts.fg =
-        'npm run format && git add . && git commit -m "✨feature: format"'
+    packageJson2.scripts.fg = 'npm run format && git add . && git commit -m "✨feature: format"'
     await writePackageJson({ data: packageJson2 })
     await installDependceny()
     consola.success("添加 prettier 配置成功")

@@ -6,9 +6,7 @@ export interface GetEditorExtensionsParams {
     source: SyncEditorSettingSource
 }
 
-export async function getEditorExtensions({
-    source,
-}: GetEditorExtensionsParams) {
+export async function getEditorExtensions({ source }: GetEditorExtensionsParams) {
     let data: string[] = []
 
     if (source !== "Online") {
@@ -23,12 +21,7 @@ export async function getEditorExtensions({
         data = await response.json()
     }
 
-    data = data.filter(
-        item =>
-            !item.startsWith("anysphere.") &&
-            item !== "github.copilot" &&
-            item !== "github.copilot-chat",
-    )
+    data = data.filter(item => !item.startsWith("anysphere.") && item !== "github.copilot" && item !== "github.copilot-chat")
 
     return new Set(data)
 }

@@ -21,8 +21,7 @@ export const ApplicationType = {
     FullStack: "FullStack",
 } as const
 
-export type ApplicationType =
-    (typeof ApplicationType)[keyof typeof ApplicationType]
+export type ApplicationType = (typeof ApplicationType)[keyof typeof ApplicationType]
 
 export async function addBuildDocker() {
     await backupFirst()
@@ -46,24 +45,15 @@ export async function addBuildDocker() {
 
     const json = await readPackageJson()
 
-    const isFullStack = await hasDependency(
-        /^(next|@remix-run\/|@react-router\/|@tanstack\/react-start$)/,
-    )
+    const isFullStack = await hasDependency(/^(next|@remix-run\/|@react-router\/|@tanstack\/react-start$)/)
 
     const isBackend = await hasDependency(/^(express$|hono$|@nestjs\/|koa$)/)
 
-    const defaultType = isFullStack
-        ? ApplicationType.FullStack
-        : isBackend
-          ? ApplicationType.Backend
-          : ApplicationType.Frontend
+    const defaultType = isFullStack ? ApplicationType.FullStack : isBackend ? ApplicationType.Backend : ApplicationType.Frontend
 
     const defaultManager = await getPackageManager()
 
-    const defaultBuild = json.scripts?.build
-        ? "build"
-        : (Object.keys(json.scripts ?? {}).find(item =>
-              /\bbuild\b/i.test(item)) ?? "build")
+    const defaultBuild = json.scripts?.build ? "build" : (Object.keys(json.scripts ?? {}).find(item => /\bbuild\b/i.test(item)) ?? "build")
 
     const { type, name, local, versions } = await inquirer.prompt<Answer>([
         {
@@ -112,15 +102,13 @@ export async function addBuildDocker() {
     let versionSource: string | undefined
 
     if (versions.includes("custom")) {
-        const { versionSource: versionSource2 } = await inquirer.prompt<Answer>(
-            {
-                type: "list",
-                name: "versionSource",
-                message: "Please select the custom image version source",
-                choices: ["Day.js version", "package.json version", "input"],
-                default: "Day.js version",
-            },
-        )
+        const { versionSource: versionSource2 } = await inquirer.prompt<Answer>({
+            type: "list",
+            name: "versionSource",
+            message: "Please select the custom image version source",
+            choices: ["Day.js version", "package.json version", "input"],
+            default: "Day.js version",
+        })
 
         versionSource = versionSource2
     }
@@ -186,13 +174,9 @@ ${insertWhen(versions.includes("custom"), `import consola from "consola"`, { bre
             versionSource === "Day.js version",
             `import dayjs from "dayjs"`,
             { breakBefore: true },
-        )}${insertWhen(
-            versionSource === "package.json version",
-            `import { readFile } from "fs/promises"`,
-            {
-                breakBefore: true,
-            },
-        )}${insertWhen(local, `import { join } from "path"`, { breakBefore: true })}
+        )}${insertWhen(versionSource === "package.json version", `import { readFile } from "fs/promises"`, {
+            breakBefore: true,
+        })}${insertWhen(local, `import { join } from "path"`, { breakBefore: true })}
 import { spawnAsync } from "soda-nodejs"
 ${insertWhen(
     versionSource === "package.json version",
@@ -310,8 +294,7 @@ http {
             const { useGitignore } = await inquirer.prompt<Answer>({
                 type: "confirm",
                 name: "useGitignore",
-                message:
-                    "Do you want to use the .gitignore as the dockerignore file?",
+                message: "Do you want to use the .gitignore as the dockerignore file?",
                 default: true,
             })
 
@@ -327,15 +310,7 @@ http {
                 name: "rules",
                 message: "Please select the rules",
                 choices: dir,
-                default: dir.filter(
-                    item =>
-                        ![
-                            "node_modules",
-                            "dist",
-                            "build",
-                            docker?.split("/").at(0),
-                        ].includes(item),
-                ),
+                default: dir.filter(item => !["node_modules", "dist", "build", docker?.split("/").at(0)].includes(item)),
             })
 
             await writeFile(".dockerignore", rules.join("\n"))

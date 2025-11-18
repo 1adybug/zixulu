@@ -35,7 +35,5 @@ export async function killProcessByPort(port: string | number) {
         default: choices.map(choice => choice.value),
     })
 
-    for (const pid of chosenPids) {
-        exec(`taskkill /f /pid ${pid}`)
-    }
+    for (const pid of chosenPids) exec(`taskkill /f /pid ${pid}`)
 }

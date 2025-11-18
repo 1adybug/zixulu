@@ -24,31 +24,28 @@ export async function initProject() {
     await createBrowserlistrc()
     await addEslint()
     const packageJson = await readPackageJson()
-    const allDependcies = Object.keys(packageJson.dependencies || {}).concat(
-        Object.keys(packageJson.devDependencies || {}),
-    )
+    const allDependcies = Object.keys(packageJson.dependencies || {}).concat(Object.keys(packageJson.devDependencies || {}))
 
-    if (
-        !allDependcies.includes("react") ||
-        !allDependcies.includes("react-dom")
-    ) {
+    if (!allDependcies.includes("react") || !allDependcies.includes("react-dom")) {
         consola.error("仅支持 React 项目")
         return
     }
 
     let type: ProjectType
 
-    if (allDependcies.some(item => item === "next")) {
-        type = ProjectType.next
-    } else if (allDependcies.some(item => item === "@remix-run/react")) {
-        type = ProjectType.remix
-    } else if (allDependcies.some(item => item === "vite")) {
-        type = ProjectType.vite
-    } else if (allDependcies.some(item => item === "@rsbuild/core")) {
-        type = ProjectType.rsbuild
-    } else {
-        consola.error("仅支持 Next、Remix、Vite、Rsbuild 项目")
-        return
+    if (allDependcies.some(item => item === "next")) type = ProjectType.next
+    else {
+        if (allDependcies.some(item => item === "@remix-run/react")) type = ProjectType.remix
+        else {
+            if (allDependcies.some(item => item === "vite")) type = ProjectType.vite
+            else {
+                if (allDependcies.some(item => item === "@rsbuild/core")) type = ProjectType.rsbuild
+                else {
+                    consola.error("仅支持 Next、Remix、Vite、Rsbuild 项目")
+                    return
+                }
+            }
+        }
     }
 
     await addGitignore()
@@ -71,17 +68,7 @@ export async function initProject() {
               "tailwind",
               "zod",
           ]
-        : [
-              "antd",
-              "@heroui/react",
-              "@tanstack/react-form",
-              "@tanstack/react-query",
-              "dayjs",
-              "deepsea-components",
-              "deepsea-tools",
-              "tailwind",
-              "react-router",
-          ]
+        : ["antd", "@heroui/react", "@tanstack/react-form", "@tanstack/react-query", "dayjs", "deepsea-components", "deepsea-tools", "tailwind", "react-router"]
 
     const { modules } = await inquirer.prompt({
         type: "checkbox",
@@ -98,12 +85,9 @@ export async function initProject() {
     if (modules.includes("tailwind")) await addTailwind()
     else await addPrettier()
 
-    if (modules.includes("@heroui/react"))
-        added.push("@heroui/react", "soda-heroui")
-    if (modules.includes("@tanstack/react-query"))
-        added.push("@tanstack/react-query")
-    if (modules.includes("@tanstack/react-form"))
-        added.push("@tanstack/react-form", "soda-tanstack-form")
+    if (modules.includes("@heroui/react")) added.push("@heroui/react", "soda-heroui")
+    if (modules.includes("@tanstack/react-query")) added.push("@tanstack/react-query")
+    if (modules.includes("@tanstack/react-form")) added.push("@tanstack/react-form", "soda-tanstack-form")
     if (modules.includes("dayjs")) added.push("dayjs")
     if (modules.includes("deepsea-components")) added.push("deepsea-components")
     if (modules.includes("deepsea-tools")) added.push("deepsea-tools")

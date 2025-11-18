@@ -28,10 +28,7 @@ import { writeZixuluSetting } from "./writeZixuluSetting"
  * 软件下载函数映射表
  * 键为软件名称，值为对应的下载函数
  */
-export const SoftwareDownloadMap: Record<
-    Software,
-    (dir: string) => Promise<void>
-> = {
+export const SoftwareDownloadMap: Record<Software, (dir: string) => Promise<void>> = {
     [Software.Chrome]: downloadChrome,
     [Software.NodeJS]: downloadNodeJS,
     [Software["7zip"]]: download7Zip,
@@ -59,18 +56,13 @@ export async function downloadLatestSoftware() {
     consola.start("开始下载软件")
     const dir = `softwares-${dayjs().format("YYYYMMDDHHmmss")}`
     const setting = await readZixuluSetting()
-    const softwareDownloadHistory = setting?.softwareDownloadHistory as
-        | Software[]
-        | undefined
+    const softwareDownloadHistory = setting?.softwareDownloadHistory as Software[] | undefined
     const { softwares } = await inquirer.prompt({
         type: "checkbox",
         name: "softwares",
         message: "请选择要下载的软件",
         choices: Object.values(Software),
-        default:
-            softwareDownloadHistory?.filter(software =>
-                Object.values(Software).includes(software)) ??
-            Object.values(Software),
+        default: softwareDownloadHistory?.filter(software => Object.values(Software).includes(software)) ?? Object.values(Software),
     })
     setting.softwareDownloadHistory = softwares
     await writeZixuluSetting(setting)

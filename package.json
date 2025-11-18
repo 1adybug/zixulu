@@ -52,21 +52,22 @@
         "yaml": "^2.8.1"
     },
     "devDependencies": {
+        "@1adybug/prettier-plugin-remove-braces": "^0.0.2",
         "@1adybug/prettier-plugin-sort-imports": "^0.0.16",
         "@eslint/js": "^9.39.1",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-        "@rslib/core": "^0.17.2",
+        "@rslib/core": "^0.18.0",
         "@types/jsdom": "^27.0.0",
         "@types/md5": "^2.3.6",
         "@types/node": "^24.10.1",
         "@types/semver": "^7.7.1",
-        "glob": "^11.0.3",
+        "glob": "^11.1.0",
         "globals": "^16.5.0",
         "prettier": "^3.6.2",
         "prettier-plugin-block-padding": "^0.0.9",
         "prettier-plugin-organize-imports": "^4.2.0",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.46.4"
+        "typescript-eslint": "^8.47.0"
     },
     "resolutions": {
         "string-width": "^4",

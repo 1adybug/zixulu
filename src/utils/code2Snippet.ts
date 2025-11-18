@@ -29,18 +29,10 @@ export async function code2Snippet(path: string) {
     const lines = code.split("\n")
     const reg = /^ *$/
     const reg2 = /^ */
-    const trim = Math.min(
-        ...lines.map(line =>
-            reg.test(line) ? Infinity : reg2.exec(line)![0].length),
-    )
+    const trim = Math.min(...lines.map(line => (reg.test(line) ? Infinity : reg2.exec(line)![0].length)))
 
     function line2Snippet(line: string) {
-        line = line
-            .slice(trim)
-            .trimEnd()
-            .replace(/\\/g, `\\\\`)
-            .replace(/"/g, `\\"`)
-            .replace(/\$/g, `\\\\$`)
+        line = line.slice(trim).trimEnd().replace(/\\/g, `\\\\`).replace(/"/g, `\\"`).replace(/\$/g, `\\\\$`)
 
         placeholders.forEach((placeholder, index) => {
             const reg = new RegExp(placeholder, "g")

@@ -39,19 +39,12 @@ export async function getPidInfoFromPort(port: number) {
         for (let i = 0; ; ) {
             if (result.some(({ info }) => info[i] === undefined)) break
 
-            if (
-                result.some(
-                    ({ info }) => info[i] !== " " || info[i + 1] !== " ",
-                )
-            ) {
+            if (result.some(({ info }) => info[i] !== " " || info[i + 1] !== " ")) {
                 i++
                 continue
             }
 
-            result.forEach(
-                item =>
-                    (item.info = `${item.info.slice(0, i)}${item.info.slice(i + 1)}`),
-            )
+            result.forEach(item => (item.info = `${item.info.slice(0, i)}${item.info.slice(i + 1)}`))
         }
 
         return result

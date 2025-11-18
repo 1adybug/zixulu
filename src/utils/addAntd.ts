@@ -13,22 +13,15 @@ import { readPackageJson } from "./readPackageJson"
 export async function addAntd() {
     consola.start("开始添加 antd 配置")
     await addDependency({
-        package: [
-            "@ant-design/icons",
-            "@ant-design/v5-patch-for-react-19",
-            "antd",
-        ],
+        package: ["@ant-design/icons", "@ant-design/v5-patch-for-react-19", "antd"],
     })
     const dir = await readdir(".")
     const componentDir = dir.includes("src") ? "src/components" : "components"
     await mkdir(componentDir, { recursive: true })
     const packageJson = await readPackageJson()
 
-    if (packageJson.dependencies.next) {
-        await addDependency({ package: "@ant-design/nextjs-registry" })
-    } else {
-        await addDependency({ package: "@ant-design/cssinjs" })
-    }
+    if (packageJson.dependencies.next) await addDependency({ package: "@ant-design/nextjs-registry" })
+    else await addDependency({ package: "@ant-design/cssinjs" })
 
     if (packageJson.dependencies.next) {
         await addDependency({ package: "@ant-design/nextjs-registry" })
@@ -59,7 +52,7 @@ const Registry: FC<RegistryProps> = ({ children }) => {
 export default Registry
 `,
         )
-    } else {
+    } else
         await writeFile(
             join(componentDir, "Registry.tsx"),
             `import { StyleProvider } from "@ant-design/cssinjs"
@@ -85,7 +78,6 @@ const Registry: FC<RegistryProps> = ({ children }) => {
 export default Registry
 `,
         )
-    }
 
     consola.success("添加 antd 配置成功")
 }

@@ -10,13 +10,7 @@ import { addTailwindToCss } from "./addTailwindToCss"
 export async function addTailwind() {
     consola.start("开始添加 tailwind 配置")
     await addDependency({
-        package: [
-            { packageName: "tailwindcss", versionRange: "^3" },
-            "autoprefixer",
-            "postcss",
-            "prettier",
-            "prettier-plugin-tailwindcss",
-        ],
+        package: [{ packageName: "tailwindcss", versionRange: "^3" }, "autoprefixer", "postcss", "prettier", "prettier-plugin-tailwindcss"],
         type: "devDependencies",
     })
     await addTailwindConfig()

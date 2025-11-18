@@ -21,10 +21,8 @@ export async function upgradeRsbuild() {
         const version = await getPackageLatestVersion(key)
         const [, b, c] = Array.from(value.match(/^(\D*)(\d.*)$/)!)
         if (c === version) continue
-        if (packageJson.dependencies?.[key])
-            packageJson.dependencies[key] = `${b}${version}`
-        if (packageJson.devDependencies?.[key])
-            packageJson.devDependencies[key] = `${b}${version}`
+        if (packageJson.dependencies?.[key]) packageJson.dependencies[key] = `${b}${version}`
+        if (packageJson.devDependencies?.[key]) packageJson.devDependencies[key] = `${b}${version}`
         upgradeLogs.push(`${key} ${c} => ${version}`)
     }
 
