@@ -49,6 +49,8 @@ import { removeFileOrFolderFromGit } from "@/utils/removeFileOrFolderFromGit"
 import { removeLock } from "@/utils/removeLock"
 import { replaceAssets } from "@/utils/replaceAssets"
 import { CommitAuthor, replaceCommitAuthor } from "@/utils/replaceCommitAuthor"
+import { replaceCommitMessage } from "@/utils/replaceCommitMessage"
+import { replaceTag } from "@/utils/replaceTag"
 import { rollup } from "@/utils/rollup"
 import { rsbuild } from "@/utils/rsbuild"
 import { rslib } from "@/utils/rslib"
@@ -411,5 +413,39 @@ program.command("create-prisma-debugger").alias("cpd").description("创建 prism
 program.command("verdaccio").description("同步 verdaccio 配置").action(verdaccio)
 
 program.command("add-cursor-rule").alias("acr").description("添加 cursor 规则").action(actionWithBackup(addCursorRule))
+
+program
+    .command("replace-tag")
+    .alias("rt")
+    .description("替换所有 git tag")
+    .argument("regexp", "正则表达式字符串")
+    .argument("[replace]", "替换字符串，默认为空字符串")
+    .option("-f, --flags <flags>", "正则表达式标志，如 i、g、m 等")
+    .option("-p, --push", "是否推送到远程仓库")
+    .option("-r, --remote <remote>", "远程仓库名称，默认为 origin")
+    .action(async (regexp, replace, options) => {
+        await replaceTag({ reg: regexp, replace: replace ?? "", flags: options.flags, push: options.push, remote: options.remote })
+    })
+
+program
+    .command("replace-commit-message")
+    .alias("rcm")
+    .description("替换所有提交消息（⚠️ 会重写 Git 历史）")
+    .argument("regexp", "正则表达式字符串")
+    .argument("[replace]", "替换字符串，默认为空字符串")
+    .option("-f, --flags <flags>", "正则表达式标志，如 g、i 等（注意：sed 语法）")
+    .option("-p, --push", "是否强制推送到远程仓库")
+    .option("-r, --remote <remote>", "远程仓库名称，默认为 origin")
+    .option("-b, --branch <branch>", "分支名称，默认为当前分支")
+    .action(async (regexp, replace, options) => {
+        await replaceCommitMessage({
+            reg: regexp,
+            replace: replace ?? "",
+            flags: options.flags,
+            push: options.push,
+            remote: options.remote,
+            branch: options.branch,
+        })
+    })
 
 program.parse()
