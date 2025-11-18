@@ -41,7 +41,7 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
     const processedReg = preprocessRegex(reg)
 
     // 显示正则表达式
-    consola.box(`正则表达式: /${processedReg}/${flags ?? ""}`)
+    consola.info(`正则表达式: /${processedReg}/${flags ?? ""}`)
 
     // 询问用户是否继续
     const cont = await shouldContinue("是否继续？")

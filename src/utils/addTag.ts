@@ -45,7 +45,8 @@ export async function addTag({ reg, flags, replacement, push, remote = "origin",
     const processedReg = preprocessRegex(reg)
 
     // 显示正则表达式和替换字符串
-    consola.box(`正则表达式: /${processedReg}/${flags ?? ""}\n替换字符串: ${replacement}`)
+    consola.info(`正则表达式: /${processedReg}/${flags ?? ""}`)
+    consola.info(`替换字符串: ${replacement}`)
 
     // 询问用户是否继续
     const cont = await shouldContinue("是否继续？")

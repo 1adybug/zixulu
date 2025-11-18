@@ -56,7 +56,8 @@ export async function replaceCommitMessage({ reg, replace, flags, push, remote =
     consola.info(`目标分支: ${currentBranch}`)
 
     // 显示正则表达式和替换字符串
-    consola.box(`正则表达式: /${processedReg}/${flags ?? ""}\n替换字符串: ${replace}`)
+    consola.info(`正则表达式: /${processedReg}/${flags ?? ""}`)
+    consola.info(`替换字符串: ${replace}`)
 
     // 询问用户是否继续
     const cont = await shouldContinue("⚠️ 是否继续？此操作将重写 Git 历史")
