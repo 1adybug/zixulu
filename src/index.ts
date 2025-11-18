@@ -50,6 +50,7 @@ import { removeLock } from "@/utils/removeLock"
 import { replaceAssets } from "@/utils/replaceAssets"
 import { CommitAuthor, replaceCommitAuthor } from "@/utils/replaceCommitAuthor"
 import { replaceCommitMessage } from "@/utils/replaceCommitMessage"
+import { removeTag } from "@/utils/removeTag"
 import { replaceTag } from "@/utils/replaceTag"
 import { rollup } from "@/utils/rollup"
 import { rsbuild } from "@/utils/rsbuild"
@@ -425,6 +426,18 @@ program
     .option("-r, --remote <remote>", "远程仓库名称，默认为 origin")
     .action(async (regexp, replace, options) => {
         await replaceTag({ reg: regexp, replace: replace ?? "", flags: options.flags, push: options.push, remote: options.remote })
+    })
+
+program
+    .command("remove-tag")
+    .alias("rmt")
+    .description("删除匹配的 git tag")
+    .argument("regexp", "正则表达式字符串")
+    .option("-f, --flags <flags>", "正则表达式标志，如 i、g、m 等")
+    .option("-p, --push", "是否同时删除远程仓库的 tag")
+    .option("-r, --remote <remote>", "远程仓库名称，默认为 origin")
+    .action(async (regexp, options) => {
+        await removeTag({ reg: regexp, flags: options.flags, push: options.push, remote: options.remote })
     })
 
 program
