@@ -1,6 +1,8 @@
 import { simpleGit } from "simple-git"
 import { consola } from "consola"
 
+import { preprocessRegex } from "./preprocessRegex"
+
 export interface RemoveTagParams {
     /** 正则表达式字符串 */
     reg: string
@@ -47,10 +49,13 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
 
     const tagsToRemove = []
 
+    // 预处理正则表达式，替换占位符
+    const processedReg = preprocessRegex(reg)
+
     // 遍历所有 tag，查找匹配的 tag
     for (const tag of allTags) {
         // 每次循环创建新的正则表达式，避免 g 标志可能带来的状态问题
-        const regexp = new RegExp(reg, flags)
+        const regexp = new RegExp(processedReg, flags)
 
         // 如果 tag 匹配正则表达式，加入待删除列表
         if (regexp.test(tag)) {

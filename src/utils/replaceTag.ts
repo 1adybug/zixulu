@@ -1,6 +1,8 @@
 import { simpleGit } from "simple-git"
 import { consola } from "consola"
 
+import { preprocessRegex } from "./preprocessRegex"
+
 export interface ReplaceTagParams {
     /** 正则表达式字符串 */
     reg: string
@@ -49,10 +51,13 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
 
     const operations = []
 
+    // 预处理正则表达式，替换占位符
+    const processedReg = preprocessRegex(reg)
+
     // 遍历所有 tag，准备操作
     for (const tag of allTags) {
         // 每次循环创建新的正则表达式，避免 g 标志可能带来的状态问题
-        const regexp = new RegExp(reg, flags)
+        const regexp = new RegExp(processedReg, flags)
         const newTag = tag.replace(regexp, replace)
 
         // 如果替换后的 tag 名称没有变化，跳过

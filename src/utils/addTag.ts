@@ -1,6 +1,8 @@
 import { simpleGit } from "simple-git"
 import { consola } from "consola"
 
+import { preprocessRegex } from "./preprocessRegex"
+
 export interface AddTagParams {
     /** 用于匹配 commit message 的正则表达式字符串 */
     reg: string
@@ -55,15 +57,18 @@ export async function addTag({ reg, flags, replacement, push, remote = "origin",
 
     const tagsToAdd = []
 
+    // 预处理正则表达式，替换占位符
+    const processedReg = preprocessRegex(reg)
+
     // 遍历所有 commit，查找匹配的 commit message
     for (const commit of commits) {
         // 每次循环创建新的正则表达式，避免 g 标志可能带来的状态问题
-        const regexp = new RegExp(reg, flags)
+        const regexp = new RegExp(processedReg, flags)
 
         // 如果 commit message 匹配正则表达式
         if (regexp.test(commit.message)) {
             // 使用正则替换生成 tag 名称
-            const tagName = commit.message.replace(new RegExp(reg, flags), replacement)
+            const tagName = commit.message.replace(new RegExp(processedReg, flags), replacement)
 
             // 检查 tag 名称是否有效
             if (tagName && tagName.trim()) {

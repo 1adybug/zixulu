@@ -5,6 +5,8 @@ import { writeFile, unlink } from "fs/promises"
 import { join } from "path"
 import { tmpdir } from "os"
 
+import { preprocessRegex } from "./preprocessRegex"
+
 export interface ReplaceCommitMessageParams {
     /** 正则表达式字符串 */
     reg: string
@@ -55,12 +57,15 @@ export async function replaceCommitMessage({ reg, replace, flags, push, remote =
 
     consola.info(`找到 ${commitCount} 个提交`)
 
+    // 预处理正则表达式，替换占位符
+    const processedReg = preprocessRegex(reg)
+
     // 创建临时脚本文件，避免转义问题
     const tempScriptPath = join(tmpdir(), `git-msg-filter-${Date.now()}.js`)
 
     // 生成 Node.js 脚本内容
     const scriptContent = `
-const reg = ${JSON.stringify(reg)}
+const reg = ${JSON.stringify(processedReg)}
 const replace = ${JSON.stringify(replace)}
 const flags = ${JSON.stringify(flags ?? "")}
 
