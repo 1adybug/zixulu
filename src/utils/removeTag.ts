@@ -26,6 +26,14 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
         return
     }
 
+    // 检查是否有未提交的更改
+    const status = await git.status()
+
+    if (status.files.length > 0) {
+        consola.error("当前 Git 仓库存在未提交的文件，请先提交或暂存这些文件")
+        return
+    }
+
     // 获取所有 tag
     const tags = await git.tags()
     const allTags = tags.all

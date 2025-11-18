@@ -20,6 +20,7 @@ import { addPrisma } from "@/utils/addPrisma"
 import { addStartScript } from "@/utils/addStartScript"
 import { addSyncPackageScript } from "@/utils/addSyncPackageScript"
 import { addTailwind } from "@/utils/addTailwind"
+import { addTag } from "@/utils/addTag"
 import { addZipDist } from "@/utils/addZipDist"
 import { arrowToFunction } from "@/utils/arrowToFunction"
 import { betaVersion } from "@/utils/betaVersion"
@@ -438,6 +439,20 @@ program
     .option("-r, --remote <remote>", "远程仓库名称，默认为 origin")
     .action(async (regexp, options) => {
         await removeTag({ reg: regexp, flags: options.flags, push: options.push, remote: options.remote })
+    })
+
+program
+    .command("add-tag")
+    .alias("adt")
+    .description("为匹配的 commit 添加 git tag")
+    .argument("regexp", "用于匹配 commit message 的正则表达式字符串")
+    .argument("replacement", "用于生成 tag 名称的替换字符串")
+    .option("-f, --flags <flags>", "正则表达式标志，如 i、g、m 等")
+    .option("-p, --push", "是否推送到远程仓库")
+    .option("-r, --remote <remote>", "远程仓库名称，默认为 origin")
+    .option("--force", "是否覆盖已存在的 tag")
+    .action(async (regexp, replacement, options) => {
+        await addTag({ reg: regexp, replacement, flags: options.flags, push: options.push, remote: options.remote, force: options.force })
     })
 
 program
