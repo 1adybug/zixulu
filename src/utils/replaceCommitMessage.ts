@@ -102,14 +102,6 @@ process.stdin.on("end", () => {
         // 删除临时脚本文件
         await unlink(tempScriptPath)
 
-        // 清理 filter-branch 创建的备份引用
-        try {
-            await git.raw(["update-ref", "-d", `refs/original/refs/heads/${currentBranch}`])
-            consola.info("已清理备份引用")
-        } catch {
-            // 忽略清理失败的错误
-        }
-
         consola.success("提交消息替换完成")
 
         // 如果需要推送到远程仓库
