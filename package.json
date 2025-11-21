@@ -13,7 +13,8 @@
         "format": "prettier --write .",
         "fg": "npm run format && git add . && git commit -m \"✨feature: format\"",
         "lint": "eslint . --fix",
-        "ucr": "npx zixulu acr"
+        "ucr": "npx zixulu acr",
+        "prepare": "husky"
     },
     "keywords": [],
     "authors": [],
@@ -52,7 +53,7 @@
         "yaml": "^2.8.1"
     },
     "devDependencies": {
-        "@1adybug/prettier-plugin-remove-braces": "^0.0.2",
+        "@1adybug/prettier-plugin-remove-braces": "^0.0.3",
         "@1adybug/prettier-plugin-sort-imports": "^0.0.16",
         "@eslint/js": "^9.39.1",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
@@ -63,6 +64,8 @@
         "@types/semver": "^7.7.1",
         "glob": "^11.1.0",
         "globals": "^16.5.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.2.7",
         "prettier": "^3.6.2",
         "prettier-plugin-block-padding": "^0.0.9",
         "prettier-plugin-organize-imports": "^4.2.0",
@@ -75,5 +78,8 @@
     },
     "volta": {
         "node": "22.21.1"
+    },
+    "lint-staged": {
+        "**/*": "prettier --write --ignore-unknown"
     }
 }

@@ -1,5 +1,5 @@
-import { simpleGit } from "simple-git"
 import { consola } from "consola"
+import { simpleGit } from "simple-git"
 
 import { preprocessRegex } from "./preprocessRegex"
 import { shouldContinue } from "./shouldContinue"
@@ -83,7 +83,7 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
     consola.info(`将要删除 ${tagsToRemove.length} 个 tag`)
 
     // 执行删除操作
-    for (const tag of tagsToRemove) {
+    for (const tag of tagsToRemove)
         try {
             // 删除本地 tag
             await git.tag(["-d", tag])
@@ -103,8 +103,6 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
         } catch (error) {
             consola.error(`删除 ${tag} 失败:`, error)
         }
-    }
 
     consola.success("所有匹配的 tag 删除完成")
 }
-

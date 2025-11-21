@@ -1,11 +1,14 @@
 import { writeFile } from "fs/promises"
 
 import consola from "consola"
+import simpleGit from "simple-git"
+import { spawnAsync } from "soda-nodejs"
 
 import { AddDependenciesConfig, addDependency } from "./addDependency"
 import { hasDependency } from "./hasDependency"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
+import { shouldContinue } from "./shouldContinue"
 import { writePackageJson } from "./writePackageJson"
 
 const ignoreConfig = `node_modules
@@ -30,6 +33,7 @@ const config = {
     endOfLine: "lf",
     printWidth: 160,
     plugins: ["./prettier-plugin-sort-imports.mjs"],
+    controlStatementBraces: "add",
 }
 
 export default config
@@ -51,6 +55,7 @@ function getPluginConfig({ isTailwind, isReact }: GetPluginConfigParams) {
 import { readFileSync } from "fs"
 import { builtinModules } from "module"
 
+import removeBraces from "@1adybug/prettier-plugin-remove-braces"
 import { createPlugin } from "@1adybug/prettier-plugin-sort-imports"
 import JSON5 from "json5"
 import blockPadding from "prettier-plugin-block-padding"${
@@ -148,7 +153,7 @@ ${
     separator: "",
     sortSideEffect: true,
     removeUnusedImports: true,
-    otherPlugins: [blockPadding${isTailwind ? ", tailwindcss" : ""}],
+    otherPlugins: [blockPadding${isTailwind ? ", tailwindcss" : ""}, removeBraces],
 })
 `
 
@@ -182,5 +187,62 @@ export async function addPrettier() {
     packageJson2.scripts.fg = 'npm run format && git add . && git commit -m "✨feature: format"'
     await writePackageJson({ data: packageJson2 })
     await installDependceny()
+
+    // 检查是否是 git 仓库
+    const git = simpleGit()
+
+    const isRepo = await git.checkIsRepo()
+
+    if (isRepo) {
+        consola.info("检测到 git 仓库")
+        const shouldSetupHooks = await shouldContinue("是否配置 git hooks，在每次 commit 前自动格式化修改的文件？")
+
+        if (!shouldSetupHooks) {
+            consola.info("跳过 git hooks 配置")
+            consola.success("添加 prettier 配置成功")
+            return
+        }
+
+        consola.start("开始配置 pre-commit hooks")
+
+        // 添加 husky 和 lint-staged 依赖
+        const huskyConfig: AddDependenciesConfig = {
+            package: ["husky", "lint-staged"],
+            type: "devDependencies",
+        }
+
+        await addDependency(huskyConfig)
+        await installDependceny()
+
+        // 初始化 husky
+        try {
+            consola.start("初始化 husky")
+            await spawnAsync("bunx husky init")
+            consola.success("husky 初始化成功")
+        } catch (error) {
+            consola.error("husky 初始化失败", error)
+        }
+
+        // 创建 pre-commit hook
+        try {
+            consola.start("配置 pre-commit hook")
+            const preCommitHook = "bunx lint-staged"
+            await writeFile(".husky/pre-commit", preCommitHook, "utf-8")
+            consola.success("pre-commit hook 配置成功")
+        } catch (error) {
+            consola.error("pre-commit hook 配置失败", error)
+        }
+
+        // 在 package.json 中添加 lint-staged 配置
+        const packageJson3 = await readPackageJson()
+        packageJson3["lint-staged"] = {
+            "**/*": "prettier --write --ignore-unknown",
+        }
+        await writePackageJson({ data: packageJson3 })
+        consola.success("lint-staged 配置成功")
+    } else {
+        consola.info("当前目录不是 git 仓库，跳过 git hooks 配置")
+    }
+
     consola.success("添加 prettier 配置成功")
 }

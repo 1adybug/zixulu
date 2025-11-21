@@ -1,9 +1,10 @@
-import { simpleGit } from "simple-git"
-import { consola } from "consola"
-import { spawnAsync } from "soda-nodejs"
-import { writeFile, unlink } from "fs/promises"
-import { join } from "path"
+import { unlink, writeFile } from "fs/promises"
 import { tmpdir } from "os"
+import { join } from "path"
+
+import { consola } from "consola"
+import { simpleGit } from "simple-git"
+import { spawnAsync } from "soda-nodejs"
 
 import { preprocessRegex } from "./preprocessRegex"
 import { shouldContinue } from "./shouldContinue"
@@ -57,6 +58,7 @@ export async function replaceCommitMessage({ reg, replace, flags, push, remote =
 
     // 显示正则表达式和替换字符串
     consola.info(`正则表达式: /${processedReg}/${flags ?? ""}`)
+
     consola.info(`替换字符串: ${replace}`)
 
     // 询问用户是否继续
@@ -113,6 +115,7 @@ process.stdin.on("end", () => {
         // 在 Windows 上，路径需要使用正斜杠或双引号包裹
         // 将反斜杠转换为正斜杠，Node.js 在 Windows 上也支持这种格式
         const scriptPathForCommand = tempScriptPath.replace(/\\/g, "/")
+
         const filterCommand = `git filter-branch -f --msg-filter "node \\"${scriptPathForCommand}\\"" -- ${currentBranch}`
 
         await spawnAsync(filterCommand)
@@ -149,4 +152,3 @@ process.stdin.on("end", () => {
         }
     }
 }
-

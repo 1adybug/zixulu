@@ -9,7 +9,7 @@ const config = {
     arrowParens: "avoid",
     endOfLine: "lf",
     printWidth: 160,
-    plugins: ["./prettier-plugin-sort-imports.mjs", "@1adybug/prettier-plugin-remove-braces"],
+    plugins: ["./prettier-plugin-sort-imports.mjs"],
     controlStatementBraces: "add",
 }
 

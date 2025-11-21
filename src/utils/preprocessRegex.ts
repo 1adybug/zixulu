@@ -6,4 +6,3 @@
 export function preprocessRegex(reg: string): string {
     return reg.replace(/\{\{CARET\}\}/g, "^")
 }
-

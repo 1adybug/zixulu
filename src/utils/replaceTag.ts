@@ -1,5 +1,5 @@
-import { simpleGit } from "simple-git"
 import { consola } from "consola"
+import { simpleGit } from "simple-git"
 
 import { preprocessRegex } from "./preprocessRegex"
 import { shouldContinue } from "./shouldContinue"
@@ -44,6 +44,7 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
 
     // 显示正则表达式和替换字符串
     consola.info(`正则表达式: /${processedReg}/${flags ?? ""}`)
+
     consola.info(`替换字符串: ${replace}`)
 
     // 询问用户是否继续
@@ -71,6 +72,7 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
     for (const tag of allTags) {
         // 每次循环创建新的正则表达式，避免 g 标志可能带来的状态问题
         const regexp = new RegExp(processedReg, flags)
+
         const newTag = tag.replace(regexp, replace)
 
         // 如果替换后的 tag 名称没有变化，跳过
@@ -89,7 +91,7 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
     consola.info(`将要替换 ${operations.length} 个 tag`)
 
     // 执行替换操作
-    for (const { oldTag, newTag } of operations) {
+    for (const { oldTag, newTag } of operations)
         try {
             // 获取旧 tag 指向的 commit
             const tagInfo = await git.raw(["rev-list", "-n", "1", oldTag])
@@ -126,7 +128,6 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
         } catch (error) {
             consola.error(`替换 ${oldTag} 失败:`, error)
         }
-    }
 
     consola.success("所有 tag 替换完成")
 }
