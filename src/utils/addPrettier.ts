@@ -175,7 +175,7 @@ export async function addPrettier() {
     await writeFile(".prettierignore", ignoreConfig, "utf-8")
 
     const config2: AddDependenciesConfig = {
-        package: ["prettier", "@1adybug/prettier-plugin-sort-imports", "prettier-plugin-block-padding", "json5"],
+        package: ["prettier", "@1adybug/prettier-plugin-remove-braces", "@1adybug/prettier-plugin-sort-imports", "prettier-plugin-block-padding", "json5"],
         type: "devDependencies",
     }
 
