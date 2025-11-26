@@ -2,6 +2,7 @@ import inquirer from "inquirer"
 import { spawnAsync } from "soda-nodejs"
 
 import { PackageManager } from "@/constant"
+
 import { getPackageManager } from "@/utils/getPackageManager"
 
 export type InstallDependcenyConfig = {

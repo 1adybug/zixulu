@@ -1,37 +1,36 @@
 {
     "name": "zixulu",
     "version": "1.71.2",
+    "description": "A CLI tool for project management and automation",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/1adybug/zixulu.git"
+    },
+    "homepage": "https://github.com/1adybug/zixulu#readme",
+    "bugs": {
+        "url": "https://github.com/1adybug/zixulu/issues"
+    },
     "type": "module",
     "main": "dist/index.js",
     "bin": "dist/index.js",
+    "files": [
+        "compiled",
+        "dist",
+        "src"
+    ],
+    "sideEffects": false,
     "scripts": {
         "build": "rslib build",
         "dev": "rslib build --watch",
+        "prepare": "husky",
         "prepublishOnly": "npm run build",
         "postpublish": "npm run sync",
         "sync": "node scripts/syncPackage.mjs",
         "format": "prettier --write .",
         "fg": "npm run format && git add . && git commit -m \"✨feature: format\"",
         "lint": "eslint . --fix",
-        "ucr": "npx zixulu acr",
-        "prepare": "husky"
-    },
-    "keywords": [],
-    "authors": [],
-    "license": "MIT",
-    "sideEffects": false,
-    "files": [
-        "compiled",
-        "dist",
-        "src"
-    ],
-    "publishConfig": {
-        "access": "public",
-        "registry": "https://registry.npmjs.com/"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/1adybug/zixulu.git"
+        "ucr": "npx zixulu acr"
     },
     "dependencies": {
         "@iarna/toml": "^3.0.0",
@@ -42,7 +41,7 @@
         "dayjs": "^1.11.19",
         "deepsea-tools": "^5.43.1",
         "https-proxy-agent": "^7.0.6",
-        "inquirer": "^13.0.1",
+        "inquirer": "^12.11.1",
         "jsdom": "^27.2.0",
         "json5": "^2.2.3",
         "md5": "^2.3.0",
@@ -53,28 +52,27 @@
         "yaml": "^2.8.1"
     },
     "devDependencies": {
-        "@1adybug/prettier-plugin-remove-braces": "^0.0.3",
-        "@1adybug/prettier-plugin-sort-imports": "^0.0.16",
+        "@1adybug/prettier": "^0.0.5",
         "@eslint/js": "^9.39.1",
-        "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
         "@rslib/core": "^0.18.0",
         "@types/jsdom": "^27.0.0",
         "@types/md5": "^2.3.6",
         "@types/node": "^24.10.1",
         "@types/semver": "^7.7.1",
-        "glob": "^11.1.0",
         "globals": "^16.5.0",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",
         "prettier": "^3.6.2",
-        "prettier-plugin-block-padding": "^0.0.9",
-        "prettier-plugin-organize-imports": "^4.2.0",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.47.0"
     },
     "resolutions": {
         "string-width": "^4",
         "strip-ansi": "^6"
+    },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.com/"
     },
     "volta": {
         "node": "22.21.1"
