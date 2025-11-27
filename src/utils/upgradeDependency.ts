@@ -32,7 +32,7 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
 
         const allPkgs = Object.keys(packageJson[type] || {})
 
-        for (let i = 0; i < allPkgs.length; i++)
+        for (let i = 0; i < allPkgs.length; i++) {
             try {
                 const pkg = allPkgs[i]
                 const rv = packageJson[type][pkg]
@@ -56,6 +56,7 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
             } catch {
                 continue
             }
+        }
 
         if (upgrades.length === 0) continue
 

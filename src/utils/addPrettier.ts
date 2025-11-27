@@ -33,6 +33,7 @@ const config = {
     printWidth: 160,
     plugins: ["@1adybug/prettier"],
     controlStatementBraces: "add",
+    multipleLineBraces: "add",
 }
 
 export default config
@@ -122,9 +123,7 @@ export async function addPrettier() {
         }
         await writePackageJson({ data: packageJson3 })
         consola.success("lint-staged 配置成功")
-    } else {
-        consola.info("当前目录不是 git 仓库，跳过 git hooks 配置")
-    }
+    } else consola.info("当前目录不是 git 仓库，跳过 git hooks 配置")
 
     consola.success("添加 prettier 配置成功")
 }

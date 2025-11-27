@@ -176,18 +176,20 @@ export async function replaceAssets(options: ReplaceAssetsOptions) {
 
                 let index = 0
 
-                for (const url of match)
+                for (const url of match) {
                     if (isAsset(url) || getReg2().test(url)) {
                         const url2 = await getReplaceUrl(url, source)
                         urlsToReplace.push(url2)
                     } else urlsToReplace.push(url)
+                }
 
                 const newData = data.replace(source ? getReg2() : getReg(), () => urlsToReplace[index++])
 
-                if (source)
+                if (source) {
                     urlsToReplace.forEach(url => {
                         if (!reg4.test(url)) console.log(url)
                     })
+                }
 
                 await writeFile(input, newData, "utf-8")
             }

@@ -176,45 +176,49 @@ export async function syncEditorSetting() {
         if (targets.includes("Code")) {
             const installExtensions = sourceExtensions.difference(vscodeExtensions)
 
-            for (const ext of installExtensions)
+            for (const ext of installExtensions) {
                 try {
                     console.log(`code --install-extension ${ext}`)
                     await execAsync(`code --install-extension ${ext}`)
                 } catch (error) {
                     console.error(`${ext} 安装失败`)
                 }
+            }
 
             const uninstallExtensions = vscodeExtensions.difference(sourceExtensions)
 
-            for (const ext of uninstallExtensions)
+            for (const ext of uninstallExtensions) {
                 try {
                     console.log(`code --uninstall-extension ${ext}`)
                     await execAsync(`code --uninstall-extension ${ext}`)
                 } catch (error) {
                     console.error(`${ext} 卸载失败`)
                 }
+            }
         }
 
         if (targets.includes("Cursor")) {
             const installExtensions = sourceExtensions.difference(cursorExtensions)
 
-            for (const ext of installExtensions)
+            for (const ext of installExtensions) {
                 try {
                     console.log(`cursor --install-extension ${ext}`)
                     await execAsync(`cursor --install-extension ${ext}`)
                 } catch (error) {
                     console.error(`${ext} 安装失败`)
                 }
+            }
 
             const uninstallExtensions = cursorExtensions.difference(sourceExtensions)
 
-            for (const ext of uninstallExtensions)
+            for (const ext of uninstallExtensions) {
                 try {
                     console.log(`cursor --uninstall-extension ${ext}`)
                     await execAsync(`cursor --uninstall-extension ${ext}`)
                 } catch (error) {
                     console.error(`${ext} 卸载失败`)
                 }
+            }
         }
 
         if (targets.includes("Online")) await writeFile(join(onlinePath, "static", "extensions.json"), JSON.stringify(Array.from(sourceExtensions), null, 4))

@@ -26,27 +26,30 @@ export async function removeESLint() {
         default: files,
     })
 
-    for (const file of selectedFiles)
+    for (const file of selectedFiles) {
         try {
             await rm(file, { force: true, recursive: true })
         } catch {
             consola.fail(`删除 ${file} 失败`)
         }
+    }
 
     consola.success("删除 ESLint 配置文件成功")
     consola.start("开始删除 ESLint 依赖")
 
     const pkg = await readPackageJson()
 
-    if (pkg.dependencies)
+    if (pkg.dependencies) {
         Object.keys(pkg.dependencies).forEach(key => {
             if (key.includes("eslint")) delete pkg.dependencies[key]
         })
+    }
 
-    if (pkg.devDependencies)
+    if (pkg.devDependencies) {
         Object.keys(pkg.devDependencies).forEach(key => {
             if (key.includes("eslint")) delete pkg.devDependencies[key]
         })
+    }
 
     await writePackageJson({ data: pkg })
 

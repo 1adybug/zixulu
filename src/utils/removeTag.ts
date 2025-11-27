@@ -70,9 +70,7 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
         const regexp = new RegExp(processedReg, flags)
 
         // 如果 tag 匹配正则表达式，加入待删除列表
-        if (regexp.test(tag)) {
-            tagsToRemove.push(tag)
-        }
+        if (regexp.test(tag)) tagsToRemove.push(tag)
     }
 
     if (tagsToRemove.length === 0) {
@@ -83,7 +81,7 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
     consola.info(`将要删除 ${tagsToRemove.length} 个 tag`)
 
     // 执行删除操作
-    for (const tag of tagsToRemove)
+    for (const tag of tagsToRemove) {
         try {
             // 删除本地 tag
             await git.tag(["-d", tag])
@@ -103,6 +101,7 @@ export async function removeTag({ reg, flags, push, remote = "origin" }: RemoveT
         } catch (error) {
             consola.error(`删除 ${tag} 失败:`, error)
         }
+    }
 
     consola.success("所有匹配的 tag 删除完成")
 }

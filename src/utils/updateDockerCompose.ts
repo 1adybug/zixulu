@@ -25,11 +25,12 @@ export async function updateDockerCompose() {
 
     consola.start("开始更新镜像")
 
-    for (const image of images)
+    for (const image of images) {
         await spawnAsync(`docker pull ${image}`, {
             shell: true,
             stdio: "inherit",
         })
+    }
 
     consola.success("更新镜像完成")
 

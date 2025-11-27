@@ -87,9 +87,10 @@ export async function betaVersion() {
         message: "是否现在发布",
     })
 
-    if (publish)
+    if (publish) {
         await spawnAsync("npm publish --tag beta", {
             shell: true,
             stdio: "inherit",
         })
+    }
 }

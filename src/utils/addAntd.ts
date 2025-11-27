@@ -52,7 +52,7 @@ const Registry: FC<RegistryProps> = ({ children }) => {
 export default Registry
 `,
         )
-    } else
+    } else {
         await writeFile(
             join(componentDir, "Registry.tsx"),
             `import { StyleProvider } from "@ant-design/cssinjs"
@@ -78,6 +78,7 @@ const Registry: FC<RegistryProps> = ({ children }) => {
 export default Registry
 `,
         )
+    }
 
     consola.success("添加 antd 配置成功")
 }

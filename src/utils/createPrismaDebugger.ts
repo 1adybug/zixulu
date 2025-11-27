@@ -70,8 +70,9 @@ export async function createPrismaDebugger() {
 
         const dir = await readdir("prisma-debugger/prisma/generated")
 
-        for (const item of dir)
+        for (const item of dir) {
             if (item.endsWith(".node")) await copyFile(join("prisma-debugger/prisma/generated", item), join("prisma-debugger/node_modules/prisma", item))
+        }
 
         await writeFile("prisma-debugger/index.ts", index, "utf-8")
         await writeFile("prisma-debugger/.env", env, "utf-8")

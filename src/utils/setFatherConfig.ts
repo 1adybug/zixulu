@@ -39,7 +39,7 @@ export async function setFatherConfig() {
     packageJson.repository.type ??= "git"
     packageJson.repository.url ??= `git+https://github.com/1adybug/${packageJson.name}.git`
 
-    if (!packageJson.types)
+    if (!packageJson.types) {
         packageJson = Object.entries(packageJson).reduce((prev: Record<string, unknown>, [key, value]) => {
             prev[key] = value
 
@@ -53,6 +53,7 @@ export async function setFatherConfig() {
 
             return prev
         }, {})
+    }
 
     delete packageJson.dependencies
     delete packageJson.devDependencies

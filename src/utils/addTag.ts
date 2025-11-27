@@ -103,7 +103,7 @@ export async function addTag({ reg, flags, replacement, push, remote = "origin",
     consola.info(`将要为 ${tagsToAdd.length} 个 commit 添加 tag`)
 
     // 执行添加操作
-    for (const { hash, message, tagName } of tagsToAdd)
+    for (const { hash, message, tagName } of tagsToAdd) {
         try {
             // 检查 tag 是否已存在
             if (allExistingTags.has(tagName)) {
@@ -135,6 +135,7 @@ export async function addTag({ reg, flags, replacement, push, remote = "origin",
         } catch (error) {
             consola.error(`为 commit ${hash} 添加 tag ${tagName} 失败:`, error)
         }
+    }
 
     consola.success("所有匹配的 tag 添加完成")
 }

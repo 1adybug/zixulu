@@ -20,15 +20,16 @@ export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependen
 
     const questions: DistinctQuestion<UpgradeDependencyConfig>[] = []
 
-    if (ks.includes("dir"))
+    if (ks.includes("dir")) {
         questions.push({
             type: "input",
             name: "dir",
             message: "请输入升级的目录",
             default: ".",
         })
+    }
 
-    if (ks.includes("types"))
+    if (ks.includes("types")) {
         questions.push({
             type: "checkbox",
             name: "types",
@@ -36,8 +37,9 @@ export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependen
             choices: ["dependencies", "devDependencies"],
             default: ["dependencies", "devDependencies"],
         })
+    }
 
-    if (ks.includes("level"))
+    if (ks.includes("level")) {
         questions.push({
             type: "select",
             name: "level",
@@ -45,6 +47,7 @@ export async function getUpgradeDependencyConfig<T extends keyof UpgradeDependen
             choices: ["major", "minor", "patch"],
             default: "minor",
         })
+    }
 
     const config = await inquirer.prompt<UpgradeDependencyConfig>(questions)
 

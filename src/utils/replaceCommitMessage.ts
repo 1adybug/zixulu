@@ -136,9 +136,7 @@ process.stdin.on("end", () => {
                 consola.error(`推送到远程失败:`, error)
                 consola.warn(`你可以手动执行: git push ${remote} ${currentBranch} --force`)
             }
-        } else {
-            consola.warn(`如需推送到远程，请执行: git push ${remote} ${currentBranch} --force`)
-        }
+        } else consola.warn(`如需推送到远程，请执行: git push ${remote} ${currentBranch} --force`)
     } catch (error) {
         consola.error("替换提交消息失败:", error)
         consola.info("如果出现错误，可以使用以下命令恢复:")

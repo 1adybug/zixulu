@@ -76,9 +76,7 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
         const newTag = tag.replace(regexp, replace)
 
         // 如果替换后的 tag 名称没有变化，跳过
-        if (newTag === tag) {
-            continue
-        }
+        if (newTag === tag) continue
 
         operations.push({ oldTag: tag, newTag })
     }
@@ -91,7 +89,7 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
     consola.info(`将要替换 ${operations.length} 个 tag`)
 
     // 执行替换操作
-    for (const { oldTag, newTag } of operations)
+    for (const { oldTag, newTag } of operations) {
         try {
             // 获取旧 tag 指向的 commit
             const tagInfo = await git.raw(["rev-list", "-n", "1", oldTag])
@@ -128,6 +126,7 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
         } catch (error) {
             consola.error(`替换 ${oldTag} 失败:`, error)
         }
+    }
 
     consola.success("所有 tag 替换完成")
 }
