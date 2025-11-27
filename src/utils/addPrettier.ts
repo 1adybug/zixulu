@@ -2,9 +2,9 @@ import { writeFile } from "fs/promises"
 
 import consola from "consola"
 import simpleGit from "simple-git"
-import { spawnAsync } from "soda-nodejs"
 
 import { AddDependenciesConfig, addDependency } from "./addDependency"
+import { addHusky } from "./addHusky"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { shouldContinue } from "./shouldContinue"
@@ -71,59 +71,25 @@ export async function addPrettier() {
     await writePackageJson({ data: packageJson2 })
     await installDependceny()
 
-    // 检查是否是 git 仓库
     const git = simpleGit()
-
     const isRepo = await git.checkIsRepo()
 
-    if (isRepo) {
-        consola.info("检测到 git 仓库")
-        const shouldSetupHooks = await shouldContinue("是否配置 git hooks，在每次 commit 前自动格式化修改的文件？")
+    if (!isRepo) {
+        consola.info("当前目录不是 git 仓库，跳过 git hooks 配置")
+        consola.success("添加 prettier 配置成功")
+        return
+    }
 
-        if (!shouldSetupHooks) {
-            consola.info("跳过 git hooks 配置")
-            consola.success("添加 prettier 配置成功")
-            return
-        }
+    consola.info("检测到 git 仓库")
+    const shouldSetupHooks = await shouldContinue("是否配置 git hooks，在每次 commit 前自动格式化修改的文件？")
 
-        consola.start("开始配置 pre-commit hooks")
+    if (!shouldSetupHooks) {
+        consola.info("跳过 git hooks 配置")
+        consola.success("添加 prettier 配置成功")
+        return
+    }
 
-        // 添加 husky 和 lint-staged 依赖
-        const huskyConfig: AddDependenciesConfig = {
-            package: ["husky", "lint-staged"],
-            type: "devDependencies",
-        }
-
-        await addDependency(huskyConfig)
-        await installDependceny()
-
-        // 初始化 husky
-        try {
-            consola.start("初始化 husky")
-            await spawnAsync("bunx husky init")
-            consola.success("husky 初始化成功")
-        } catch (error) {
-            consola.error("husky 初始化失败", error)
-        }
-
-        // 创建 pre-commit hook
-        try {
-            consola.start("配置 pre-commit hook")
-            const preCommitHook = "npx lint-staged"
-            await writeFile(".husky/pre-commit", preCommitHook, "utf-8")
-            consola.success("pre-commit hook 配置成功")
-        } catch (error) {
-            consola.error("pre-commit hook 配置失败", error)
-        }
-
-        // 在 package.json 中添加 lint-staged 配置
-        const packageJson3 = await readPackageJson()
-        packageJson3["lint-staged"] = {
-            "**/*": "prettier --write --ignore-unknown",
-        }
-        await writePackageJson({ data: packageJson3 })
-        consola.success("lint-staged 配置成功")
-    } else consola.info("当前目录不是 git 仓库，跳过 git hooks 配置")
+    await addHusky({ skipConfirm: true })
 
     consola.success("添加 prettier 配置成功")
 }

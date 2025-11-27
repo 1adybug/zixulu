@@ -15,6 +15,7 @@ import { addBuildDocker } from "@/utils/addBuildDocker"
 import { addCursorRule } from "@/utils/addCursorRule"
 import { addEslint } from "@/utils/addEslint"
 import { addGitignore } from "@/utils/addGitignore"
+import { addHusky } from "@/utils/addHusky"
 import { addFolderPathAlias, replacePathAlias } from "@/utils/addPathAlias"
 import { addPrettier } from "@/utils/addPrettier"
 import { addPrisma } from "@/utils/addPrisma"
@@ -106,6 +107,11 @@ program
     .command("prettier")
     .description("添加 prettier 配置")
     .action(actionWithBackup(addPrettier, getCommitMessage(CommitType.feature, "添加 prettier 配置文件")))
+
+program
+    .command("husky")
+    .description("添加 husky 配置")
+    .action(actionWithBackup(addHusky, getCommitMessage(CommitType.feature, "添加 husky 配置")))
 
 program
     .command("vite")
