@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readdir, rm, writeFile } from "fs/promises"
+import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "fs/promises"
 import { homedir } from "os"
 import { join } from "path"
 
@@ -32,7 +32,10 @@ export async function syncVscode() {
     if (options.length === 0) return
     const userDir = homedir()
     const snippetSource = join(userDir, "AppData/Roaming/Code/User/snippets")
-    const setting = join(userDir, "AppData/Roaming/Code/User/settings.json")
+    const setting = (await readFile(join(userDir, "AppData/Roaming/Code/User/settings.json"), "utf-8")).replace(
+        /}[ \n\r]*$/,
+        `    "chat.disableAIFeatures": true,\n}`,
+    )
     const dir = `vscode-${dayjs().format("YYYYMMDDHHmmss")}`
 
     try {
@@ -42,7 +45,7 @@ export async function syncVscode() {
             const snippetTarget = join(dir, "snippets")
             await mkdir(snippetTarget, { recursive: true })
             consola.start("开始下载最新 VSCode 配置")
-            await copyFile(setting, join(dir, "settings.json"))
+            await writeFile(join(dir, "settings.json"), setting, "utf-8")
             const files = await readdir(snippetSource)
             for (const file of files) await copyFile(join(snippetSource, file), join(snippetTarget, file))
             consola.success("下载最新 VSCode 配置完成")
