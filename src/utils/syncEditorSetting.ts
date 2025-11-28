@@ -1,5 +1,5 @@
 import { existsSync } from "fs"
-import { readFile, rename, writeFile } from "fs/promises"
+import { mkdir, readFile, rename, writeFile } from "fs/promises"
 import { homedir } from "os"
 import { join, parse } from "path"
 
@@ -13,6 +13,8 @@ import { addGitCommit } from "./addGitCommit"
 import { getCommitMessage } from "./getCommitMessage"
 import { getEditorExtensions } from "./getEditorExtensions"
 import { hasChangeNoCommit } from "./hasChangeNoCommit"
+import { hasCode } from "./hasCode"
+import { hasCursor } from "./hasCursor"
 import { readZixuluSetting } from "./readZixuluSetting"
 import { writeZixuluSetting } from "./writeZixuluSetting"
 
@@ -62,8 +64,11 @@ async function getFile(source: string) {
 
 export async function syncEditorFile({ source, target }: SyncEditorFileParams) {
     const { dir, base } = parse(target)
+    await mkdir(dir, { recursive: true })
     const setting = await readZixuluSetting()
-    const code = await getFile(source)
+    let code = await getFile(source)
+
+    if (target === fileSourceMap.settings.Code) code = code.replace(/\n^ *"extensions\.gallery\.serviceUrl":.+,?$/m, "")
 
     if (existsSync(target)) {
         const text = await readFile(target, "utf-8")
@@ -80,6 +85,7 @@ export async function syncEditorFile({ source, target }: SyncEditorFileParams) {
                 message: `是否备份原文件（${target}）`,
                 default: setting.syncEditor?.fileConfigs?.[target]?.backup ?? true,
             })
+
             setting.syncEditor ??= {}
             setting.syncEditor.fileConfigs ??= {}
             setting.syncEditor.fileConfigs[target] ??= {}
@@ -102,12 +108,17 @@ export async function syncEditorSetting() {
         targets: SyncEditorSettingSource[]
     }
 
+    const sourceChoices = ["Online"]
+
+    if (hasCode()) sourceChoices.unshift("Code")
+    if (hasCursor()) sourceChoices.unshift("Cursor")
+
     const { source } = await inquirer.prompt<Answer>([
         {
             type: "list",
             name: "source",
             message: "选择同步来源",
-            choices: ["Code", "Cursor", "Online"],
+            choices: sourceChoices,
             default: setting.syncEditor?.source ?? "Cursor",
         },
     ])
@@ -115,13 +126,17 @@ export async function syncEditorSetting() {
     setting.syncEditor ??= {}
     setting.syncEditor.source = source
 
+    const targetChoices = sourceChoices.filter(v => v !== source)
+
+    if (targetChoices.length === 0) return consola.info("没有可同步的目标")
+
     const { targets, types } = await inquirer.prompt<Answer>([
         {
             type: "checkbox",
             name: "targets",
             message: "选择同步目标",
-            choices: ["Code", "Cursor", "Online"].filter(v => v !== source),
-            default: (setting.syncEditor?.targets ?? ["Code", "Cursor", "Online"]).filter(v => v !== source),
+            choices: targetChoices,
+            default: setting.syncEditor?.targets?.filter(item => targetChoices.includes(item)) ?? targetChoices,
         },
         {
             type: "checkbox",
@@ -143,12 +158,14 @@ export async function syncEditorSetting() {
         const { onlinePath } = await inquirer.prompt<Answer>({
             type: "input",
             name: "onlinePath",
-            message: "请输入 blog 文件夹的路径",
-            default: setting.syncEditor?.onlinePath ?? "C:\\Users\\lenovo\\Desktop\\workspace\\blog",
+            message: "请输入 blog 文件夹的路径（留空则跳过）",
+            default: setting.syncEditor?.onlinePath,
         })
 
-        setting.syncEditor.onlinePath = onlinePath
+        setting.syncEditor.onlinePath = onlinePath.trim() ?? undefined
     }
+
+    if (!setting.syncEditor.onlinePath) setting.syncEditor.targets = targets.filter(v => v !== "Online")
 
     const onlinePath = setting.syncEditor.onlinePath!
 
@@ -225,6 +242,8 @@ export async function syncEditorSetting() {
     }
 
     if (targets.includes("Online")) {
+        await execAsync("npm run format", { cwd: onlinePath })
+
         if (await hasChangeNoCommit(onlinePath)) {
             await addGitCommit({
                 message: getCommitMessage(CommitType.feature, "sync editor setting"),
