@@ -13,7 +13,7 @@ import { writeTsConfig } from "./writeTsConfig"
 export async function rsbuild() {
     consola.start("开始设置 rsbuild 配置")
     await addDependency({
-        package: ["@rsbuild/plugin-svgr", "@rsbuild/plugin-babel", { packageName: "babel-plugin-react-compiler", versionRange: "@rc" }],
+        package: ["@rsbuild/plugin-svgr", "@rsbuild/plugin-babel", "babel-plugin-react-compiler"],
         type: "devDependencies",
     })
     const packageJson = await readPackageJson()

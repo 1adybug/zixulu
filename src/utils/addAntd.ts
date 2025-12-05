@@ -13,7 +13,7 @@ import { readPackageJson } from "./readPackageJson"
 export async function addAntd() {
     consola.start("开始添加 antd 配置")
     await addDependency({
-        package: ["@ant-design/icons", "@ant-design/v5-patch-for-react-19", "antd"],
+        package: ["@ant-design/icons", "antd"],
     })
     const dir = await readdir(".")
     const componentDir = dir.includes("src") ? "src/components" : "components"
@@ -34,8 +34,6 @@ import { AntdRegistry } from "@ant-design/nextjs-registry"
 import { ConfigProvider } from "antd"
 import zhCN from "antd/locale/zh_CN"
 
-import "@ant-design/v5-patch-for-react-19"
-
 export interface RegistryProps {
     children?: ReactNode
 }
@@ -43,7 +41,7 @@ export interface RegistryProps {
 const Registry: FC<RegistryProps> = ({ children }) => {
 
     return (
-        <AntdRegistry hashPriority="high">
+        <AntdRegistry layer>
             <ConfigProvider locale={zhCN}>{children}</ConfigProvider>
         </AntdRegistry>
     )
@@ -60,8 +58,6 @@ import { ConfigProvider } from "antd"
 import zhCN from "antd/locale/zh_CN"
 import { FC, ReactNode } from "react"
 
-import "@ant-design/v5-patch-for-react-19"
-
 export interface RegistryProps {
     children?: ReactNode
 }
@@ -69,7 +65,7 @@ export interface RegistryProps {
 const Registry: FC<RegistryProps> = ({ children }) => {
 
     return (
-        <StyleProvider hashPriority="high">
+        <StyleProvider layer>
             <ConfigProvider locale={zhCN}>{children}</ConfigProvider>
         </StyleProvider>
     )
