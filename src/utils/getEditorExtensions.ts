@@ -15,7 +15,6 @@ export async function getEditorExtensions({ source }: GetEditorExtensionsParams)
             .split("\n")
             .map(item => item.trim())
             .filter(Boolean)
-            .filter(item => item !== "menglong.cursor-infinity")
     } else {
         const response = await fetch("https://luzixu.geskj.com/extensions.json")
         data = await response.json()
