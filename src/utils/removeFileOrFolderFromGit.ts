@@ -2,7 +2,7 @@ import { stat } from "fs/promises"
 
 import consola from "consola"
 import inquirer from "inquirer"
-import { execAsync } from "soda-nodejs"
+import { spawnAsync } from "soda-nodejs"
 
 import { backupFirst } from "./backupFirst"
 
@@ -33,7 +33,7 @@ export async function removeFileOrFolderFromGit(input: string) {
 
     await backupFirst(true)
     consola.start(`开始从 git 中删除 ${input}`)
-    await execAsync(
+    await spawnAsync(
         `git filter-branch --force --index-filter "git rm${recursive ? " -r" : ""} --cached --ignore-unmatch ${input}" --prune-empty --tag-name-filter cat -- --all`,
     )
     consola.success(`从 git 中删除 ${input} 成功`)
