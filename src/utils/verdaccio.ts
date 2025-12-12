@@ -1,13 +1,15 @@
-import { mkdir, stat, writeFile } from "fs/promises"
-import { join, parse, resolve } from "path"
+import { mkdir, readdir, stat, writeFile } from "fs/promises"
+import { join, resolve } from "path"
 
+import consola from "consola"
 import inquirer from "inquirer"
-import { zip } from "soda-nodejs"
+import { spawnAsync } from "soda-nodejs"
 
 import { readZixuluSetting } from "./readZixuluSetting"
 import { writeZixuluSetting } from "./writeZixuluSetting"
 
 const script = `import { spawnSync } from "child_process"
+import { rmSync } from "fs"
 
 spawnSync("docker compose down", { cwd: "verdaccio", shell: true, stdio: "inherit" })
 
@@ -16,10 +18,21 @@ spawnSync("rimraf verdaccio", { shell: true, stdio: "inherit" })
 spawnSync("7z x verdaccio.zip", { shell: true, stdio: "inherit" })
 
 spawnSync("docker compose up -d", { cwd: "verdaccio", shell: true, stdio: "inherit" })
+
+spawnSync("rimraf verdaccio.zip", { shell: true, stdio: "inherit" })
+
+rmSync(import.meta.filename)
 `
 
 export async function verdaccio() {
-    await mkdir("verdaccio", { recursive: true })
+    const dir = await readdir(".")
+
+    if (dir.includes(".verdaccio")) {
+        consola.warn(".verdaccio 文件夹已存在")
+        process.exit(1)
+    }
+
+    await mkdir(".verdaccio", { recursive: true })
 
     const setting = await readZixuluSetting()
 
@@ -43,12 +56,7 @@ export async function verdaccio() {
     setting.verdaccioPath = verdaccioPath
     await writeZixuluSetting(setting)
 
-    const { base } = parse(verdaccioPath)
+    await spawnAsync(`7z a .verdaccio/verdaccio.zip ${verdaccioPath}`, { shell: true, stdio: "inherit" })
 
-    await zip({
-        input: verdaccioPath,
-        output: join("verdaccio", `${base}.zip`),
-    })
-
-    await writeFile(join("verdaccio", "syncVerdaccio.mjs"), script, "utf-8")
+    await writeFile(join(".verdaccio", "verdaccio.mjs"), script, "utf-8")
 }

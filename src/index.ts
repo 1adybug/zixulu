@@ -83,6 +83,8 @@ import { verdaccio } from "@/utils/verdaccio"
 import { vite } from "@/utils/vite"
 import { winget } from "@/utils/winget"
 
+import { gdm } from "./utils/gdm"
+
 setDefaultOptions({
     shell: true,
     stdio: "inherit",
@@ -482,5 +484,7 @@ program
             branch: options.branch,
         })
     })
+
+program.command("gdm").description("同步 geshu-docker-management").action(gdm)
 
 program.parse()
