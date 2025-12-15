@@ -39,7 +39,7 @@ export async function addCursorRule() {
 
         if (existsSync(codexConfig)) {
             const config = parse(await readFile(codexConfig, "utf-8"))
-            config.project_doc_fallback_filenames = sourceDir.map(item => join(".cursor", "rules", item))
+            config.project_doc_fallback_filenames = sourceDir.map(item => `.cursor/rules/${item}`)
             if (typeof config.project_doc_max_bytes === "number" && config.project_doc_max_bytes < 65536) config.project_doc_max_bytes = 65536
             await writeFile(codexConfig, stringify(config))
         }
