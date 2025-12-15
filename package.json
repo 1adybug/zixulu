@@ -13,7 +13,9 @@
     },
     "type": "module",
     "main": "dist/index.js",
-    "bin": "dist/index.js",
+    "bin": {
+        "zixulu": "dist/index.js"
+    },
     "files": [
         "compiled",
         "dist",
@@ -48,6 +50,7 @@
         "node-fetch": "^3.3.2",
         "semver": "^7.7.3",
         "simple-git": "^3.30.0",
+        "smol-toml": "^1.5.2",
         "soda-nodejs": "^0.8.7",
         "yaml": "^2.8.2"
     },
