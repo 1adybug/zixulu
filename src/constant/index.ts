@@ -10,7 +10,7 @@ export enum PackageManager {
 }
 
 export enum Registry {
-    npm = "https://registry.npmjs.org/",
+    npm = "https://registry.npmjs.com/",
     taobao = "https://registry.npmmirror.com/",
     tencent = "https://mirrors.cloud.tencent.com/npm/",
 }
