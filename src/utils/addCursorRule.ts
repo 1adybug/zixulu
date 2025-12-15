@@ -58,7 +58,7 @@ export async function addCursorRule() {
             map[file] = "modified"
         }
 
-        if (Object.keys(map).length === 0) throw new Error("cursor 规则已是最新")
+        if (Object.keys(map).length === 0) throw new Error("Cursor 规则已是最新")
 
         interface Answer {
             files: string[]
@@ -96,7 +96,7 @@ description:
             await writeFile(join(".agent/rules", file.replace(/\.mdc$/, ".md")), content)
         }
 
-        return getCommitMessage(CommitType.feature, `${existed ? "更新" : "添加"} cursor 规则`)
+        return getCommitMessage(CommitType.feature, `${existed ? "更新" : "添加"} Cursor 规则`)
     } catch (error) {
         await rm(source, { recursive: true })
         throw error
