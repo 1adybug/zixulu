@@ -31,8 +31,7 @@
         "sync": "node scripts/syncPackage.mjs",
         "format": "prettier --write .",
         "fg": "npm run format && git add . && git commit -m \"✨feature: format\"",
-        "lint": "eslint . --fix",
-        "ucr": "npx zixulu acr"
+        "lint": "eslint . --fix"
     },
     "dependencies": {
         "@iarna/toml": "^3.0.0",

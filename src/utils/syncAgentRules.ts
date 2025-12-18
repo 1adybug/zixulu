@@ -1,10 +1,8 @@
 import { existsSync } from "fs"
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "fs/promises"
-import { homedir } from "os"
 import { join } from "path"
 
 import inquirer from "inquirer"
-import { parse, stringify } from "smol-toml"
 import { spawnAsync } from "soda-nodejs"
 
 import { CommitType } from "@/constant"
@@ -13,7 +11,7 @@ import { getCommitMessage } from "./getCommitMessage"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
 
-export async function addCursorRule() {
+export async function asyncAgentRules() {
     try {
         const packageJson = await readPackageJson()
         packageJson.scripts ??= {}
@@ -34,15 +32,6 @@ export async function addCursorRule() {
     try {
         const sourceDir = await readdir(source)
         const targetDir = await readdir(target)
-
-        const codexConfig = join(homedir(), ".codex", "config.toml")
-
-        if (existsSync(codexConfig)) {
-            const config = parse(await readFile(codexConfig, "utf-8"))
-            config.project_doc_fallback_filenames = sourceDir.map(item => `.cursor/rules/${item}`)
-            if (typeof config.project_doc_max_bytes === "number" && config.project_doc_max_bytes < 65536) config.project_doc_max_bytes = 65536
-            await writeFile(codexConfig, stringify(config))
-        }
 
         const map: Record<string, string> = {}
 
@@ -83,8 +72,16 @@ export async function addCursorRule() {
 
         await mkdir(".agent/rules", { recursive: true })
 
+        const orders = ["base.mdc", "component.mdc", "api.mdc", "next.mdc"]
+
+        dir.sort((a, b) => orders.indexOf(a) - orders.indexOf(b))
+
+        let agentsRule = `# Agent Rules`
+
         for (const file of dir) {
-            const content = (await readFile(join(".cursor/rules", file), "utf-8")).replace(
+            const source = await readFile(join(".cursor/rules", file), "utf-8")
+
+            const content = source.replace(
                 /^---\nalwaysApply: (true|false)\n---/,
                 (match, p1) => `---
 trigger: ${p1 === "true" ? "always_on" : "model_decision"}
@@ -93,8 +90,18 @@ description:
 ---`,
             )
 
+            const content2 = source.replace(/^---\nalwaysApply: (true|false)\n---/, "").replace(/^(#+ )/gm, "#$1")
+
+            agentsRule = agentsRule + content2
+
+            agentsRule = agentsRule.replace(/\n+$/, "")
+
             await writeFile(join(".agent/rules", file.replace(/\.mdc$/, ".md")), content)
         }
+
+        agentsRule = agentsRule + "\n"
+
+        await writeFile("AGENTS.md", agentsRule)
 
         return getCommitMessage(CommitType.feature, `${existed ? "更新" : "添加"} Cursor 规则`)
     } catch (error) {

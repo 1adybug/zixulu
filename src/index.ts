@@ -12,7 +12,6 @@ import { actionWithBackup } from "@/utils/actionWithBackup"
 import { addAntd } from "@/utils/addAntd"
 import { addApi } from "@/utils/addApi"
 import { addBuildDocker } from "@/utils/addBuildDocker"
-import { addCursorRule } from "@/utils/addCursorRule"
 import { addEslint } from "@/utils/addEslint"
 import { addGitignore } from "@/utils/addGitignore"
 import { addHusky } from "@/utils/addHusky"
@@ -68,6 +67,7 @@ import { setGlobalConfig } from "@/utils/setGlobalConfig"
 import { setRegistry } from "@/utils/setRegistry"
 import { setShellProxy } from "@/utils/setShellProxy"
 import { sortPackageJson } from "@/utils/sortPackageJson"
+import { asyncAgentRules } from "@/utils/syncAgentRules"
 import { syncCursorExtToCode } from "@/utils/syncCursorExtToCode"
 import { syncEditorSetting } from "@/utils/syncEditorSetting"
 import { syncVscode } from "@/utils/syncVscode"
@@ -423,7 +423,7 @@ program.command("create-prisma-debugger").alias("cpd").description("创建 prism
 
 program.command("verdaccio").description("同步 verdaccio 配置").action(verdaccio)
 
-program.command("add-cursor-rule").alias("acr").description("添加 cursor 规则").action(actionWithBackup(addCursorRule))
+program.command("sync-agent-rules").alias("sar").description("同步 Agent 规则").action(actionWithBackup(asyncAgentRules))
 
 program
     .command("replace-tag")
