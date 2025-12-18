@@ -83,11 +83,12 @@ export async function syncEditorFile({
 
     if (targetType === "Antigravity") {
         code = code.replace(/\n^ *"extensions\.gallery\.serviceUrl":.+,?$/m, "").replace(
-            /} *$/,
+            /}[ \n]*$/,
             `    "antigravity.marketplaceExtensionGalleryServiceURL": "https://marketplace.visualstudio.com/_apis/public/gallery",
     "antigravity.marketplaceGalleryItemURL": "https://marketplace.visualstudio.com/items",
     "json.schemaDownload.enable": true,
-}`,
+}
+`,
         )
     }
 
