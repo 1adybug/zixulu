@@ -103,7 +103,7 @@ description:
 
         await writeFile("AGENTS.md", agentsRule)
 
-        return getCommitMessage(CommitType.feature, `${existed ? "更新" : "添加"} Cursor 规则`)
+        return getCommitMessage(CommitType.feature, `同步 Agent 规则`)
     } catch (error) {
         await rm(source, { recursive: true })
         throw error
