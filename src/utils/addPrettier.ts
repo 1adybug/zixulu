@@ -18,6 +18,7 @@ generated
 .next
 .vscode
 .generated
+**/components/ui/**
 `
 
 const prettierConfig = `// @ts-check
