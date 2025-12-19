@@ -14,8 +14,7 @@ import { writePackageJson } from "./writePackageJson"
 export async function asyncAgentRules() {
     try {
         const packageJson = await readPackageJson()
-        packageJson.scripts ??= {}
-        packageJson.scripts.ucr = "npx zixulu acr"
+        if (packageJson?.scripts?.ucr === "npx zixulu acr") packageJson.scripts.ucr = undefined
         await writePackageJson({ data: packageJson })
     } catch (error) {}
 
