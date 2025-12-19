@@ -71,7 +71,7 @@ export async function asyncAgentRules() {
 
         await mkdir(".agent/rules", { recursive: true })
 
-        const orders = ["base.mdc", "component.mdc", "api.mdc", "next.mdc"]
+        const orders = ["base.mdc", "react.mdc", "api.mdc", "next.mdc"]
 
         dir.sort((a, b) => orders.indexOf(a) - orders.indexOf(b))
 
