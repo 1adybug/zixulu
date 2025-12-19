@@ -83,7 +83,9 @@ import { verdaccio } from "@/utils/verdaccio"
 import { vite } from "@/utils/vite"
 import { winget } from "@/utils/winget"
 
+import { addOpenWith } from "./utils/addOpenWith"
 import { gdm } from "./utils/gdm"
+import { removeOpenWith } from "./utils/removeOpenWith"
 
 setDefaultOptions({
     shell: true,
@@ -486,5 +488,25 @@ program
     })
 
 program.command("gdm").description("同步 geshu-docker-management").action(gdm)
+
+program
+    .command("add-open-with")
+    .alias("aow")
+    .description("添加打开文件的脚本")
+    .argument("path", "程序路径")
+    .option("--no-file", "是否不添加文件关联")
+    .option("--no-folder", "是否不添加文件夹关联")
+    .option("--no-background", "是否不添加文件夹空白处关联")
+    .action(addOpenWith)
+
+program
+    .command("remove-open-with")
+    .alias("row")
+    .description("删除打开文件的脚本")
+    .argument("name", "脚本名称")
+    .option("--no-file", "是否不删除文件关联")
+    .option("--no-folder", "是否不删除文件夹关联")
+    .option("--no-background", "是否不删除文件夹空白处关联")
+    .action(removeOpenWith)
 
 program.parse()
