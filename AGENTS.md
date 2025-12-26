@@ -104,3 +104,7 @@
     ✨ feature: some feature u did
     🐞 fix: some bug u fixed
     ```
+
+- 除了 `React` 组件和页面以外所有的导出必须使用 `export` 关键字导出，不要使用 `export default` 关键字导出
+
+- 当一个文件中需要导出多个 `React` 组件时，主组件必须使用 `export default` 关键字导出，其他组件必须使用 `export` 关键字导出
