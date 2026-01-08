@@ -16,6 +16,7 @@ import { hasAntiGravity } from "./hasAntiGravity"
 import { hasChangeNoCommit } from "./hasChangeNoCommit"
 import { hasCode } from "./hasCode"
 import { hasCursor } from "./hasCursor"
+import { modifyJsonc } from "./modifyJsonc"
 import { readZixuluSetting } from "./readZixuluSetting"
 import { writeZixuluSetting } from "./writeZixuluSetting"
 
@@ -57,6 +58,7 @@ export interface SyncEditorFileItem {
 }
 
 export interface SyncEditorFileParams {
+    type: EditorFileType
     source: SyncEditorFileItem
     target: SyncEditorFileItem
 }
@@ -71,6 +73,7 @@ async function getFile(source: string) {
 }
 
 export async function syncEditorFile({
+    type,
     source: { type: sourceType, value: sourceValue },
     target: { type: targetType, value: targetValue },
 }: SyncEditorFileParams) {
@@ -79,17 +82,15 @@ export async function syncEditorFile({
     const setting = await readZixuluSetting()
     let code = await getFile(sourceValue)
 
-    if (targetType === "Code") code = code.replace(/\n^ *"extensions\.gallery\.serviceUrl":.+,?$/m, "")
+    if (type === "settings") {
+        code = modifyJsonc(code, ["extensions.gallery.serviceUrl"], undefined)
+        code = modifyJsonc(code, ["antigravity.marketplaceExtensionGalleryServiceURL"], undefined)
+        code = modifyJsonc(code, ["antigravity.marketplaceGalleryItemURL"], undefined)
 
-    if (targetType === "Antigravity") {
-        code = code.replace(/\n^ *"extensions\.gallery\.serviceUrl":.+,?$/m, "").replace(
-            /}[ \n]*$/,
-            `    "antigravity.marketplaceExtensionGalleryServiceURL": "https://marketplace.visualstudio.com/_apis/public/gallery",
-    "antigravity.marketplaceGalleryItemURL": "https://marketplace.visualstudio.com/items",
-    "json.schemaDownload.enable": true,
-}
-`,
-        )
+        if (targetType === "Antigravity") {
+            code = modifyJsonc(code, ["antigravity.marketplaceExtensionGalleryServiceURL"], "https://marketplace.visualstudio.com/_apis/public/gallery")
+            code = modifyJsonc(code, ["antigravity.marketplaceGalleryItemURL"], "https://marketplace.visualstudio.com/items")
+        }
     }
 
     if (existsSync(targetValue)) {
@@ -203,6 +204,7 @@ export async function syncEditorSetting() {
         .filter(item => item !== "extensions")
         .map(fileType =>
             targets.map(target => ({
+                type: fileType,
                 source: { type: source, value: fileSourceMap[fileType][source] },
                 target: {
                     type: target,
