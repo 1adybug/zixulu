@@ -14,6 +14,7 @@ export enum VscodeSyncOption {
     "配置" = "SETTING",
     "插件" = "EXTENSION",
     "软件" = "SOFTWARE",
+    "PowerShell" = "POWERSHELL",
 }
 
 export async function syncVscode() {
@@ -97,10 +98,21 @@ ${
     for (const file of dir2) {
         await rm(join(snippetTarget, file), { force: true })
         await copyFile(join("./snippets", file), join(snippetTarget, file))
-    }
-`
+    }`
                     : ""
-            }}
+            }${
+                options.includes(VscodeSyncOption.PowerShell)
+                    ? `
+    ${
+        options.includes(VscodeSyncOption.配置)
+            ? ""
+            : `const userDir = homedir()
+`
+    }const profile = join(userDir, "Documents/PowerShell/Microsoft.PowerShell_profile.ps1")
+    await copyFile("./Microsoft.PowerShell_profile.ps1", profile)`
+                    : ""
+            }
+}
 
 main()`
 
@@ -111,6 +123,15 @@ main()`
             consola.start("开始下载最新 VSCode")
             await download(`https://code.visualstudio.com/sha/download?build=stable&os=win32-x64`, dir)
             consola.success("下载最新 VSCode 完成")
+        }
+
+        if (options.includes(VscodeSyncOption.PowerShell)) {
+            consola.start("开始同步 PowerShell 配置")
+            const userDir = homedir()
+            const profile = join(userDir, "Documents/PowerShell/Microsoft.PowerShell_profile.ps1")
+            const content = await readFile(profile, "utf-8")
+            await writeFile(join(dir, "Microsoft.PowerShell_profile.ps1"), content.replace(/cursor|antigravity/g, "code"))
+            consola.success("同步 PowerShell 配置成功")
         }
     } catch (error) {
         type PromptResult = {
