@@ -41,13 +41,15 @@ export default defineConfig([
             globals: globals.browser,
         },
         rules: {
+            "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-empty-object-type": "off",
+            "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
             "no-empty": "off",
             "no-extra-boolean-cast": "off",
             "no-unused-vars": "off",${
                 isReact
                     ? `
-            "react-refresh/only-export-components": "warn",`
+            "react-refresh/only-export-components": "off",`
                     : ""
             }
             "@typescript-eslint/no-unused-vars": [
