@@ -515,7 +515,7 @@ program
     .alias("pd")
     .description("拉取 docker 镜像")
     .argument("image", "镜像名称")
-    .argument("[sha256]", "镜像 sha256")
-    .action((image: string, sha256?: string) => pullDockerImage({ image, sha256 }))
+    .argument("sha256", "镜像 sha256")
+    .action((image: string, sha256: string) => pullDockerImage({ image, sha256 }))
 
 program.parse()
