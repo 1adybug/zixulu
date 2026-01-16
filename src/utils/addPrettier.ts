@@ -5,21 +5,27 @@ import simpleGit from "simple-git"
 
 import { AddDependenciesConfig, addDependency } from "./addDependency"
 import { addHusky } from "./addHusky"
+import { addRuleToPrettierIgnore } from "./addRuleToPrettierIgnore"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { shouldContinue } from "./shouldContinue"
 import { writePackageJson } from "./writePackageJson"
 
-const ignoreConfig = `node_modules
-public
-dist
-build
-generated
-.next
-.vscode
-.generated
-**/components/ui/**
-`
+const prettierIgnoreRules = [
+    "node_modules",
+    "public",
+    "dist",
+    "build",
+    "generated",
+    ".next",
+    ".vscode",
+    ".generated",
+    "**/components/ui/**",
+    "**/components/ai/**",
+    ".agent",
+    ".cursor",
+    "AGENTS.md",
+]
 
 const prettierConfig = `// @ts-check
 
@@ -58,7 +64,7 @@ export interface GetPluginConfigParams {
 export async function addPrettier() {
     consola.start("开始添加 prettier 配置")
     await writeFile("prettier.config.mjs", prettierConfig, "utf-8")
-    await writeFile(".prettierignore", ignoreConfig, "utf-8")
+    await addRuleToPrettierIgnore(...prettierIgnoreRules)
 
     const config2: AddDependenciesConfig = {
         package: ["prettier", "@1adybug/prettier"],

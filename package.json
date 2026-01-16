@@ -55,7 +55,7 @@
         "yaml": "^2.8.2"
     },
     "devDependencies": {
-        "@1adybug/prettier": "^0.0.25",
+        "@1adybug/prettier": "^0.0.27",
         "@eslint/js": "^9.39.2",
         "@rslib/core": "^0.19.2",
         "@types/jsdom": "^27.0.0",
