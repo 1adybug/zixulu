@@ -12,7 +12,7 @@ const config = {
     plugins: ["@1adybug/prettier"],
     controlStatementBraces: "add",
     multiLineBraces: "add",
-    removeUnusedImports: true,
+    nodeProtocol: true,
 }
 
 export default config
