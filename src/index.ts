@@ -85,6 +85,7 @@ import { winget } from "@/utils/winget"
 
 import { addOpenWith } from "./utils/addOpenWith"
 import { gdm } from "./utils/gdm"
+import { pullDockerImage } from "./utils/pullDockerImage"
 import { removeOpenWith } from "./utils/removeOpenWith"
 
 setDefaultOptions({
@@ -508,5 +509,13 @@ program
     .option("--no-folder", "是否不删除文件夹关联")
     .option("--no-background", "是否不删除文件夹空白处关联")
     .action(removeOpenWith)
+
+program
+    .command("pull-docker-image")
+    .alias("pd")
+    .description("拉取 docker 镜像")
+    .argument("image", "镜像名称")
+    .argument("[sha256]", "镜像 sha256")
+    .action((image: string, sha256?: string) => pullDockerImage({ image, sha256 }))
 
 program.parse()
