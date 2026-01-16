@@ -9,7 +9,7 @@ import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
 
 const zipDistContent = `// @ts-check
-import { rm } from "fs/promises"
+import { rm } from "node:fs/promises"
 import { zip } from "soda-nodejs"
 
 const filename = process.env.FILENAME || "dist.zip"

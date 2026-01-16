@@ -11,10 +11,10 @@ import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
 
 const script = `// @ts-check
-import { spawn } from "child_process"
+import { spawn } from "node:child_process"
 import { config } from "dotenv"
-import { readFile } from "fs/promises"
-import { cpus } from "os"
+import { readFile } from "node:fs/promises"
+import { cpus } from "node:os"
 
 config()
 
@@ -36,11 +36,11 @@ import compression from "compression"
 import cors from "cors"
 import { config } from "dotenv"
 import express from "express"
-import { readFileSync } from "fs"
-import { createServer as createHttpServer } from "http"
-import { createServer as createHttpsServer } from "https"
+import { readFileSync } from "node:fs"
+import { createServer as createHttpServer } from "node:http"
+import { createServer as createHttpsServer } from "node:https"
 import morgan from "morgan"
-import { join, resolve } from "path"
+import { join, resolve } from "node:path"
 
 config()
 
@@ -90,12 +90,12 @@ import compression from "compression"
 import cors from "cors"
 import { config } from "dotenv"
 import express from "express"
-import { readFileSync } from "fs"
-import { createServer as createHttpServer } from "http"
-import { createServer as createHttpsServer } from "https"
+import { readFileSync } from "node:fs"
+import { createServer as createHttpServer } from "node:http"
+import { createServer as createHttpsServer } from "node:https"
 import morgan from "morgan"
 import next from "next"
-import { join } from "path"
+import { join } from "node:path"
 
 config()
 

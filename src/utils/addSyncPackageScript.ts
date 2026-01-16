@@ -62,8 +62,8 @@ function syncPackage(packageName) {
 ${
     monorepo
         ? `async function main() {
-    const { readdir, readFile, stat } = await import("fs/promises")
-    const { join } = await import("path")
+    const { readdir, readFile, stat } = await import("node:fs/promises")
+    const { join } = await import("node:path")
     const dir = "${dir}"
     const dir2 = await readdir(dir)
     /** @type {string[]} */
@@ -80,7 +80,7 @@ ${
     await Promise.all(packages2.map(syncPackage))
 }`
         : `async function main() {
-    const { readFile } = await import("fs/promises")
+    const { readFile } = await import("node:fs/promises")
     const packageJson = JSON.parse(await readFile("package.json", "utf-8"))
     await syncPackage(packageJson.name)
 }`

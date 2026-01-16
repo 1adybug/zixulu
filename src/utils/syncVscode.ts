@@ -60,10 +60,10 @@ export async function syncVscode() {
         if (options.includes(VscodeSyncOption.配置) || options.includes(VscodeSyncOption.插件)) {
             const script = `// @ts-check
 
-import { spawn } from "child_process"
-import { readdir, copyFile, rm } from "fs/promises"
-import { homedir } from "os"
-import { join } from "path"
+import { spawn } from "node:child_process"
+import { readdir, copyFile, rm } from "node:fs/promises"
+import { homedir } from "node:os"
+import { join } from "node:path"
 
 /** 
  * @param {string} command

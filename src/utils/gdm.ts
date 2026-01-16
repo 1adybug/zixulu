@@ -10,9 +10,9 @@ import { writePackageJson } from "./writePackageJson"
 
 const script = `// @ts-check
 
-import { spawnSync } from "child_process"
-import { readdirSync, renameSync, rmSync } from "fs"
-import { styleText } from "util"
+import { spawnSync } from "node:child_process"
+import { readdirSync, renameSync, rmSync } from "node:fs"
+import { styleText } from "node:util"
 
 const dir = readdirSync(".")
 

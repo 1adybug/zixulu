@@ -8,8 +8,8 @@ import { spawnAsync } from "soda-nodejs"
 import { readZixuluSetting } from "./readZixuluSetting"
 import { writeZixuluSetting } from "./writeZixuluSetting"
 
-const script = `import { spawnSync } from "child_process"
-import { rmSync } from "fs"
+const script = `import { spawnSync } from "node:child_process"
+import { rmSync } from "node:fs"
 
 spawnSync("docker compose down", { cwd: "verdaccio", shell: true, stdio: "inherit" })
 

@@ -174,9 +174,9 @@ ${insertWhen(versions.includes("custom"), `import consola from "consola"`, { bre
             versionSource === "Day.js version",
             `import dayjs from "dayjs"`,
             { breakBefore: true },
-        )}${insertWhen(versionSource === "package.json version", `import { readFile } from "fs/promises"`, {
+        )}${insertWhen(versionSource === "package.json version", `import { readFile } from "node:fs/promises"`, {
             breakBefore: true,
-        })}${insertWhen(local, `import { join } from "path"`, { breakBefore: true })}
+        })}${insertWhen(local, `import { join } from "node:path"`, { breakBefore: true })}
 import { spawnAsync } from "soda-nodejs"
 ${insertWhen(
     versionSource === "package.json version",
