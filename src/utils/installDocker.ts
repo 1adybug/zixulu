@@ -1,4 +1,4 @@
-import { readdir, rm } from "fs/promises"
+import { readdir, rm } from "node:fs/promises"
 
 import inquirer from "inquirer"
 import { JSDOM } from "jsdom"

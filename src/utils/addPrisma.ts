@@ -1,4 +1,4 @@
-import { readdir, writeFile } from "fs/promises"
+import { readdir, writeFile } from "node:fs/promises"
 
 import consola from "consola"
 import { spawnAsync } from "soda-nodejs"

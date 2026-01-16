@@ -1,6 +1,6 @@
-import { writeFile } from "fs/promises"
-import { homedir } from "os"
-import { join } from "path"
+import { writeFile } from "node:fs/promises"
+import { homedir } from "node:os"
+import { join } from "node:path"
 
 import { JsonMap, stringify } from "@iarna/toml"
 

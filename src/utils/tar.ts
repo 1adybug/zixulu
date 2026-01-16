@@ -1,4 +1,4 @@
-import { existsSync } from "fs"
+import { existsSync } from "node:fs"
 
 import inquirer from "inquirer"
 import { compress } from "soda-nodejs"

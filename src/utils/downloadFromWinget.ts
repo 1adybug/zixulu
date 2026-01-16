@@ -1,5 +1,5 @@
-import { rename } from "fs/promises"
-import { join } from "path"
+import { rename } from "node:fs/promises"
+import { join } from "node:path"
 
 import consola from "consola"
 import fetch from "node-fetch"

@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises"
+import { readFile } from "node:fs/promises"
 
 import clipboard from "clipboardy"
 import consola from "consola"

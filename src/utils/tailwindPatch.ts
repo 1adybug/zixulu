@@ -1,4 +1,4 @@
-import { readdir, rename } from "fs/promises"
+import { readdir, rename } from "node:fs/promises"
 
 import { getPackageVersionInDependcy } from "./getPackageVersionInDependcy"
 import { installDependceny } from "./installDependceny"

@@ -1,6 +1,6 @@
-import { existsSync } from "fs"
-import { writeFile as _writeFile, mkdir } from "fs/promises"
-import { join } from "path"
+import { existsSync } from "node:fs"
+import { writeFile as _writeFile, mkdir } from "node:fs/promises"
+import { join } from "node:path"
 
 import { capitalize } from "deepsea-tools"
 import inquirer from "inquirer"

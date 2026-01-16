@@ -1,4 +1,4 @@
-import { writeFile } from "fs/promises"
+import { writeFile } from "node:fs/promises"
 
 export interface WriteRsbuildConfigParams {
     /** 项目标题 */

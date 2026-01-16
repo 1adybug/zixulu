@@ -1,5 +1,5 @@
-import { copyFile, mkdir, readdir, rename, writeFile } from "fs/promises"
-import { join } from "path"
+import { copyFile, mkdir, readdir, rename, writeFile } from "node:fs/promises"
+import { join } from "node:path"
 
 import consola from "consola"
 import { execAsync, setDefaultOptions, spawnAsync } from "soda-nodejs"

@@ -1,4 +1,4 @@
-import { readdir } from "fs/promises"
+import { readdir } from "node:fs/promises"
 
 import { getEnumValues } from "deepsea-tools"
 import inquirer from "inquirer"

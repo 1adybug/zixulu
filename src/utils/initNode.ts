@@ -1,5 +1,5 @@
-import { writeFile } from "fs/promises"
-import { parse, resolve } from "path"
+import { writeFile } from "node:fs/promises"
+import { parse, resolve } from "node:path"
 
 const { name } = parse(resolve("."))
 

@@ -1,5 +1,5 @@
-import { rename, rm } from "fs/promises"
-import { join } from "path"
+import { rename, rm } from "node:fs/promises"
+import { join } from "node:path"
 
 import { unzip } from "soda-nodejs"
 

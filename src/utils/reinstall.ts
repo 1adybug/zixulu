@@ -1,4 +1,4 @@
-import { rm } from "fs/promises"
+import { rm } from "node:fs/promises"
 
 import { getPackageManager } from "./getPackageManager"
 import { installDependceny } from "./installDependceny"

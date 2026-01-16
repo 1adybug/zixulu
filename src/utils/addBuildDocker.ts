@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readdir, writeFile } from "fs/promises"
+import { copyFile, mkdir, readdir, writeFile } from "node:fs/promises"
 
 import consola from "consola"
 import { getEnumValues } from "deepsea-tools"

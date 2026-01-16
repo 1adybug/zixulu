@@ -1,5 +1,5 @@
-import { mkdir, readdir, stat, writeFile } from "fs/promises"
-import { join, resolve } from "path"
+import { mkdir, readdir, stat, writeFile } from "node:fs/promises"
+import { join, resolve } from "node:path"
 
 import consola from "consola"
 import inquirer from "inquirer"

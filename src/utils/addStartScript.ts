@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "fs/promises"
+import { mkdir, readFile, writeFile } from "node:fs/promises"
 
 import consola from "consola"
 

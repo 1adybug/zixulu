@@ -1,5 +1,5 @@
-import { readFile, writeFile } from "fs/promises"
-import { parse } from "path"
+import { readFile, writeFile } from "node:fs/promises"
+import { parse } from "node:path"
 
 import consola from "consola"
 

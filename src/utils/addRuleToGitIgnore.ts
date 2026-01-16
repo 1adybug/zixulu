@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from "fs/promises"
+import { readdir, readFile, writeFile } from "node:fs/promises"
 
 import { CommitType } from "@/constant"
 

@@ -1,6 +1,6 @@
-import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "fs/promises"
-import { homedir } from "os"
-import { join } from "path"
+import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises"
+import { homedir } from "node:os"
+import { join } from "node:path"
 
 import consola from "consola"
 import dayjs from "dayjs"

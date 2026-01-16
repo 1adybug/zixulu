@@ -1,5 +1,5 @@
-import { readdir, rename } from "fs/promises"
-import { join } from "path"
+import { readdir, rename } from "node:fs/promises"
+import { join } from "node:path"
 
 import { downloadFromPCQQ } from "./downloadFromPCQQ"
 

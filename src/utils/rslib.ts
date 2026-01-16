@@ -1,4 +1,4 @@
-import { writeFile } from "fs/promises"
+import { writeFile } from "node:fs/promises"
 
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"

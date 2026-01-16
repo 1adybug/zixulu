@@ -1,7 +1,7 @@
-import { existsSync } from "fs"
-import { mkdir, readFile, rename, writeFile } from "fs/promises"
-import { homedir } from "os"
-import { join, parse } from "path"
+import { existsSync } from "node:fs"
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises"
+import { homedir } from "node:os"
+import { join, parse } from "node:path"
 
 import consola from "consola"
 import inquirer from "inquirer"

@@ -1,5 +1,5 @@
-import { stat, writeFile } from "fs/promises"
-import { parse, resolve } from "path"
+import { stat, writeFile } from "node:fs/promises"
+import { parse, resolve } from "node:path"
 
 export interface OpenWithOptions {
     file: boolean

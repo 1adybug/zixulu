@@ -7,3 +7,6 @@ generated
 .vscode
 .generated
 **/components/ui/**
+.agent
+.cursor
+AGENTS.md

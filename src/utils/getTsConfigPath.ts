@@ -1,5 +1,5 @@
-import { join } from "path"
-import { cwd } from "process"
+import { join } from "node:path"
+import { cwd } from "node:process"
 
 /**
  * 获取 tsconfig.json 的完整路径

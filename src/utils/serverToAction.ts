@@ -1,5 +1,5 @@
-import { mkdir, readdir, readFile, rm, writeFile } from "fs/promises"
-import { join } from "path"
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises"
+import { join } from "node:path"
 
 export async function serverToAction() {
     const dir = await readdir("shared")

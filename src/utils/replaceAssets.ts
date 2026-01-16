@@ -1,7 +1,7 @@
-import { createWriteStream } from "fs"
-import { mkdir, readdir, readFile, stat, writeFile } from "fs/promises"
-import { join, parse } from "path"
-import { Readable } from "stream"
+import { createWriteStream } from "node:fs"
+import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises"
+import { join, parse } from "node:path"
+import { Readable } from "node:stream"
 
 import consola from "consola"
 import md5 from "md5"

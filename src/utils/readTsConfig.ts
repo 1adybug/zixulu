@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises"
+import { readFile } from "node:fs/promises"
 
 import consola from "consola"
 import JSON5 from "json5"

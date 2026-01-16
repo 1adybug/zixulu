@@ -1,5 +1,5 @@
-import { mkdir, readdir, writeFile } from "fs/promises"
-import { join } from "path"
+import { mkdir, readdir, writeFile } from "node:fs/promises"
+import { join } from "node:path"
 
 import consola from "consola"
 

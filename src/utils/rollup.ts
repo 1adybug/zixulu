@@ -1,5 +1,5 @@
-import { existsSync } from "fs"
-import { writeFile } from "fs/promises"
+import { existsSync } from "node:fs"
+import { writeFile } from "node:fs/promises"
 
 import { addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"

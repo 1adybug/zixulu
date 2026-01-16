@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "fs/promises"
+import { readFile, writeFile } from "node:fs/promises"
 
 import consola from "consola"
 import inquirer from "inquirer"

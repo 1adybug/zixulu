@@ -1,5 +1,5 @@
-import { readdir, stat } from "fs/promises"
-import { join } from "path"
+import { readdir, stat } from "node:fs/promises"
+import { join } from "node:path"
 
 /**
  * 获取入口 CSS 路径

@@ -1,6 +1,6 @@
-import { rm } from "fs/promises"
-import { homedir } from "os"
-import { join } from "path"
+import { rm } from "node:fs/promises"
+import { homedir } from "node:os"
+import { join } from "node:path"
 
 export async function removeZixuluCache() {
     const userDir = homedir()

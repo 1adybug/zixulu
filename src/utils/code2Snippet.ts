@@ -3,8 +3,8 @@
  * 支持自定义占位符替换
  * @param path 源代码文件路径
  */
-import { readFile } from "fs/promises"
-import { parse } from "path"
+import { readFile } from "node:fs/promises"
+import { parse } from "node:path"
 
 import clipboard from "clipboardy"
 import inquirer from "inquirer"

@@ -1,5 +1,5 @@
-import { existsSync } from "fs"
-import { join, parse } from "path"
+import { existsSync } from "node:fs"
+import { join, parse } from "node:path"
 
 export type TsFile = {
     depth: 0 | 1

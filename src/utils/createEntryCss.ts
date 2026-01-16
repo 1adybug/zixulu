@@ -1,5 +1,5 @@
-import { readdir, writeFile } from "fs/promises"
-import { join, parse } from "path"
+import { readdir, writeFile } from "node:fs/promises"
+import { join, parse } from "node:path"
 
 import { getEntryCssDir } from "./getEntryCssDir"
 

@@ -1,6 +1,6 @@
-import { readdir, stat } from "fs/promises"
-import { join, resolve } from "path"
-import { chdir } from "process"
+import { readdir, stat } from "node:fs/promises"
+import { join, resolve } from "node:path"
+import { chdir } from "node:process"
 
 import consola from "consola"
 import inquirer from "inquirer"

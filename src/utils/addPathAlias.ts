@@ -1,5 +1,5 @@
-import { readFile, writeFile } from "fs/promises"
-import { join, parse } from "path"
+import { readFile, writeFile } from "node:fs/promises"
+import { join, parse } from "node:path"
 
 import inquirer from "inquirer"
 

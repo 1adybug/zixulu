@@ -1,6 +1,6 @@
-import { createWriteStream } from "fs"
-import { join } from "path"
-import { Readable } from "stream"
+import { createWriteStream } from "node:fs"
+import { join } from "node:path"
+import { Readable } from "node:stream"
 
 import fetch from "node-fetch"
 

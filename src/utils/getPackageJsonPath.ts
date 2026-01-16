@@ -1,4 +1,4 @@
-import { join } from "path"
+import { join } from "node:path"
 
 /**
  * 获取 package.json 的完整路径
