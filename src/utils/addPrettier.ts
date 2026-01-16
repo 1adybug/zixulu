@@ -11,21 +11,7 @@ import { readPackageJson } from "./readPackageJson"
 import { shouldContinue } from "./shouldContinue"
 import { writePackageJson } from "./writePackageJson"
 
-const prettierIgnoreRules = [
-    "node_modules",
-    "public",
-    "dist",
-    "build",
-    "generated",
-    ".next",
-    ".vscode",
-    ".generated",
-    "**/components/ui/**",
-    "**/components/ai/**",
-    ".agent",
-    ".cursor",
-    "AGENTS.md",
-]
+const prettierIgnoreRules = ["node_modules", "public", "dist", "build", "generated", ".next", ".vscode", ".generated", ".agent", ".cursor", "AGENTS.md"]
 
 const prettierConfig = `// @ts-check
 
