@@ -61,9 +61,8 @@ export async function updateDockerCompose() {
     const data = yaml.parse(content) as DockerCompose
     const images = Object.values(data.services).map(service => service.image) as string[]
 
-    consola.start("开始更新镜像")
-
     for (const image of images) {
+        consola.start(`开始更新镜像 ${image}`)
         const match = image.match(/^(.+):(.+)$/)
         const name = match ? match[1] : image
         const tag = match ? match[2] : "latest"
@@ -73,8 +72,6 @@ export async function updateDockerCompose() {
         await pullDockerImage({ image, sha256 })
         consola.info(`更新镜像 ${image} 完成`)
     }
-
-    consola.success("更新镜像完成")
 
     await spawnAsync("docker compose down", {
         shell: true,
