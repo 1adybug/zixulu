@@ -35,7 +35,7 @@ const config = {
     plugins: ["@1adybug/prettier"],
     controlStatementBraces: "add",
     multiLineBraces: "add",
-    nodeProtocol: true,
+    nodeProtocol: "add",
 }
 
 export default config
