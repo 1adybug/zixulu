@@ -1,5 +1,6 @@
 import { Agent } from "node:http"
 
+import { checkPort } from "get-port-please"
 import { HttpsProxyAgent } from "https-proxy-agent"
 
 export enum PackageManager {
@@ -65,7 +66,7 @@ export const SpawnOptions = {
     stdio: "inherit",
 }
 
-export const agent = new HttpsProxyAgent("http://localhost:7890") as Agent
+export const agent = (await checkPort(7890, "127.0.0.1")) ? (new HttpsProxyAgent("http://127.0.0.1:7890") as Agent) : undefined
 
 export const addedRules = [
     "package-lock.json",
