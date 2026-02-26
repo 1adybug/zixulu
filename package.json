@@ -31,7 +31,7 @@
         "sync": "node scripts/syncPackage.mjs",
         "format": "prettier --write .",
         "fg": "npm run format && git add . && git commit -m \"✨feature: format\"",
-        "lint": "eslint . --fix"
+        "lint": "eslint ."
     },
     "dependencies": {
         "@iarna/toml": "^3.0.0",
@@ -51,24 +51,22 @@
         "node-fetch": "^3.3.2",
         "semver": "^7.7.3",
         "simple-git": "^3.30.0",
-        "smol-toml": "^1.6.0",
         "soda-nodejs": "^0.8.9",
         "yaml": "^2.8.2"
     },
     "devDependencies": {
+        "@1adybug/eslint": "^0.0.4",
         "@1adybug/prettier": "^0.0.27",
-        "@eslint/js": "^9.39.2",
         "@rslib/core": "^0.19.2",
         "@types/jsdom": "^27.0.0",
         "@types/md5": "^2.3.6",
         "@types/node": "^24.10.9",
         "@types/semver": "^7.7.1",
-        "globals": "^17.0.0",
+        "eslint": "^9.39.3",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",
         "prettier": "^3.8.0",
-        "typescript": "^5.9.3",
-        "typescript-eslint": "^8.53.0"
+        "typescript": "^5.9.3"
     },
     "resolutions": {
         "string-width": "^4",

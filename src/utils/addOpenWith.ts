@@ -19,7 +19,7 @@ export async function addOpenWith(path: string, { file, folder, background }: Op
 
     const { name } = parse(path)
 
-    const escapedPath = path.replace(/[\\\/]/g, "\\\\")
+    const escapedPath = path.replace(/[\\/]/g, "\\\\")
 
     let reg = `\ufeffWindows Registry Editor Version 5.00
 `
