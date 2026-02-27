@@ -87,6 +87,7 @@ import { addOpenWith } from "./utils/addOpenWith"
 import { gdm } from "./utils/gdm"
 import { pullDockerImage } from "./utils/pullDockerImage"
 import { removeOpenWith } from "./utils/removeOpenWith"
+import { syncTemplate } from "./utils/syncTemplate"
 
 setDefaultOptions({
     shell: true,
@@ -517,5 +518,7 @@ program
     .argument("image", "镜像名称")
     .argument("sha256", "镜像 sha256")
     .action((image: string, sha256: string) => pullDockerImage({ image, sha256 }))
+
+program.command("sync-template").alias("st").description("同步模板项目").action(syncTemplate)
 
 program.parse()

@@ -23,6 +23,7 @@ export interface ZixuluSetting {
     upgradeWorkspaceDependcenyHistory?: Record<string, string[]>
     syncEditor?: SyncEditorConfig
     verdaccioPath?: string
+    templateProjects?: string[]
 }
 
 export async function readZixuluSetting(): Promise<ZixuluSetting> {
