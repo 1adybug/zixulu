@@ -84,6 +84,7 @@ import { vite } from "@/utils/vite"
 import { winget } from "@/utils/winget"
 
 import { addOpenWith } from "./utils/addOpenWith"
+import { createRepository } from "./utils/createRepository"
 import { gdm } from "./utils/gdm"
 import { pullDockerImage } from "./utils/pullDockerImage"
 import { removeOpenWith } from "./utils/removeOpenWith"
@@ -520,5 +521,7 @@ program
     .action((image: string, sha256: string) => pullDockerImage({ image, sha256 }))
 
 program.command("sync-template").alias("st").description("同步模板项目").action(syncTemplate)
+
+program.command("create-repository").alias("cr").description("创建 GitHub 仓库").action(createRepository)
 
 program.parse()
