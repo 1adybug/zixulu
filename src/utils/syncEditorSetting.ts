@@ -24,13 +24,21 @@ export type Editor = "Code" | "Cursor" | "Antigravity"
 
 export type SyncEditorSettingSource = Editor | "Online"
 
-export type EditorFileType = "settings" | "snippets"
+export type EditorFileType = "settings" | "snippets" | "PowerShell"
 
 export type EditorConfigType = EditorFileType | "extensions"
 
 export type EditorFileSourceMap = Record<EditorFileType, Record<SyncEditorSettingSource, string>>
 
 const userDir = homedir()
+const powerShellProfileFilename = "Microsoft.PowerShell_profile.ps1"
+const powerShellProfilePath = join(userDir, "Documents/PowerShell", powerShellProfileFilename)
+
+const onlineFileNameMap: Record<EditorFileType, string> = {
+    settings: "settings.json",
+    snippets: "global.code-snippets",
+    PowerShell: powerShellProfileFilename,
+}
 
 const fileSourceMap: EditorFileSourceMap = {
     settings: {
@@ -44,6 +52,12 @@ const fileSourceMap: EditorFileSourceMap = {
         Cursor: join(userDir, "AppData/Roaming/Cursor/User/snippets/global.code-snippets"),
         Antigravity: join(userDir, "AppData/Roaming/Antigravity/User/snippets/global.code-snippets"),
         Online: "https://luzixu.geskj.com/global.code-snippets",
+    },
+    PowerShell: {
+        Code: powerShellProfilePath,
+        Cursor: powerShellProfilePath,
+        Antigravity: powerShellProfilePath,
+        Online: `https://luzixu.geskj.com/${powerShellProfileFilename}`,
     },
 }
 
@@ -72,11 +86,7 @@ async function getFile(source: string) {
     return await readFile(source, "utf-8")
 }
 
-export async function syncEditorFile({
-    type,
-    source: { type: sourceType, value: sourceValue },
-    target: { type: targetType, value: targetValue },
-}: SyncEditorFileParams) {
+export async function syncEditorFile({ type, source: { value: sourceValue }, target: { type: targetType, value: targetValue } }: SyncEditorFileParams) {
     const { dir, base } = parse(targetValue)
     await mkdir(dir, { recursive: true })
     const setting = await readZixuluSetting()
@@ -173,8 +183,8 @@ export async function syncEditorSetting() {
             type: "checkbox",
             name: "types",
             message: "选择的配置类型",
-            choices: ["settings", "snippets", "extensions"],
-            default: setting.syncEditor?.types ?? ["settings", "snippets", "extensions"],
+            choices: ["settings", "snippets", "extensions", "PowerShell"],
+            default: setting.syncEditor?.types ?? ["settings", "snippets", "extensions", "PowerShell"],
         },
     ])
 
@@ -201,20 +211,49 @@ export async function syncEditorSetting() {
     const onlinePath = setting.syncEditor.onlinePath!
 
     const configs: SyncEditorFileParams[] = types
-        .filter(item => item !== "extensions")
+        .filter(item => item !== "extensions" && item !== "PowerShell")
         .map(fileType =>
             targets.map(target => ({
                 type: fileType,
                 source: { type: source, value: fileSourceMap[fileType][source] },
                 target: {
                     type: target,
-                    value:
-                        target === "Online"
-                            ? join(onlinePath, "static", fileType === "settings" ? "settings.json" : "global.code-snippets")
-                            : fileSourceMap[fileType][target],
+                    value: target === "Online" ? join(onlinePath, "static", onlineFileNameMap[fileType]) : fileSourceMap[fileType][target],
                 },
             })))
         .flat()
+
+    if (types.includes("PowerShell")) {
+        const powerShellLocalTarget = targets.find(target => target !== "Online")
+
+        if (targets.includes("Online")) {
+            configs.push({
+                type: "PowerShell",
+                source: {
+                    type: source,
+                    value: powerShellProfilePath,
+                },
+                target: {
+                    type: "Online",
+                    value: join(onlinePath, "static", onlineFileNameMap.PowerShell),
+                },
+            })
+        }
+
+        if (source === "Online" && powerShellLocalTarget) {
+            configs.push({
+                type: "PowerShell",
+                source: {
+                    type: "Online",
+                    value: fileSourceMap.PowerShell.Online,
+                },
+                target: {
+                    type: powerShellLocalTarget,
+                    value: powerShellProfilePath,
+                },
+            })
+        }
+    }
 
     for (const config of configs) await syncEditorFile(config)
 
