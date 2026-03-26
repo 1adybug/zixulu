@@ -23,6 +23,13 @@ export interface VscodeExt {
 }
 
 /**
+ * VSCode 扩展版本信息
+ */
+export interface VscodeExtVersion {
+    version: string
+}
+
+/**
  * 获取指定VSCode扩展的详细信息
  * @param ext 扩展ID
  * @returns Promise<VscodeExt> 扩展详细信息
@@ -36,9 +43,7 @@ export async function getVscodeExtInfo(ext: string): Promise<VscodeExt> {
 
     if (ext === "ms-ceintl.vscode-language-pack-zh-hans") {
         const reg2 = /"Versions":(\[\{".+?\])/
-        const versions = JSON.parse(html.match(reg2)![1]) as {
-            version: string
-        }[]
+        const versions = JSON.parse(html.match(reg2)![1]) as VscodeExtVersion[]
         const output = await execAsync("code --version")
         const codeVersions = output.split("\n")[0].split(".").map(Number)
         const item =

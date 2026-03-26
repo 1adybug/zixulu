@@ -5,6 +5,14 @@ import inquirer from "inquirer"
 
 import { getPidInfoFromPort, getProcessInfoFromPid } from "./processInfo"
 
+/**
+ * 进程选择项
+ */
+export interface ProcessChoice {
+    name: string
+    value: number
+}
+
 export async function killProcessByPort(port: string | number) {
     port = typeof port === "string" ? parseInt(port) : port
 
@@ -15,7 +23,7 @@ export async function killProcessByPort(port: string | number) {
 
     const pidInfos = await getPidInfoFromPort(port)
 
-    const choices: { name: string; value: number }[] = []
+    const choices: ProcessChoice[] = []
 
     for (const { pid, info } of pidInfos) {
         const name = await getProcessInfoFromPid(pid)
