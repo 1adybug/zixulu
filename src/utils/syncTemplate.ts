@@ -29,6 +29,10 @@ export interface DeleteTemplateProjectsAnswer {
     projectPaths: string[]
 }
 
+export interface SelectSyncTemplateProjectsAnswer {
+    projectPaths: string[]
+}
+
 export interface SyncTemplateProjectParams {
     projectPath: string
     index: number
@@ -60,6 +64,10 @@ export interface ResolveBranchCommitHashParams {
 }
 
 export interface SyncTemplateProjectsParams {
+    templateProjects: string[]
+}
+
+export interface SelectSyncTemplateProjectsParams {
     templateProjects: string[]
 }
 
@@ -95,6 +103,10 @@ export interface AddTemplateProjectsParams {
 
 export interface DeleteTemplateProjectsParams {
     templateProjects: string[]
+}
+
+export interface PrintFailedSyncTemplateProjectsParams {
+    failedProjectPaths: string[]
 }
 
 export async function syncTemplate() {
@@ -257,14 +269,23 @@ export async function syncTemplateProjects({ templateProjects }: SyncTemplatePro
         return templateProjects
     }
 
-    const templateProjectSet = new Set(templateProjects)
+    const selectedTemplateProjects = await selectSyncTemplateProjects({ templateProjects })
 
-    for (const [index, projectPath] of templateProjects.entries()) {
+    if (selectedTemplateProjects.length === 0) {
+        consola.info("未选择任何项目")
+        return templateProjects
+    }
+
+    const templateProjectSet = new Set(templateProjects)
+    const failedProjectPathSet = new Set<string>()
+
+    for (const [index, projectPath] of selectedTemplateProjects.entries()) {
         const { isAvailable, reason } = await checkSyncProjectAvailable({ projectPath })
 
         if (!isAvailable) {
             const invalidReason = reason ?? "目录不可用"
-            consola.warn(`[${index + 1}/${templateProjects.length}] 跳过 ${projectPath}，原因：${invalidReason}`)
+            failedProjectPathSet.add(projectPath)
+            consola.warn(`[${index + 1}/${selectedTemplateProjects.length}] 跳过 ${projectPath}，原因：${invalidReason}`)
 
             const shouldDelete = await confirmDeleteInvalidTemplateProject({
                 projectPath,
@@ -279,16 +300,34 @@ export async function syncTemplateProjects({ templateProjects }: SyncTemplatePro
             continue
         }
 
-        await syncTemplateProject({
+        const isSuccess = await syncTemplateProject({
             projectPath,
             index: index + 1,
-            total: templateProjects.length,
+            total: selectedTemplateProjects.length,
         })
+
+        if (!isSuccess) failedProjectPathSet.add(projectPath)
     }
 
     consola.success("模板项目同步完成")
+    printFailedSyncTemplateProjects({ failedProjectPaths: Array.from(failedProjectPathSet) })
 
     return Array.from(templateProjectSet)
+}
+
+export async function selectSyncTemplateProjects({ templateProjects }: SelectSyncTemplateProjectsParams) {
+    const { projectPaths } = await inquirer.prompt<SelectSyncTemplateProjectsAnswer>({
+        type: "checkbox",
+        name: "projectPaths",
+        message: "请选择要同步的项目",
+        choices: templateProjects.map(projectPath => ({
+            name: projectPath,
+            value: projectPath,
+        })),
+        default: templateProjects,
+    })
+
+    return projectPaths
 }
 
 export async function checkSyncProjectAvailable({ projectPath }: CheckSyncProjectAvailableParams): Promise<CheckSyncProjectAvailableResult> {
@@ -354,6 +393,16 @@ export async function hasTemplateRemote({ cwd }: HasTemplateRemoteParams) {
     }
 }
 
+export function printFailedSyncTemplateProjects({ failedProjectPaths }: PrintFailedSyncTemplateProjectsParams) {
+    if (failedProjectPaths.length === 0) return
+
+    consola.warn("以下目录同步失败")
+
+    failedProjectPaths.forEach((projectPath, index) => {
+        consola.log(`${index + 1}. ${projectPath}`)
+    })
+}
+
 export async function syncTemplateProject({ projectPath, index, total }: SyncTemplateProjectParams) {
     consola.start(`[${index}/${total}] 开始同步 ${projectPath}`)
 
@@ -400,10 +449,12 @@ export async function syncTemplateProject({ projectPath, index, total }: SyncTem
         })
 
         consola.success(`[${index}/${total}] 同步成功 ${projectPath}`)
+        return true
     } catch (error) {
         const errorMessage = getGitCommandErrorMessage({ error })
         consola.error(`[${index}/${total}] 同步失败 ${projectPath}`)
         consola.error(errorMessage)
+        return false
     }
 }
 
