@@ -1,7 +1,7 @@
 import { consola } from "consola"
 import { simpleGit } from "simple-git"
 
-import { preprocessRegex } from "./preprocessRegex"
+import { preprocessPlaceholderText, preprocessRegex } from "./preprocessRegex"
 import { shouldContinue } from "./shouldContinue"
 
 export interface ReplaceTagParams {
@@ -42,10 +42,12 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
     // 预处理正则表达式，替换占位符
     const processedReg = preprocessRegex(reg)
 
+    const processedReplace = preprocessPlaceholderText(replace)
+
     // 显示正则表达式和替换字符串
     consola.info(`正则表达式: /${processedReg}/${flags ?? ""}`)
 
-    consola.info(`替换字符串: ${replace}`)
+    consola.info(`替换字符串: ${processedReplace}`)
 
     // 询问用户是否继续
     const cont = await shouldContinue("是否继续？")
@@ -73,7 +75,7 @@ export async function replaceTag({ reg, replace, flags, push, remote = "origin" 
         // 每次循环创建新的正则表达式，避免 g 标志可能带来的状态问题
         const regexp = new RegExp(processedReg, flags)
 
-        const newTag = tag.replace(regexp, replace)
+        const newTag = tag.replace(regexp, processedReplace)
 
         // 如果替换后的 tag 名称没有变化，跳过
         if (newTag === tag) continue

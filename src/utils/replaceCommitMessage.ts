@@ -6,7 +6,7 @@ import { consola } from "consola"
 import { simpleGit } from "simple-git"
 import { spawnAsync } from "soda-nodejs"
 
-import { preprocessRegex } from "./preprocessRegex"
+import { preprocessPlaceholderText, preprocessRegex } from "./preprocessRegex"
 import { shouldContinue } from "./shouldContinue"
 
 export interface ReplaceCommitMessageParams {
@@ -53,13 +53,15 @@ export async function replaceCommitMessage({ reg, replace, flags, push, remote =
     // 预处理正则表达式，替换占位符
     const processedReg = preprocessRegex(reg)
 
+    const processedReplace = preprocessPlaceholderText(replace)
+
     consola.warn("⚠️  警告：此操作将重写 Git 历史，建议先备份")
     consola.info(`目标分支: ${currentBranch}`)
 
     // 显示正则表达式和替换字符串
     consola.info(`正则表达式: /${processedReg}/${flags ?? ""}`)
 
-    consola.info(`替换字符串: ${replace}`)
+    consola.info(`替换字符串: ${processedReplace}`)
 
     // 询问用户是否继续
     const cont = await shouldContinue("⚠️ 是否继续？此操作将重写 Git 历史")
@@ -81,7 +83,7 @@ export async function replaceCommitMessage({ reg, replace, flags, push, remote =
     // 生成 Node.js 脚本内容
     const scriptContent = `
 const reg = ${JSON.stringify(processedReg)}
-const replace = ${JSON.stringify(replace)}
+const replace = ${JSON.stringify(processedReplace)}
 const flags = ${JSON.stringify(flags ?? "")}
 
 let input = ""

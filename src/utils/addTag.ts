@@ -1,7 +1,7 @@
 import { consola } from "consola"
 import { simpleGit } from "simple-git"
 
-import { preprocessRegex } from "./preprocessRegex"
+import { preprocessPlaceholderText, preprocessRegex } from "./preprocessRegex"
 import { shouldContinue } from "./shouldContinue"
 
 export interface AddTagParams {
@@ -44,10 +44,12 @@ export async function addTag({ reg, flags, replacement, push, remote = "origin",
     // 预处理正则表达式，替换占位符
     const processedReg = preprocessRegex(reg)
 
+    const processedReplacement = preprocessPlaceholderText(replacement)
+
     // 显示正则表达式和替换字符串
     consola.info(`正则表达式: /${processedReg}/${flags ?? ""}`)
 
-    consola.info(`替换字符串: ${replacement}`)
+    consola.info(`替换字符串: ${processedReplacement}`)
 
     // 询问用户是否继续
     const cont = await shouldContinue("是否继续？")
@@ -82,7 +84,7 @@ export async function addTag({ reg, flags, replacement, push, remote = "origin",
         // 如果 commit message 匹配正则表达式
         if (regexp.test(commit.message)) {
             // 使用正则替换生成 tag 名称
-            const tagName = commit.message.replace(new RegExp(processedReg, flags), replacement)
+            const tagName = commit.message.replace(new RegExp(processedReg, flags), processedReplacement)
 
             // 检查 tag 名称是否有效
             if (tagName && tagName.trim()) {
