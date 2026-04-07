@@ -22,6 +22,7 @@ import { addStartScript } from "@/utils/addStartScript"
 import { addSyncPackageScript } from "@/utils/addSyncPackageScript"
 import { addTag } from "@/utils/addTag"
 import { addTailwind } from "@/utils/addTailwind"
+import { addTemplate } from "@/utils/addTemplate"
 import { addZipDist } from "@/utils/addZipDist"
 import { arrowToFunction } from "@/utils/arrowToFunction"
 import { betaVersion } from "@/utils/betaVersion"
@@ -522,6 +523,8 @@ program
     .action((image: string, sha256: string) => pullDockerImage({ image, sha256 }))
 
 program.command("sync-template").alias("st").description("同步模板项目").action(syncTemplate)
+
+program.command("add-template").alias("at").description("添加模板远程仓库").action(addTemplate)
 
 program.command("create-repository").alias("cr").description("创建 GitHub 仓库").action(createRepository)
 

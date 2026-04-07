@@ -73,6 +73,8 @@
 - `zixulu add-zip-dist` (别名: `azd`) - 添加将 dist 压缩的脚本
 - `zixulu bun` - 设置 bun
 - `zixulu add-sync` - 添加同步包脚本
+- `zixulu add-template` (别名: `at`) - 为当前仓库添加 template 远程，并将 push 地址设置为 `no_push://template`
+- `zixulu sync-template` (别名: `st`) - 同步模板项目
 
 ## 选项
 
