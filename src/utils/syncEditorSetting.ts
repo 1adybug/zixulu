@@ -11,7 +11,7 @@ import { CommitType } from "@/constant"
 
 import { addGitCommit } from "./addGitCommit"
 import { getCommitMessage } from "./getCommitMessage"
-import { getEditorExtensions } from "./getEditorExtensions"
+import { canGetEditorExtensions, getEditorExtensionCommand, getEditorExtensions } from "./getEditorExtensions"
 import { hasAntiGravity } from "./hasAntiGravity"
 import { hasChangeNoCommit } from "./hasChangeNoCommit"
 import { hasCode } from "./hasCode"
@@ -77,6 +77,12 @@ export interface SyncEditorFileParams {
     target: SyncEditorFileItem
 }
 
+export interface SyncEditorExtensionsParams {
+    editor: Editor
+    sourceExtensions: Set<string>
+    targetExtensions: Set<string>
+}
+
 async function getFile(source: string) {
     if (source.startsWith("http")) {
         const response = await fetch(source)
@@ -137,6 +143,31 @@ export async function syncEditorFile({ type, source: { value: sourceValue }, tar
 
     await writeFile(targetValue, code, "utf-8")
     consola.success(`${targetValue} 同步完成`)
+}
+
+export async function syncEditorExtensions({ editor, sourceExtensions, targetExtensions }: SyncEditorExtensionsParams) {
+    const command = getEditorExtensionCommand({ editor })
+    const installExtensions = sourceExtensions.difference(targetExtensions)
+
+    for (const ext of installExtensions) {
+        try {
+            console.log(`${command} --install-extension ${ext}`)
+            await execAsync(`${command} --install-extension ${ext}`)
+        } catch {
+            console.error(`${ext} 安装失败`)
+        }
+    }
+
+    const uninstallExtensions = targetExtensions.difference(sourceExtensions)
+
+    for (const ext of uninstallExtensions) {
+        try {
+            console.log(`${command} --uninstall-extension ${ext}`)
+            await execAsync(`${command} --uninstall-extension ${ext}`)
+        } catch {
+            console.error(`${ext} 卸载失败`)
+        }
+    }
 }
 
 export async function syncEditorSetting() {
@@ -258,83 +289,58 @@ export async function syncEditorSetting() {
     for (const config of configs) await syncEditorFile(config)
 
     if (types.includes("extensions")) {
-        const vscodeExtensions = await getEditorExtensions({ source: "Code" })
-        const cursorExtensions = await getEditorExtensions({ source: "Cursor" })
-        const antigravityExtensions = await getEditorExtensions({ source: "Antigravity" })
-        const onlineExtensions = await getEditorExtensions({ source: "Online" })
+        const extensionMap = new Map<SyncEditorSettingSource, Set<string>>()
+        extensionMap.set("Online", await getEditorExtensions({ source: "Online" }))
 
-        const sourceExtensions =
-            source === "Code" ? vscodeExtensions : source === "Cursor" ? cursorExtensions : source === "Antigravity" ? antigravityExtensions : onlineExtensions
+        if (source !== "Online") {
+            const canReadSourceExtensions = await canGetEditorExtensions({ editor: source })
+
+            if (!canReadSourceExtensions) throw new Error(`${source} 命令不可用，无法读取扩展列表，请确认已安装并加入 PATH`)
+
+            extensionMap.set(source, await getEditorExtensions({ source }))
+        }
+
+        const sourceExtensions = extensionMap.get(source)!
 
         if (targets.includes("Code")) {
-            const installExtensions = sourceExtensions.difference(vscodeExtensions)
+            const canReadCodeExtensions = await canGetEditorExtensions({ editor: "Code" })
 
-            for (const ext of installExtensions) {
-                try {
-                    console.log(`code --install-extension ${ext}`)
-                    await execAsync(`code --install-extension ${ext}`)
-                } catch (error) {
-                    console.error(`${ext} 安装失败`)
-                }
-            }
-
-            const uninstallExtensions = vscodeExtensions.difference(sourceExtensions)
-
-            for (const ext of uninstallExtensions) {
-                try {
-                    console.log(`code --uninstall-extension ${ext}`)
-                    await execAsync(`code --uninstall-extension ${ext}`)
-                } catch (error) {
-                    console.error(`${ext} 卸载失败`)
-                }
+            if (!canReadCodeExtensions) consola.warn("Code 命令不可用，已跳过 VS Code 扩展同步")
+            else {
+                extensionMap.set("Code", await getEditorExtensions({ source: "Code" }))
+                await syncEditorExtensions({
+                    editor: "Code",
+                    sourceExtensions,
+                    targetExtensions: extensionMap.get("Code")!,
+                })
             }
         }
 
         if (targets.includes("Cursor")) {
-            const installExtensions = sourceExtensions.difference(cursorExtensions)
+            const canReadCursorExtensions = await canGetEditorExtensions({ editor: "Cursor" })
 
-            for (const ext of installExtensions) {
-                try {
-                    console.log(`cursor --install-extension ${ext}`)
-                    await execAsync(`cursor --install-extension ${ext}`)
-                } catch (error) {
-                    console.error(`${ext} 安装失败`)
-                }
-            }
-
-            const uninstallExtensions = cursorExtensions.difference(sourceExtensions)
-
-            for (const ext of uninstallExtensions) {
-                try {
-                    console.log(`cursor --uninstall-extension ${ext}`)
-                    await execAsync(`cursor --uninstall-extension ${ext}`)
-                } catch (error) {
-                    console.error(`${ext} 卸载失败`)
-                }
+            if (!canReadCursorExtensions) consola.warn("Cursor 命令不可用，已跳过 Cursor 扩展同步")
+            else {
+                extensionMap.set("Cursor", await getEditorExtensions({ source: "Cursor" }))
+                await syncEditorExtensions({
+                    editor: "Cursor",
+                    sourceExtensions,
+                    targetExtensions: extensionMap.get("Cursor")!,
+                })
             }
         }
 
         if (targets.includes("Antigravity")) {
-            const installExtensions = sourceExtensions.difference(antigravityExtensions)
+            const canReadAntigravityExtensions = await canGetEditorExtensions({ editor: "Antigravity" })
 
-            for (const ext of installExtensions) {
-                try {
-                    console.log(`antigravity --install-extension ${ext}`)
-                    await execAsync(`antigravity --install-extension ${ext}`)
-                } catch (error) {
-                    console.error(`${ext} 安装失败`)
-                }
-            }
-
-            const uninstallExtensions = antigravityExtensions.difference(sourceExtensions)
-
-            for (const ext of uninstallExtensions) {
-                try {
-                    console.log(`antigravity --uninstall-extension ${ext}`)
-                    await execAsync(`antigravity --uninstall-extension ${ext}`)
-                } catch (error) {
-                    console.error(`${ext} 卸载失败`)
-                }
+            if (!canReadAntigravityExtensions) consola.warn("Antigravity 命令不可用，已跳过 Antigravity 扩展同步")
+            else {
+                extensionMap.set("Antigravity", await getEditorExtensions({ source: "Antigravity" }))
+                await syncEditorExtensions({
+                    editor: "Antigravity",
+                    sourceExtensions,
+                    targetExtensions: extensionMap.get("Antigravity")!,
+                })
             }
         }
 
