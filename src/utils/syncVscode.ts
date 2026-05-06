@@ -45,7 +45,7 @@ async function pathExists(path) {
     }
 }
 
-// Windows 上优先查找真实的 code.cmd，避免 shell 拼命令时的路径问题
+// Windows 上优先查找 code.cmd，避免直接调用 Code.exe 打开编辑器窗口
 async function resolveCodeCli() {
     if (process.platform !== "win32") return "code"
 
@@ -61,7 +61,6 @@ async function resolveCodeCli() {
     const pathDirs = process.env.PATH?.split(delimiter).filter(Boolean) ?? []
     for (const dir of pathDirs) {
         candidates.add(join(dir, "code.cmd"))
-        candidates.add(join(dir, "code.exe"))
         candidates.add(join(dir, "code"))
     }
 
@@ -73,15 +72,68 @@ async function resolveCodeCli() {
 }
 
 /**
+ * @param {string} value
+ */
+function quoteWindowsArg(value) {
+    return "\\"" + value.replace(/"/g, "\\"\\"") + "\\""
+}
+
+/**
+ * @param {string[]} args
+ * @param {string} output
+ */
+function isCliCommandSuccessful(args, output) {
+    if (args.includes("--install-extension")) return output.includes("was successfully installed.") || output.includes("is already installed.")
+    if (args.includes("--uninstall-extension")) return output.includes("was successfully uninstalled.") || output.includes("is not installed.")
+    return false
+}
+
+/**
+ * @param {Buffer | string} data
+ * @param {string[]} chunks
+ * @param {NodeJS.WriteStream} stream
+ */
+function writeChildOutput(data, chunks, stream) {
+    const text = data.toString()
+    chunks.push(text)
+    stream.write(text)
+}
+
+/**
  * @param {string} command
  * @param {string[]} args
  */
 function spawnAsync(command, args) {
     return new Promise((resolve, reject) => {
-        const child = spawn(command, args, { stdio: "inherit" })
+        // Windows 不能直接 spawn .cmd 或 .bat 文件，需要交给 cmd.exe 执行
+        const needCmdShell = process.platform === "win32" && /\\.(cmd|bat)$/i.test(command)
+        const chunks = []
+        const child = needCmdShell
+            ? spawn(
+                  process.env.ComSpec ?? "cmd.exe",
+                  ["/d", "/s", "/c", "\\"" + quoteWindowsArg(command) + " " + args.map(quoteWindowsArg).join(" ") + "\\""],
+                  {
+                      stdio: ["ignore", "pipe", "pipe"],
+                      windowsVerbatimArguments: true,
+                  },
+              )
+            : spawn(command, args, { stdio: ["ignore", "pipe", "pipe"] })
+
+        child.stdout?.on("data", data => writeChildOutput(data, chunks, process.stdout))
+        child.stderr?.on("data", data => writeChildOutput(data, chunks, process.stderr))
         child.on("error", reject)
         child.on("exit", code => {
-            if (code !== 0) return reject(new Error(\`Command failed with code \${code}: \${command} \${args.join(" ")}\`))
+            const output = chunks.join("")
+
+            if (code !== 0) {
+                if (isCliCommandSuccessful(args, output)) {
+                    console.warn(\`VS Code 命令退出码为 \${code}，但操作已完成，继续执行后续步骤\`)
+                    return resolve(0)
+                }
+
+                return reject(new Error(\`Command failed with code \${code}: \${command} \${args.join(" ")}\`))
+            }
+
             resolve(0)
         })
     })
@@ -99,8 +151,18 @@ ${
             ? `    const extensionsDir = join(workspaceDir, "extensions")
     const codeCli = await resolveCodeCli()
     const dir = await readdir(extensionsDir)
+    const extensionErrors = []
     for (const ext of dir) {
-        await spawnAsync(codeCli, ["--install-extension", join(extensionsDir, ext)])
+        try {
+            await spawnAsync(codeCli, ["--install-extension", join(extensionsDir, ext), "--force"])
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error)
+            extensionErrors.push(\`\${ext}: \${message}\`)
+            console.error(\`扩展同步失败：\${ext}\`)
+        }
+    }
+    if (extensionErrors.length > 0) {
+        throw new Error(\`以下扩展同步失败：\\n\${extensionErrors.join("\\n")}\`)
     }
 `
             : ""
