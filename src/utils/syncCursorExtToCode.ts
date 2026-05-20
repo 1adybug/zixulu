@@ -14,7 +14,7 @@ export async function syncCursorExtToCode() {
 
     const cursorExts = await getEditorExtensions({ source: "Cursor" })
     const vscodeExts = await getEditorExtensions({ source: "Code" })
-    const codeCommand = getEditorExtensionCommand({ editor: "Code" })
+    const codeCommand = await getEditorExtensionCommand({ editor: "Code" })
     const installExts = cursorExts.difference(vscodeExts)
 
     for (const ext of installExts) await execAsync(`${codeCommand} --install-extension ${ext}`)

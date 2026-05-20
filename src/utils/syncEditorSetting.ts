@@ -146,7 +146,7 @@ export async function syncEditorFile({ type, source: { value: sourceValue }, tar
 }
 
 export async function syncEditorExtensions({ editor, sourceExtensions, targetExtensions }: SyncEditorExtensionsParams) {
-    const command = getEditorExtensionCommand({ editor })
+    const command = await getEditorExtensionCommand({ editor })
     const installExtensions = sourceExtensions.difference(targetExtensions)
 
     for (const ext of installExtensions) {
