@@ -3,7 +3,7 @@ import semver from "semver"
 
 import { getPackageRequiredVersion } from "./getPackageRequiredVersion"
 import { getPackageVersionFromRange } from "./getPackageVersionFromRange"
-import { UpgradeLevel } from "./getUpgradeDependencyConfig"
+import type { UpgradeLevel } from "./getUpgradeDependencyConfig"
 import { retry } from "./retry"
 
 /**

@@ -143,7 +143,7 @@ export async function replacePathAlias() {
         await writeFile(file, code, "utf-8")
     }
 
-    return getCommitMessage(CommitType.feature, "replace path alias")
+    return getCommitMessage(CommitType.feat, "replace path alias")
 }
 
 /**
@@ -177,5 +177,5 @@ export async function addFolderPathAlias() {
             path: getRelativePath(join(folder, item)),
         })),
     )
-    return getCommitMessage(CommitType.feature, `add path alias: ${result.join(", ")}`)
+    return getCommitMessage(CommitType.feat, `add path alias: ${result.join(", ")}`)
 }

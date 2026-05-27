@@ -1,4 +1,4 @@
-import { CommitType, CommitTypeMap } from "@/constant"
+import type { CommitType } from "@/constant"
 
 /**
  * 获取提交信息
@@ -7,5 +7,5 @@ import { CommitType, CommitTypeMap } from "@/constant"
  * @returns 提交信息
  */
 export function getCommitMessage(type: CommitType, message: string) {
-    return `${CommitTypeMap[type]}${message}`
+    return `${type}: ${message}`
 }

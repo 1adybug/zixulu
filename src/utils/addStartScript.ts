@@ -209,5 +209,5 @@ export async function addStartScript({ type, pemPath, port, core, hostname }: Ad
     await writePackageJson({ data: packageJson })
     consola.success("已添加启动命令 start")
     await installDependceny()
-    return getCommitMessage(CommitType.feature, "添加启动命令")
+    return getCommitMessage(CommitType.feat, "添加启动命令")
 }

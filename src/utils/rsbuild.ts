@@ -7,7 +7,7 @@ import { addDependency } from "./addDependency"
 import { checkTailwind } from "./checkTailwind"
 import { readPackageJson } from "./readPackageJson"
 import { readTsConfig } from "./readTsConfig"
-import { writeRsbuildConfig, WriteRsbuildConfigParams } from "./writeRsbuildConfig"
+import { type WriteRsbuildConfigParams, writeRsbuildConfig } from "./writeRsbuildConfig"
 import { writeTsConfig } from "./writeTsConfig"
 
 export async function rsbuild() {

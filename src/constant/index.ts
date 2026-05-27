@@ -1,4 +1,4 @@
-import { Agent } from "node:http"
+import type { Agent } from "node:http"
 
 import { checkPort } from "get-port-please"
 import { HttpsProxyAgent } from "https-proxy-agent"
@@ -42,23 +42,13 @@ export enum ProjectType {
 }
 
 export enum CommitType {
-    feature = "feature",
+    feat = "feat",
     fix = "fix",
     docs = "docs",
     wip = "wip",
     perfs = "perfs",
     rollback = "rollback",
     other = "other",
-}
-
-export const CommitTypeMap = {
-    [CommitType.feature]: "✨feature: ",
-    [CommitType.fix]: "🐞 fix: ",
-    [CommitType.docs]: "📄 docs: ",
-    [CommitType.wip]: "🖥️ wip: ",
-    [CommitType.perfs]: "🚅 perfs: ",
-    [CommitType.rollback]: "⏪ rollback: ",
-    [CommitType.other]: "🔵 other: ",
 }
 
 export const SpawnOptions = {

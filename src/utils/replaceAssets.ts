@@ -5,7 +5,7 @@ import { Readable } from "node:stream"
 
 import consola from "consola"
 import md5 from "md5"
-import fetch, { Headers, Response } from "node-fetch"
+import fetch, { type Response, Headers } from "node-fetch"
 
 import { agent } from "@/constant"
 

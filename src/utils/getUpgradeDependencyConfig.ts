@@ -1,4 +1,4 @@
-import inquirer, { DistinctQuestion } from "inquirer"
+import inquirer, { type DistinctQuestion } from "inquirer"
 
 export type UpgradeType = "dependencies" | "devDependencies"
 

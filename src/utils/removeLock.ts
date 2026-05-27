@@ -12,5 +12,5 @@ export async function removeLock() {
     await rm("bun.lockb", { force: true, recursive: true })
     await rm("bun.lock", { force: true, recursive: true })
     await addRuleToGitIgnore("package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lockb", "bun.lock")
-    return getCommitMessage(CommitType.feature, "删除包管理 lock 文件")
+    return getCommitMessage(CommitType.feat, "删除包管理 lock 文件")
 }

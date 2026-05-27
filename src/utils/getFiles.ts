@@ -1,6 +1,6 @@
-import { Stats } from "node:fs"
+import type { Stats } from "node:fs"
 import { readdir, stat } from "node:fs/promises"
-import { join, parse, ParsedPath } from "node:path"
+import { type ParsedPath, join, parse } from "node:path"
 
 export interface GetFilesOptions {
     /**

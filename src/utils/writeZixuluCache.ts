@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises"
 import { homedir } from "node:os"
 import { join } from "node:path"
 
-import { ZixuluCache } from "./readZixuluCache"
+import type { ZixuluCache } from "./readZixuluCache"
 
 export async function writeZixuluCache(cache: ZixuluCache) {
     const userDir = homedir()

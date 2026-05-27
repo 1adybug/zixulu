@@ -1,13 +1,13 @@
 import { writeFile } from "node:fs/promises"
 
 import {
+    type OpenWithOptions,
     buildOpenWithCommand,
     getOpenWithName,
     getOpenWithRegistryTargets,
     listOpenWithRegistryItems,
     normalizeOpenWithCommand,
     normalizeOpenWithName,
-    OpenWithOptions,
 } from "./addOpenWith"
 
 export async function removeOpenWith(name: string, { file, folder, background }: OpenWithOptions) {

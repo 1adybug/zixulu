@@ -1,4 +1,4 @@
-import { applyEdits, JSONPath, ModificationOptions, modify } from "jsonc-parser"
+import { type JSONPath, type ModificationOptions, applyEdits, modify } from "jsonc-parser"
 
 export function modifyJsonc(text: string, path: JSONPath, value: any, options?: ModificationOptions) {
     options = { ...options }

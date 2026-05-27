@@ -352,7 +352,7 @@ export async function syncEditorSetting() {
 
         if (await hasChangeNoCommit(onlinePath)) {
             await addGitCommit({
-                message: getCommitMessage(CommitType.feature, "sync editor setting"),
+                message: getCommitMessage(CommitType.feat, "sync editor setting"),
                 cwd: onlinePath,
             })
             await execAsync(`git push`, {

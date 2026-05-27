@@ -4,7 +4,7 @@ import consola from "consola"
 import simpleGit from "simple-git"
 import { spawnAsync } from "soda-nodejs"
 
-import { AddDependenciesConfig, addDependency } from "./addDependency"
+import { type AddDependenciesConfig, addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { shouldContinue } from "./shouldContinue"

@@ -31,5 +31,5 @@ export async function upgradeRsbuild() {
     await installDependceny()
     const upgradeLog = `upgrade dependencies: ${upgradeLogs.join(", ")}`
     consola.success(upgradeLog)
-    return getCommitMessage(CommitType.feature, upgradeLog)
+    return getCommitMessage(CommitType.feat, upgradeLog)
 }

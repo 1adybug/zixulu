@@ -11,7 +11,7 @@ import { getCommitMessage } from "./getCommitMessage"
  */
 export async function addRuleToPrettierIgnore(...rules: string[]) {
     const dir = await readdir(".")
-    const message = getCommitMessage(CommitType.feature, `添加 .prettierignore 规则 ${rules.join(", ")}`)
+    const message = getCommitMessage(CommitType.feat, `添加 .prettierignore 规则 ${rules.join(", ")}`)
 
     if (!dir.includes(".prettierignore")) {
         await writeFile(".prettierignore", rules.join("\n"), "utf-8")

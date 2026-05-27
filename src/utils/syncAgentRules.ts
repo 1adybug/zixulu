@@ -182,7 +182,7 @@ export async function asyncAgentRules() {
 
         await syncAgentsMdRules(rules.filter(rule => selectedFiles.includes(rule.filename)))
 
-        return getCommitMessage(CommitType.feature, `同步 Agent 规则`)
+        return getCommitMessage(CommitType.feat, `同步 Agent 规则`)
     } finally {
         await rm(source, { recursive: true, force: true })
     }

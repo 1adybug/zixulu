@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises"
 import { homedir } from "node:os"
 import { join } from "node:path"
 
-import { JsonMap, stringify } from "@iarna/toml"
+import { type JsonMap, stringify } from "@iarna/toml"
 
 export async function writeBunConfig(config: JsonMap) {
     const path = join(homedir(), ".bunfig.toml")

@@ -132,5 +132,5 @@ main()
     else packageJson.scripts.postpublish = `npm run ${name}`
 
     await writePackageJson({ data: packageJson })
-    return getCommitMessage(CommitType.feature, "添加同步包脚本")
+    return getCommitMessage(CommitType.feat, "添加同步包脚本")
 }

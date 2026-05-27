@@ -53,7 +53,7 @@ import { removeFileOrFolderFromGit } from "@/utils/removeFileOrFolderFromGit"
 import { removeLock } from "@/utils/removeLock"
 import { removeTag } from "@/utils/removeTag"
 import { replaceAssets } from "@/utils/replaceAssets"
-import { CommitAuthor, replaceCommitAuthor } from "@/utils/replaceCommitAuthor"
+import { type CommitAuthor, replaceCommitAuthor } from "@/utils/replaceCommitAuthor"
 import { replaceCommitMessage } from "@/utils/replaceCommitMessage"
 import { replaceTag } from "@/utils/replaceTag"
 import { rollup } from "@/utils/rollup"
@@ -110,49 +110,49 @@ console.log(chalk.redBright.bold(`zixulu ${pkg.version}`))
 program
     .command("eslint")
     .description("添加 ESLint 相关配置")
-    .action(actionWithBackup(addEslint, getCommitMessage(CommitType.feature, "添加 ESLint 相关配置")))
+    .action(actionWithBackup(addEslint, getCommitMessage(CommitType.feat, "添加 ESLint 相关配置")))
 
 program
     .command("prettier")
     .description("添加 prettier 配置")
-    .action(actionWithBackup(addPrettier, getCommitMessage(CommitType.feature, "添加 prettier 配置文件")))
+    .action(actionWithBackup(addPrettier, getCommitMessage(CommitType.feat, "添加 prettier 配置文件")))
 
 program
     .command("husky")
     .description("添加 husky 配置")
-    .action(actionWithBackup(addHusky, getCommitMessage(CommitType.feature, "添加 husky 配置")))
+    .action(actionWithBackup(addHusky, getCommitMessage(CommitType.feat, "添加 husky 配置")))
 
 program
     .command("vite")
     .description("初始化 vite 配置")
-    .action(actionWithBackup(vite, getCommitMessage(CommitType.feature, "初始化 vite 配置")))
+    .action(actionWithBackup(vite, getCommitMessage(CommitType.feat, "初始化 vite 配置")))
 
 program
     .command("rsbuild")
     .description("初始化 rsbuild 配置")
-    .action(actionWithBackup(rsbuild, getCommitMessage(CommitType.feature, "初始化 rsbuild 配置")))
+    .action(actionWithBackup(rsbuild, getCommitMessage(CommitType.feat, "初始化 rsbuild 配置")))
 
 program
     .command("next")
     .description("初始化 next 配置")
-    .action(actionWithBackup(next, getCommitMessage(CommitType.feature, "初始化 next 配置")))
+    .action(actionWithBackup(next, getCommitMessage(CommitType.feat, "初始化 next 配置")))
 
 program
     .command("tailwind")
     .description("添加 tailwind 配置")
-    .action(actionWithBackup(addTailwind, getCommitMessage(CommitType.feature, "添加 tailwind 配置")))
+    .action(actionWithBackup(addTailwind, getCommitMessage(CommitType.feat, "添加 tailwind 配置")))
 
 program
     .command("remove-comment")
     .description("删除文件注释")
     .argument("path", "文件路径")
-    .action(actionWithBackup(removeComment, getCommitMessage(CommitType.feature, "删除文件注释")))
+    .action(actionWithBackup(removeComment, getCommitMessage(CommitType.feat, "删除文件注释")))
 
 program
     .command("father")
     .alias("fs")
     .description("初始化 father 项目配置")
-    .action(actionWithBackup(setFatherConfig, getCommitMessage(CommitType.feature, "初始化 father 项目配置")))
+    .action(actionWithBackup(setFatherConfig, getCommitMessage(CommitType.feat, "初始化 father 项目配置")))
 
 program
     .command("upgrade-dependency")
@@ -182,19 +182,19 @@ program
     .command("sort-package-json")
     .alias("spj")
     .description("对 package.json 中的依赖进行排序")
-    .action(actionWithBackup(sortPackageJson, getCommitMessage(CommitType.feature, "对 package.json 中的依赖进行排序")))
+    .action(actionWithBackup(sortPackageJson, getCommitMessage(CommitType.feat, "对 package.json 中的依赖进行排序")))
 
 program
     .command("arrow-to-function")
     .alias("a2f")
     .description("将箭头函数组件转换为函数组件")
-    .action(actionWithBackup(arrowToFunction, getCommitMessage(CommitType.feature, "将箭头函数组件转换为函数组件")))
+    .action(actionWithBackup(arrowToFunction, getCommitMessage(CommitType.feat, "将箭头函数组件转换为函数组件")))
 
 program
     .command("interface-to-type")
     .alias("i2t")
     .description("将 interface 转换为 type")
-    .action(actionWithBackup(interfaceToType, getCommitMessage(CommitType.feature, "将 interface 转换为 type")))
+    .action(actionWithBackup(interfaceToType, getCommitMessage(CommitType.feat, "将 interface 转换为 type")))
 
 program.command("gitignore").description("添加 .gitignore 配置").action(actionWithBackup(addGitignore))
 
@@ -215,19 +215,19 @@ program.command("npm-download").alias("nd").description("下载 npm 包").argume
 program
     .command("prisma")
     .description("添加 prisma 配置")
-    .action(actionWithBackup(() => addPrisma(), getCommitMessage(CommitType.feature, "添加 prisma 配置")))
+    .action(actionWithBackup(() => addPrisma(), getCommitMessage(CommitType.feat, "添加 prisma 配置")))
 
 program.command("prisma-generate").alias("pg").description("生成 prisma client").action(generatePrisma)
 
 program
     .command("antd")
     .description("添加 antd 配置")
-    .action(actionWithBackup(addAntd, getCommitMessage(CommitType.feature, "添加 antd 配置")))
+    .action(actionWithBackup(addAntd, getCommitMessage(CommitType.feat, "添加 antd 配置")))
 
 program
     .command("init")
     .description("初始化项目")
-    .action(actionWithBackup(initProject, getCommitMessage(CommitType.feature, "初始化项目")))
+    .action(actionWithBackup(initProject, getCommitMessage(CommitType.feat, "初始化项目")))
 
 program.command("tsc").description("类型检查").action(checkType)
 

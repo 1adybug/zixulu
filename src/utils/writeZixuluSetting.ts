@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises"
 import { homedir } from "node:os"
 import { join } from "node:path"
 
-import { ZixuluSetting } from "./readZixuluSetting"
+import type { ZixuluSetting } from "./readZixuluSetting"
 
 export async function writeZixuluSetting(setting: ZixuluSetting) {
     const userDir = homedir()

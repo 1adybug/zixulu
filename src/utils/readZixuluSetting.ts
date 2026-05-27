@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises"
 import { homedir } from "node:os"
 import { join } from "node:path"
 
-import { EditorConfigType, SyncEditorSettingSource } from "./syncEditorSetting"
+import type { EditorConfigType, SyncEditorSettingSource } from "./syncEditorSetting"
 
 export interface SyncEditorFileConfig {
     backup?: boolean

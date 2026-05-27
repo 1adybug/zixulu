@@ -3,7 +3,7 @@ import { readdir, writeFile } from "node:fs/promises"
 import consola from "consola"
 import { spawnAsync } from "soda-nodejs"
 
-import { PackageManager } from "@/constant"
+import type { PackageManager } from "@/constant"
 
 import { addDependency } from "./addDependency"
 import { installDependceny } from "./installDependceny"

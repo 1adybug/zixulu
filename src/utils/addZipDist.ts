@@ -53,5 +53,5 @@ export async function addZipDist({ install }: AddZipDistConfig = {}) {
     packageJson.scripts.build = `${packageJson.scripts.build} && node scripts/zipDist.mjs`
     await writePackageJson({ data: packageJson })
     if (install) await installDependceny()
-    return getCommitMessage(CommitType.feature, "添加压缩脚本")
+    return getCommitMessage(CommitType.feat, "添加压缩脚本")
 }

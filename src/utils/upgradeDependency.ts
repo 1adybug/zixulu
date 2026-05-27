@@ -5,7 +5,7 @@ import { CommitType } from "@/constant/index"
 import { getCommitMessage } from "./getCommitMessage"
 import { getPackageUpgradeVersion } from "./getPackageUpgradeVersion"
 import { getPackageVersionFromRange } from "./getPackageVersionFromRange"
-import { getUpgradeDependencyConfig, UpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
+import { type UpgradeDependencyConfig, getUpgradeDependencyConfig } from "./getUpgradeDependencyConfig"
 import { installDependceny } from "./installDependceny"
 import { readPackageJson } from "./readPackageJson"
 import { writePackageJson } from "./writePackageJson"
@@ -85,5 +85,5 @@ export async function upgradeDependency(config?: UpgradeDependencyConfig): Promi
     await writePackageJson({ data: packageJson, dir })
     await installDependceny()
 
-    return getCommitMessage(CommitType.feature, `upgrade dependencies: ${upgradeLogs.join(", ")}`)
+    return getCommitMessage(CommitType.feat, `upgrade dependencies: ${upgradeLogs.join(", ")}`)
 }

@@ -30,5 +30,5 @@ export async function upgradeTailwind() {
     await installDependceny()
     const upgradeLog = `upgrade dependencies: tailwindcss ${version} => ${newVersion}`
     consola.success(upgradeLog)
-    return getCommitMessage(CommitType.feature, upgradeLog)
+    return getCommitMessage(CommitType.feat, upgradeLog)
 }
