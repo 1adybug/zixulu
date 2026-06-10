@@ -19,6 +19,8 @@ export interface AddApiParams {
     hook?: string
     idType?: AddApiIdType
     name?: string
+    prefix?: string
+    suffix?: string
 }
 
 async function writeFile(...args: Parameters<typeof _writeFile>) {
@@ -41,8 +43,9 @@ async function writeFile(...args: Parameters<typeof _writeFile>) {
     return await _writeFile(...args)
 }
 
-export async function addApi({ type, api, hook, idType = AddApiIdType.字符串, name }: AddApiParams) {
+export async function addApi({ type, api, hook, idType = AddApiIdType.字符串, name, prefix = "", suffix = "" }: AddApiParams) {
     type = capitalize(type)
+    const itemType = `${prefix ? capitalize(prefix) : ""}${type}${suffix ? capitalize(suffix) : ""}`
     name ??= type
     api ??= "apis"
     hook ??= "hooks"
@@ -72,13 +75,13 @@ export interface Query${type}Params {
     pageNum?: number
 }
 
-export interface ${type} {
+export interface ${itemType} {
     id: ${idType}
     name: string
 }
 
 export async function query${type}(params: Query${type}Params) {
-    const response = await request<Page<${type}>>("/${type2}/query", {
+    const response = await request<Page<${itemType}>>("/${type2}/query", {
         method: "POST",
         body: params,
     })
@@ -86,7 +89,7 @@ export async function query${type}(params: Query${type}Params) {
 }
 
 export async function getAll${type}() {
-    const response = await request<${type}[]>("/${type2}/getAll", {
+    const response = await request<${itemType}[]>("/${type2}/getAll", {
         method: "POST",
     })
     return response
@@ -97,12 +100,12 @@ export async function getAll${type}() {
 
     const add = `import { request } from "@/utils/request"
 
-import type { ${type} } from "./query${type}"
+import type { ${itemType} } from "./query${type}"
 
-export interface Add${type}Params extends Pick<${type}, "name"> {}
+export interface Add${type}Params extends Pick<${itemType}, "name"> {}
 
 export async function add${type}(params: Add${type}Params) {
-    const response = await request<${type}>("/${type2}/add", {
+    const response = await request<${itemType}>("/${type2}/add", {
         method: "POST",
         body: params,
     })
@@ -114,12 +117,12 @@ export async function add${type}(params: Add${type}Params) {
 
     const update = `import { request } from "@/utils/request"
 
-import type { ${type} } from "./query${type}"
+import type { ${itemType} } from "./query${type}"
 
-export interface Update${type}Params extends Pick<${type}, "id" | "name"> {}
+export interface Update${type}Params extends Pick<${itemType}, "id" | "name"> {}
 
 export async function update${type}(params: Update${type}Params) {
-    const response = await request<${type}>("/${type2}/update", {
+    const response = await request<${itemType}>("/${type2}/update", {
         method: "POST",
         body: params,
     })
@@ -131,10 +134,10 @@ export async function update${type}(params: Update${type}Params) {
 
     const _delete = `import { request } from "@/utils/request"
 
-import type { ${type} } from "./query${type}"
+import type { ${itemType} } from "./query${type}"
 
 export async function delete${type}(id: ${idType}) {
-    const response = await request<${type}>(\`/${type2}/delete/\${id}\`, {
+    const response = await request<${itemType}>(\`/${type2}/delete/\${id}\`, {
         method: "DELETE",
     })
     return response
@@ -145,10 +148,10 @@ export async function delete${type}(id: ${idType}) {
 
     const get = `import { request } from "@/utils/request"
 
-import type { ${type} } from "./query${type}"
+import type { ${itemType} } from "./query${type}"
 
 export async function get${type}(id: ${idType}) {
-    const response = await request<${type}>(\`/${type2}/get/\${id}\`, {
+    const response = await request<${itemType}>(\`/${type2}/get/\${id}\`, {
         method: "POST",
     })
     return response

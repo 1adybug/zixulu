@@ -410,7 +410,9 @@ program
     .option("-h, --hook <hook>", "hook 文件夹路径")
     .addOption(new Option("--id-type <idType>", "id 类型，可选 string 或 number").choices(Object.values(AddApiIdType)).default(AddApiIdType.字符串))
     .option("-n, --name <name>", "名称，默认与 type 一致")
-    .action(async (type, { api, hook, idType, name }) => addApi({ type, api, hook, idType, name }))
+    .option("-p, --prefix <prefix>", "item 类型名前缀")
+    .option("-s, --suffix <suffix>", "item 类型名后缀")
+    .action(async (type, { api, hook, idType, name, prefix, suffix }) => addApi({ type, api, hook, idType, name, prefix, suffix }))
 
 program.command("rslib").description("rslib 配置").action(rslib)
 
