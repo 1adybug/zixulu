@@ -5,11 +5,11 @@
 - 永远使用中文回复
 - 禁止修改 `node_modules` 文件夹中的任何文件
 - 当我让你修复一个问题，而你尝试一次或多次修复失败后，我会在每次失败修复后的问题现象再次反馈给你，在进行下一次修复之前，你必须思考之前所有的修复是否还有必要，是否需要先撤回之前的修复，然后再进行修复
+- 在进行可能导致破坏性变更的修改前，例如删除功能、移除字段、改变 API 行为、修改数据结构、引入不兼容变更等，若我没有明确说明是否需要保持向后兼容，必须先向我确认兼容性要求，不能直接执行。
 - 禁止未经允许启动项目的开发服务
 - 对于 `Electron` 开发的应用，不要尝试在浏览器中加载和验证
 - 尽量使用 `interface` 而不是 `type`，函数类型除外
 - 所有的类型定义都使用 `export` 导出
-- 如果某一个属性的类型是 `[key]: someType | null`，请将它改写为 `[key]?: someType`，尽量不要使用 `null` 类型
 - 禁止使用字面量类型，必须使用独立的类型定义，比如:
 
     ```typescript
@@ -49,7 +49,7 @@
 
     ```typescript
     // 而不是使用 默认导出.方法 的形式
-    import fs from "fs/promises"
+    import fs from "node:fs/promises"
 
     fs.readFile
     ```
@@ -60,8 +60,8 @@
 - `Web API` 中的 `ReadableStream` 可以使用以下方法转换为 `Node.js` 中的 `Readable`:
 
     ```typescript
-    import { Readable } from "stream"
-    import { ReadableStream } from "stream/web"
+    import { Readable } from "node:stream"
+    import { ReadableStream } from "node:stream/web"
 
     // 这里的 webStream 是 Web API 中的 ReadableStream
     const webStream = someWebApi()
@@ -87,23 +87,20 @@
     export type Gender = (typeof Gender)[keyof typeof Gender]
     ```
 
-- 在创建 `git` 提交记录，必须使用 `[emoji] [type]: 具体内容`的格式进行提交，具体内容使用中文，以下是预设的 `emoji` 和 `type`：
+- 在创建 `git` 提交记录，必须使用 `[type]: 具体内容` 的格式进行提交
 
     ```text
-    ✨ feature: Select when creating new things
-    🐞 fix: Select when fixing a bug
-    📝 docs: Select when editing documentation
-    💻 wip: Select when work is not finished
-    🚄 perfs: Select when working on performances
-    ⏪ rollback:Select when undoing something
-    🔵 other: Select when fixing a bug
+    feat: Select when creating new things
+    fix: Select when fixing a bug
+    docs: Select when editing documentation
+    ...
     ```
 
-    你必须使用预设的 `emoji` 和 `type`。如果你的提交记录包含了多种内容，你可以使用多行比如：
+    在 monorepo 中，必须使用 `[type](package): 具体内容` 的格式进行提交：
 
     ```text
-    ✨ feature: some feature u did
-    🐞 fix: some bug u fixed
+    feat(wdp-react): add some feature
+    fix(deepsea-tools): fix some bug
     ```
 
 - 除了 `React` 组件和页面以外所有的导出必须使用 `export` 关键字导出，不要使用 `export default` 关键字导出
