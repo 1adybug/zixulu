@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import chalk from "chalk"
-import { Command } from "commander"
+import { Command, Option } from "commander"
 import consola from "consola"
 import { emailReg } from "deepsea-tools"
 import { setDefaultOptions } from "soda-nodejs"
@@ -10,7 +10,7 @@ import { CommitType } from "@/constant/index"
 
 import { actionWithBackup } from "@/utils/actionWithBackup"
 import { addAntd } from "@/utils/addAntd"
-import { addApi } from "@/utils/addApi"
+import { addApi, AddApiIdType } from "@/utils/addApi"
 import { addBuildDocker } from "@/utils/addBuildDocker"
 import { addEslint } from "@/utils/addEslint"
 import { addGitignore } from "@/utils/addGitignore"
@@ -408,7 +408,9 @@ program
     .argument("type", "api 类型")
     .option("-a, --api <api>", "api 文件夹路径")
     .option("-h, --hook <hook>", "hook 文件夹路径")
-    .action(async (type, { api, hook }) => addApi({ type, api, hook }))
+    .addOption(new Option("--id-type <idType>", "id 类型，可选 string 或 number").choices(Object.values(AddApiIdType)).default(AddApiIdType.字符串))
+    .option("-n, --name <name>", "名称，默认与 type 一致")
+    .action(async (type, { api, hook, idType, name }) => addApi({ type, api, hook, idType, name }))
 
 program.command("rslib").description("rslib 配置").action(rslib)
 
